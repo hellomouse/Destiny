@@ -13,7 +13,6 @@ collect stats on songs nad shit :D
 - per user too
 
 quick fixes:
-add duration to queue / now playing
 add dB option for db volumes? (dispatcher.setVolumeDecibels)
 require percentage for percent, otherwise like 0.5?
 compute displayVolume like in aegiscommand-discord

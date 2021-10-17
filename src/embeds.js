@@ -33,11 +33,14 @@ module.exports = {
      * An embed for a song ("Queued" / "Now playing")
      * @param {object} song Song obj
      * @param {string} title Title
+     * @param {boolean} showDuration show duration
      * @return {*}
      */
-    songEmbed: (song, title) => {
+    songEmbed: (song, title, showDuration = true) => {
         return defaultEmbed()
-            .setTitle(title)
+            .setTitle(showDuration ?
+                `${title} (${song.formatedDuration})` :
+                title)
             .setDescription(`[${song.title}](${song.url}) [${song.requestedBy.toString()}]`)
             .setURL(song.url);
     }

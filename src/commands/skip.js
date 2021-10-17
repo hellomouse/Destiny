@@ -15,7 +15,7 @@ module.exports.run = async (client, message, args) => {
     utils.log(`Skipped music : ${serverQueue.songs[0].title}`);
     serverQueue.skip();
 
-    return message.channel.send(embeds.songEmbed(serverQueue.currentSong(), 'Skipping'));
+    return message.channel.send(embeds.songEmbed(serverQueue.currentSong(), 'Skipping', false));
 };
 
 module.exports.names = ['skip', 's'];
