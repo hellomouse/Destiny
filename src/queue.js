@@ -73,10 +73,9 @@ class ServerQueue {
         if (this.loop === 'queue')
             this.index %= this.size();
 
-        this._isPlaying = true;
-
         const song = this.songs[this.index];
-        this.textchannel = song.textchannel; // Update text channel
+        this.textchannel = song.requestedChannel; // Update text channel
+        this._isPlaying = true;
 
         if (this.loop !== 'song')
             song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
@@ -90,7 +89,7 @@ class ServerQueue {
         }));
 
         dispatcher.on('finish', () => {
-            if (this.songs[this.index])
+            if (this.songs[this.index + 1])
                 utils.log(`Finished playing the music : ${this.songs[this.index].title}`);
             else
                 utils.log(`Finished playing all musics, no more musics in the queue`);
