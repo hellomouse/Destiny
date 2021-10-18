@@ -43,11 +43,6 @@ automated tests (check for all params, help text, etc...)
 locla file support / other sources 
 - oundcloud, bandcamp, http urls
 
-!!np / now playing
-- song
-- who request 
-- how far in
-
 !!help maybe
 
 database somewhere

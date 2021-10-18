@@ -80,6 +80,7 @@ module.exports = {
     },
 
     formatDuration: sec => {
+        sec = Math.round(sec);
         let min = Math.floor(sec / 60);
         let hours = Math.floor(min / 60);
         min %= 60;

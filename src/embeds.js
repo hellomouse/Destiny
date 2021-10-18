@@ -37,11 +37,15 @@ module.exports = {
      * @return {*}
      */
     songEmbed: (song, title, showDuration = true) => {
-        return defaultEmbed()
+        let embed = defaultEmbed()
             .setTitle(showDuration ?
-                `${title} (${song.formatedDuration})` :
+                `${title} (${song.formattedDuration})` :
                 title)
             .setDescription(`[${song.title}](${song.url}) [${song.requestedBy.toString()}]`)
             .setURL(song.url);
+
+        if (song.thumbnails.length)
+            embed.setThumbnail(song.thumbnails[0].url);
+        return embed;
     }
 };
