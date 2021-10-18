@@ -1,7 +1,8 @@
 const AsciiTable = require('ascii-table/ascii-table');
 const YouTube = require('youtube-sr').default;
 
-let config = require('../config');
+const embeds = require('./embeds.js');
+const config = require('../config');
 
 class FlagHelpError extends Error {
     constructor(message) {
@@ -15,7 +16,7 @@ class Inactivity {
         this.config = Object.assign({
             waitRejoinSeconds: 60,
             botIdleSeconds: 600
-        }, config.Inactivity) // Writes default values with ones from written configuration file
+        }, config.inactivity); // Writes default values with ones from written configuration file
 
         // Convert to milliseconds for timers
         this.config.waitRejoinSeconds *= 1000;
@@ -27,8 +28,11 @@ class Inactivity {
 
     onAlone(serverQueue) {
         clearTimeout(this.aloneTimer);
-        if (config.waitRejoinSeconds < 0) return;
-        setTimeout(() => { serverQueue.voiceChannel.leave(); }, this.config.waitRejoinSeconds);
+        if (this.config.waitRejoinSeconds < 0) return;
+        setTimeout(() => {
+            serverQueue.voiceChannel.leave();
+            serverQueue.textChannel.send(embeds.defaultEmbed().setDescription(':wave: Leaving as no one is in VC'));
+        }, this.config.waitRejoinSeconds);
     }
 
     onPersonJoin() {
@@ -37,8 +41,11 @@ class Inactivity {
 
     onNotPlaying(serverQueue) {
         clearTimeout(this.inactivityTimer);
-        if (config.botIdleSeconds < 0) return;
-        setTimeout(() => { serverQueue.voiceChannel.leave() }, this.config.botIdleSeconds);
+        if (this.config.botIdleSeconds < 0) return;
+        setTimeout(() => {
+            serverQueue.voiceChannel.leave();
+            serverQueue.textChannel.send(embeds.defaultEmbed().setDescription(':wave: Leaving due to inactivity'));
+        }, this.config.botIdleSeconds);
     }
 
     onPlaying() {

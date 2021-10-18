@@ -37,6 +37,11 @@ module.exports = async (client, message) => {
                 if (!serverQueue)
                     return message.channel.send(embeds.songQueueEmpty());
             }
+            if (cmd.requirements & commands.REQUIRE_IS_PLAYING) {
+                const serverQueue = queue.queueManager.get(message.guild.id);
+                if (!serverQueue.isPlaying())
+                    return message.channel.send(embeds.queueNotPlaying());
+            }
             if (cmd.requirements & commands.REQUIRE_USER_IN_VC && !message.member.voice.channel)
                 return message.channel.send(embeds.notInVoiceChannelEmbed());
         }

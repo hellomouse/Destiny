@@ -1,5 +1,6 @@
 const utils = require('../utils');
 const embeds = require('../embeds.js');
+const queue = require('../queue.js');
 const { REQUIRE_USER_IN_VC } = require('../commands.js');
 
 /**
@@ -11,7 +12,12 @@ const { REQUIRE_USER_IN_VC } = require('../commands.js');
  */
 module.exports.run = async (client, message, args) => {
     const voiceChannel = message.member.voice.channel;
+    const serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
+    const connection = await voiceChannel.join();
+
+    serverQueue.connection = connection;
     utils.log(`Joined the channel : ${voiceChannel.name}`);
+
     return message.channel.send(embeds.defaultEmbed()
         .setDescription(`Joining ${voiceChannel.toString()}`));
 };

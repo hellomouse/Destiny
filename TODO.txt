@@ -30,8 +30,6 @@ warn about node version when starting up >= 14
 
 warn if no perms to view voice channel
 
-leave after inactivity - if config
-
 colored terminal log
 
 load playlists
@@ -54,12 +52,11 @@ database somewhere
 - /remove 
 / remove range start end
 - shuffle 
-- song - display info about song or current song
 - 24/7 mode (never leave)
 
 - fastforward (amount)
 - rewind (amount)
-seek (amount) 
+- seek (amount) 
 - search
 
 save personal queues

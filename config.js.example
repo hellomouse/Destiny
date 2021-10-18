@@ -1,9 +1,9 @@
 module.exports = {
     token: "your token",
     prefix: "your prefix",
-    "inactivity": {
-        "waitRejoinSeconds": 60, // Number of seconds to wait for someone to rejoin the VC when it is empty before the bot leaves. Use -1 to disable this.
-        "botIdleSeconds": 600 // Inactivity in seconds before it leaves. Use -1 to disable this.
+    inactivity: {
+        waitRejoinSeconds: 60, // Number of seconds to wait for someone to rejoin the VC when it is empty before the bot leaves. Use -1 to disable this.
+        botIdleSeconds: 600 // Inactivity in seconds before it leaves. Use -1 to disable this.
     }
 
 };

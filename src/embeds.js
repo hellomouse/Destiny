@@ -15,6 +15,7 @@ module.exports = {
 
     notInVoiceChannelEmbed: () => errorEmbed().setTitle('You must be in a voice channel to do this'),
     songQueueEmpty: () => defaultEmbed().setDescription('The queue is empty'),
+    queueNotPlaying: () => defaultEmbed().setDescription('Nothing is playing right now'),
 
     helpEmbed: cmd => {
         let embed = defaultEmbed()

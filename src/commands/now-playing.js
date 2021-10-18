@@ -1,7 +1,7 @@
 const embeds = require('../embeds.js');
 const utils = require('../utils');
 const queue = require('../queue.js');
-const { REQUIRE_QUEUE_NON_EMPTY } = require('../commands.js');
+const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } = require('../commands.js');
 
 /**
  * @description Pause current song
@@ -19,7 +19,7 @@ module.exports.run = async (client, message, args) => {
         .songEmbed(song, `Now Playing`, false)
         .addField('Duration', `${time} / ${song.formattedDuration}`, true)
         .addField('Action', serverQueue.isPaused() ? 'Paused' : 'Playing', true)
-        .addField('Channel', song.songAuthor.name, true);
+        .addField('YT Channel', song.songAuthor.name, true);
 
     return message.channel.send(embed);
 };
@@ -29,4 +29,4 @@ module.exports.help = {
     desc: 'Get the currently playing song',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY;
+module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_IS_PLAYING;

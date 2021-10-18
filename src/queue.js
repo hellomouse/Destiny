@@ -19,7 +19,7 @@ class ServerQueue {
      */
     constructor(message, voiceChannel) {
         this.serverID = message.guild.id;
-        this.textchannel = message.channel;
+        this.textChannel = message.channel;
         this.voiceChannel = voiceChannel;
 
         this.connection = null;
@@ -34,7 +34,7 @@ class ServerQueue {
         this.index = 0;
         this._isPlaying = false;
 
-        utils.inactivity.onNotPlaying();
+        utils.inactivity.onNotPlaying(this);
     }
 
     isEmpty() {
@@ -72,9 +72,9 @@ class ServerQueue {
     play() {
         if (this.isEmpty() || this.index < 0 || this.index >= this.size()) {
             this._isPlaying = false;
-            this.textchannel.send(embeds.defaultEmbed()
+            this.textChannel.send(embeds.defaultEmbed()
                 .setDescription('Finished playing!'));
-            utils.inactivity.onNotPlaying();
+            utils.inactivity.onNotPlaying(this);
             return;
         }
         if (this.loop === 'queue')
@@ -84,7 +84,7 @@ class ServerQueue {
         utils.inactivity.onPlaying();
 
         const song = this.songs[this.index];
-        this.textchannel = song.requestedChannel; // Update text channel
+        this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
         if (this.loop !== 'song')
