@@ -117,6 +117,20 @@ module.exports = {
         return link;
     },
 
+    formatDuration: sec => {
+        sec = Math.round(sec);
+        let min = Math.floor(sec / 60);
+        let hours = Math.floor(min / 60);
+        min %= 60;
+        sec %= 60;
+
+        let result = hours > 0 ? `${hours}h ` : '';
+        result += min < 10 ? '0' + min : min;
+        result += ':';
+        result += sec < 10 ? '0' + sec : sec;
+        return result;
+    },
+
     FlagHelpError,
 
     inactivity: new Inactivity(),

@@ -13,7 +13,6 @@ collect stats on songs nad shit :D
 - per user too
 
 quick fixes:
-add duration to queue / now playing
 add dB option for db volumes? (dispatcher.setVolumeDecibels)
 require percentage for percent, otherwise like 0.5?
 compute displayVolume like in aegiscommand-discord
@@ -43,11 +42,6 @@ automated tests (check for all params, help text, etc...)
 
 locla file support / other sources 
 - oundcloud, bandcamp, http urls
-
-!!np / now playing
-- song
-- who request 
-- how far in
 
 !!help maybe
 

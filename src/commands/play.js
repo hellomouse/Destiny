@@ -25,8 +25,15 @@ module.exports.run = async (client, message, args) => {
     const songInfo = await ytdl.getBasicInfo(FUrl);
     const song = {
         title: songInfo.videoDetails.title,
+        formattedDuration: utils.formatDuration(songInfo.videoDetails.lengthSeconds),
         duration: songInfo.videoDetails.lengthSeconds,
         url: FUrl,
+
+        thumbnails: songInfo.videoDetails.thumbnails || [],
+        songAuthor: songInfo.videoDetails.author,
+        videoId: songInfo.videoDetails.videoId,
+        viewCount: songInfo.videoDetails.viewCount,
+
         requestedBy: message.author,
         requestedChannel: message.channel
     };

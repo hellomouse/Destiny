@@ -33,12 +33,19 @@ module.exports = {
      * An embed for a song ("Queued" / "Now playing")
      * @param {object} song Song obj
      * @param {string} title Title
+     * @param {boolean} showDuration show duration
      * @return {*}
      */
-    songEmbed: (song, title) => {
-        return defaultEmbed()
-            .setTitle(title)
+    songEmbed: (song, title, showDuration = true) => {
+        let embed = defaultEmbed()
+            .setTitle(showDuration ?
+                `${title} (${song.formattedDuration})` :
+                title)
             .setDescription(`[${song.title}](${song.url}) [${song.requestedBy.toString()}]`)
             .setURL(song.url);
+
+        if (song.thumbnails.length)
+            embed.setThumbnail(song.thumbnails[0].url);
+        return embed;
     }
 };

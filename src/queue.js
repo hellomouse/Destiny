@@ -26,7 +26,7 @@ class ServerQueue {
 
         this.songs = [];
         this.volume = 100;
-        this.paused = false;
+        this._paused = false;
         this.loop = 'none'; // in LOOP_MODES
         this.skipped = false;
 
@@ -39,6 +39,10 @@ class ServerQueue {
 
     isEmpty() {
         return !this.songs.length;
+    }
+
+    isPaused() {
+        return this._paused;
     }
 
     size() {
@@ -80,7 +84,8 @@ class ServerQueue {
         utils.inactivity.onPlaying();
 
         const song = this.songs[this.index];
-        this.textchannel = song.textchannel; // Update text channel
+        this.textchannel = song.requestedChannel; // Update text channel
+        this._isPlaying = true;
 
         if (this.loop !== 'song')
             song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
@@ -94,7 +99,7 @@ class ServerQueue {
         }));
 
         dispatcher.on('finish', () => {
-            if (this.songs[this.index])
+            if (this.songs[this.index + 1])
                 utils.log(`Finished playing the music : ${this.songs[this.index].title}`);
             else
                 utils.log(`Finished playing all musics, no more musics in the queue`);
@@ -134,16 +139,16 @@ class ServerQueue {
 
     /** Pause currently playing song */
     pause() {
-        if (this.paused) return;
-        this.paused = true;
+        if (this._paused) return;
+        this._paused = true;
         this.connection.dispatcher.pause();
         this.inactivity.stoppedPlaying();
     }
 
     /** Resume currently playing song */
     resume() {
-        if (!this.paused) return;
-        this.paused = false;
+        if (!this._paused) return;
+        this._paused = false;
 
         // Hacky fix for a bug that was never fixed
         // This resume-pause-resume must be followed if running
