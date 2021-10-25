@@ -1,4 +1,3 @@
-const embeds = require('../embeds.js');
 const utils = require('../utils');
 const queue = require('../queue.js');
 const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } = require('../commands.js');
@@ -15,11 +14,7 @@ module.exports.run = async (client, message, args) => {
     const song = serverQueue.currentSong();
     const time = utils.formatDuration(serverQueue.connection.dispatcher.streamTime / 1000);
 
-    const embed = embeds
-        .songEmbed(song, `Now Playing`, false)
-        .addField('Duration', `${time} / ${song.formattedDuration}`, true)
-        .addField('Action', serverQueue.isPaused() ? 'Paused' : 'Playing', true)
-        .addField('YT Channel', song.songAuthor.name, true);
+    const embed = song.getEmbed(time, serverQueue.isPaused());
 
     return message.channel.send(embed);
 };

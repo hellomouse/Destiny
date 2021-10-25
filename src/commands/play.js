@@ -2,7 +2,7 @@ const utils = require('../utils');
 const queue = require('../queue.js');
 const embeds = require('../embeds.js');
 const { REQUIRE_USER_IN_VC } = require('../commands.js');
-const getSong = require('../Song');
+const getSong = require('../song');
 
 /**
  * @description Play a song with the provided link
