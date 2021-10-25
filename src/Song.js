@@ -13,16 +13,17 @@ class Song {
         this.thumbnails = [];
         this.songAuthor = undefined;
     }
+
 }
 
 class YouTubeSong extends Song {
-    constructor(...args) {
-        super(args);
+    constructor(url, author, channel) {
+        super(url, author, channel);
         this.parse();
     }
 
-    parse() {
-        let songMetadata = ytdl.getInfo();
+    async parse() {
+        let songMetadata = await ytdl.getBasicInfo(this.url);
 
         this.id = songMetadata.videoDetails.videoId,
         this.thumbnails = [`https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`];
@@ -32,11 +33,19 @@ class YouTubeSong extends Song {
         this.songAuthor = songMetadata.videoDetails.author,
         this.viewCount = songMetadata.videoDetails.viewCount;
     }
+
+    get() {
+        return ytdl(this.url, {
+            filter: 'audioonly',
+            quality: 'highestaudio',
+            highWaterMark: 1 << 25
+        });
+    }
 }
 
 class FileSong extends Song {
-    constructor(...args) {
-        super(args);
+    constructor(url, author, channel) {
+        super(url, author, channel);
     }
 }
 
@@ -47,8 +56,8 @@ class FileSong extends Song {
  * @param {Discord.Message.channel} channel
  * @return {Song} song
  */
-function getSong(url, author, channel) {
-    if (url.startsWith('https://youtube.com') || url.startsWith('https://youtu.be')) return new YouTubeSong(url, author, channel);
+async function getSong(url, author, channel) {
+    if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be')) return new YouTubeSong(url, author, channel);
 
     if (url.endsWith('.mp3') || url.endsWith('.ogg')) return new FileSong(url, author, channel);
     return undefined;

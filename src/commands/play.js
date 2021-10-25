@@ -26,7 +26,8 @@ module.exports.run = async (client, message, args) => {
     } else
         url = utils.isURL(args[0]) ? args[0] : await utils.getUrl(args);
 
-    let song = getSong(url, message.author, message.channel);
+    let song = await getSong(url, message.author, message.channel);
+    if (!song) return message.channel.send(embeds.errorEmbed().setTitle('Could not find song'));
 
     let voiceChannel = message.member.voice.channel;
     let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);

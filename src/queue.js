@@ -93,7 +93,7 @@ class ServerQueue {
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
         // todo: add short link
-        let dispatcher = this.connection.play(song.url);
+        let dispatcher = this.connection.play(song.get());
 
         dispatcher.on('finish', () => {
             if (this.songs[this.index + 1])
