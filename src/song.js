@@ -74,13 +74,14 @@ class FileSong extends Song {
         let format = metadata.format;
         let tags = format.tags || {};
 
-        let searchTags = ['title', 'duration', 'artist', 'album'];
+        let searchTags = ['title', 'artist', 'album'];
         Object.entries(tags).forEach(([tag, value]) => {
             tag = tag.toLowerCase();
             if (searchTags.includes(tag)) this[tag] = value;
         });
 
-        this.formattedDuration = utils.formatDuration(format.duration);
+        this.duration = format.duration || this.duration;
+        this.formattedDuration = utils.formatDuration(this.duration);
 
         return this;
     }
