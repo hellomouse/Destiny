@@ -19,19 +19,19 @@ class Song {
 class YouTubeSong extends Song {
     constructor(url, author, channel) {
         super(url, author, channel);
-        this.parse();
     }
 
     async parse() {
         let songMetadata = await ytdl.getBasicInfo(this.url);
 
         this.id = songMetadata.videoDetails.videoId,
-        this.thumbnails = [`https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`];
+        this.thumbnails = [{ url: `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg` }];
         this.title = songMetadata.videoDetails.title,
         this.formattedDuration = utils.formatDuration(songMetadata.videoDetails.lengthSeconds),
         this.duration = songMetadata.videoDetails.lengthSeconds,
         this.songAuthor = songMetadata.videoDetails.author,
         this.viewCount = songMetadata.videoDetails.viewCount;
+        return this;
     }
 
     get() {
@@ -57,9 +57,11 @@ class FileSong extends Song {
  * @return {Song} song
  */
 async function getSong(url, author, channel) {
-    if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be')) return new YouTubeSong(url, author, channel);
+    if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be'))
+        return await new YouTubeSong(url, author, channel).parse();
 
-    if (url.endsWith('.mp3') || url.endsWith('.ogg')) return new FileSong(url, author, channel);
+    if (url.endsWith('.mp3') || url.endsWith('.ogg'))
+        return new FileSong(url, author, channel);
     return undefined;
 }
 
