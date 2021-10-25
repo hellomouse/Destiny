@@ -1,5 +1,5 @@
-const Discord = require('discord.js-selfbot');
-const client = new Discord.Client();
+const Discord = require('discord.js');
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS] });
 
 const fs = require('fs');
 const Enmap = require('enmap');
