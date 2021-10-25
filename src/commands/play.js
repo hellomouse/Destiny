@@ -1,9 +1,8 @@
-const ytdl = require('ytdl-core');
-
 const utils = require('../utils');
 const queue = require('../queue.js');
 const embeds = require('../embeds.js');
 const { REQUIRE_USER_IN_VC } = require('../commands.js');
+const getSong = require('../Song');
 
 /**
  * @description Play a song with the provided link
@@ -13,30 +12,24 @@ const { REQUIRE_USER_IN_VC } = require('../commands.js');
  * @return {Promise<Message>} sent message
  */
 module.exports.run = async (client, message, args) => {
-    if (!args[0])
+    if (!args[0] && message.attachments.size === 0)
         throw new utils.FlagHelpError();
 
     utils.log('Looking for music details...');
 
-    let FUrl = utils.isURL(args[0]) ? args[0] : await utils.getUrl(args);
+    let url;
+
+    if (!args[0] && message.attachments.size > 0) {
+        let attachment = message.attachments.find(x => ['mp3', 'ogg', 'webm'].some(extension => x.url.includes(extension)));
+        if (!attachment) return; // Cannot find a song url
+        url = attachment.url;
+    } else
+        url = utils.isURL(args[0]) ? args[0] : await utils.getUrl(args);
+
+    let song = getSong(url, message.author, message.channel);
+
     let voiceChannel = message.member.voice.channel;
     let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
-
-    const songInfo = await ytdl.getBasicInfo(FUrl);
-    const song = {
-        title: songInfo.videoDetails.title,
-        formattedDuration: utils.formatDuration(songInfo.videoDetails.lengthSeconds),
-        duration: songInfo.videoDetails.lengthSeconds,
-        url: FUrl,
-
-        thumbnails: songInfo.videoDetails.thumbnails || [],
-        songAuthor: songInfo.videoDetails.author,
-        videoId: songInfo.videoDetails.videoId,
-        viewCount: songInfo.videoDetails.viewCount,
-
-        requestedBy: message.author,
-        requestedChannel: message.channel
-    };
 
     utils.log('Got music details, preparing the music to be played...');
 

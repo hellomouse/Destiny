@@ -92,11 +92,8 @@ class ServerQueue {
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
-        const dispatcher = this.connection.play(ytdl(song.url, {
-            filter: 'audioonly',
-            quality: 'highestaudio',
-            highWaterMark: 1 << 25
-        }));
+        // todo: add short link
+        let dispatcher = this.connection.play(song.url);
 
         dispatcher.on('finish', () => {
             if (this.songs[this.index + 1])
