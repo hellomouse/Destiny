@@ -33,6 +33,8 @@ warn if no perms to view voice channel
 colored terminal log
 
 load playlists
+- from text file
+- add to local playlists (create new, append songs to existing)
 
 reload 
 
