@@ -11,7 +11,7 @@ class FlagHelpError extends Error {
     }
 }
 
-class Inactivity {
+class Inactivity { // TODO: each ServerQueue should have it's own instance, also not all timers are cleared. Only dereferenced
     constructor() {
         this.config = Object.assign({
             waitRejoinSeconds: 60,
