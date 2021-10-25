@@ -1,6 +1,7 @@
 const ytdl = require('ytdl-core');
 const utils = require('./utils');
 const embeds = require('./embeds.js');
+const ffmpeg = require('fluent-ffmpeg');
 
 class Song {
     constructor(url, author, channel) {
@@ -63,6 +64,35 @@ class FileSong extends Song {
         super(url, author, channel);
     }
 
+    async parse() {
+        let metadata = await new Promise((resolve, reject) => {
+            ffmpeg.ffprobe(this.url, (err, data) => {
+                resolve(data);
+            });
+        });
+
+        let format = metadata.format;
+        this.title = format.tags.title || this.title;
+        this.formattedDuration = utils.formatDuration(format.duration);
+        this.duration = format.duration || this.duration;
+        this.songAuthor = format.tags.artist || this.songAuthor;
+        this.album = format.tags.album || undefined;
+
+        return this;
+    }
+
+    getEmbed(time, isPaused) {
+        let embed = embeds
+            .songEmbed(this, `Now Playing`, false)
+            .addField('Duration', `${time} / ${this.formattedDuration}`, true)
+            .addField('Action', isPaused ? 'Paused' : 'Playing', true);
+
+        if (this.songAuthor) embed.addField('Artist', this.songAuthor, true);
+        if (this.album) embed.addField('Album', this.album, true);
+
+        return embed;
+    }
+
     get() {
         return this.url;
     }
@@ -80,7 +110,7 @@ async function getSong(url, author, channel) {
         return await new YouTubeSong(url, author, channel).parse();
 
     if (url.endsWith('.mp3') || url.endsWith('.ogg'))
-        return new FileSong(url, author, channel);
+        return await new FileSong(url, author, channel).parse();
     return undefined;
 }
 
