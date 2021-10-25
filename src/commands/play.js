@@ -20,7 +20,7 @@ module.exports.run = async (client, message, args) => {
     let url;
 
     if (!args[0] && message.attachments.size > 0) {
-        let attachment = message.attachments.find(x => ['mp3', 'ogg', 'webm'].some(extension => x.url.includes(extension)));
+        let attachment = message.attachments.find(x => ['mp3', 'ogg', 'flac', 'webm'].some(extension => x.url.includes(extension)));
         if (!attachment) return; // Cannot find a song url
         url = attachment.url;
     } else
