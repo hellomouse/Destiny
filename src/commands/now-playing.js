@@ -1,5 +1,6 @@
 const utils = require('../utils');
 const queue = require('../queue.js');
+const embeds = require('../embeds.js');
 const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } = require('../commands.js');
 
 /**
@@ -12,6 +13,8 @@ const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } = require('../commands.js'
 module.exports.run = async (client, message, args) => {
     const serverQueue = queue.queueManager.get(message.guild.id);
     const song = serverQueue.currentSong();
+
+    if (!song) return message.channel.send(embeds.queueNotPlaying());
     const time = utils.formatDuration(serverQueue.connection.dispatcher.streamTime / 1000);
 
     const embed = song.getEmbed(time, serverQueue.isPaused());
