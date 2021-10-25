@@ -12,7 +12,7 @@ class Song {
         this.title = 'No title';
         this.formattedDuration = 'NaN:NaN';
         this.duration = Infinity;
-        this.songAuthor = undefined;
+        this.artist = undefined;
     }
 
     getEmbed(time, isPaused) {
@@ -37,7 +37,7 @@ class YouTubeSong extends Song {
         this.title = songMetadata.videoDetails.title;
         this.formattedDuration = utils.formatDuration(songMetadata.videoDetails.lengthSeconds);
         this.duration = songMetadata.videoDetails.lengthSeconds;
-        this.songAuthor = songMetadata.videoDetails.author;
+        this.artist = songMetadata.videoDetails.author;
         this.viewCount = songMetadata.videoDetails.viewCount;
         return this;
     }
@@ -47,7 +47,7 @@ class YouTubeSong extends Song {
             .songEmbed(this, `Now Playing`, false)
             .addField('Duration', `${time} / ${this.formattedDuration}`, true)
             .addField('Action', isPaused ? 'Paused' : 'Playing', true)
-            .addField('YT Channel', this.songAuthor.name, true);
+            .addField('YT Channel', this.artist.name, true);
     }
 
     get() {
@@ -72,11 +72,15 @@ class FileSong extends Song {
         });
 
         let format = metadata.format;
-        this.title = format.tags.title || this.title;
+        let tags = format.tags || {};
+
+        let searchTags = ['title', 'duration', 'artist', 'album'];
+        Object.entries(tags).forEach(([tag, value]) => {
+            tag = tag.toLowerCase();
+            if (searchTags.includes(tag)) this[tag] = value;
+        });
+
         this.formattedDuration = utils.formatDuration(format.duration);
-        this.duration = format.duration || this.duration;
-        this.songAuthor = format.tags.artist || this.songAuthor;
-        this.album = format.tags.album || undefined;
 
         return this;
     }
@@ -87,7 +91,7 @@ class FileSong extends Song {
             .addField('Duration', `${time} / ${this.formattedDuration}`, true)
             .addField('Action', isPaused ? 'Paused' : 'Playing', true);
 
-        if (this.songAuthor) embed.addField('Artist', this.songAuthor, true);
+        if (this.artist) embed.addField('Artist', this.artist, true);
         if (this.album) embed.addField('Album', this.album, true);
 
         return embed;
@@ -109,7 +113,7 @@ async function getSong(url, author, channel) {
     if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be'))
         return await new YouTubeSong(url, author, channel).parse();
 
-    if (url.endsWith('.mp3') || url.endsWith('.ogg'))
+    if (url.endsWith('.mp3') || url.endsWith('.ogg') || url.endsWith('.flac') || url.endsWith('.webm'))
         return await new FileSong(url, author, channel).parse();
     return undefined;
 }
