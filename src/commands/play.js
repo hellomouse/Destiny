@@ -3,6 +3,7 @@ const queue = require('../queue.js');
 const embeds = require('../embeds.js');
 const { REQUIRE_USER_IN_VC } = require('../commands.js');
 const getSong = require('../song');
+const YouTube = require('youtube-sr').default;
 
 /**
  * @description Play a song with the provided link
@@ -17,14 +18,24 @@ module.exports.run = async (client, message, args) => {
 
     utils.log('Looking for music details...');
 
-    let url;
+    let songs = [];
 
     if (!args[0] && message.attachments.size > 0) {
         let attachment = message.attachments.find(x => ['mp3', 'ogg', 'flac', 'webm'].some(extension => x.url.includes(extension)));
         if (!attachment) return; // Cannot find a song url
-        url = attachment.url;
-    } else
-        url = utils.isURL(args[0]) ? args[0] : await utils.getUrl(args);
+        songs.push(attachment.url);
+    } else if (utils.isURL(args[0])) {
+        let url = args[0];
+        console.log(url + ' ' + url.startsWith('https://www.youtube.com/playlist?list='));
+        if (url.startsWith('https://www.youtube.com/playlist?list='))
+            YouTube.getPlaylist(url)
+                .then(playlist => {
+                    console.log(playlist.videos[0]);
+                    console.log(Object.getOwnPropertyNames(playlist.videos));
+                });
+        else
+            songs.push(await utils.getUrl(args));
+    }
 
     let song = await getSong(url, message.author, message.channel);
     if (!song) return message.channel.send(embeds.errorEmbed().setTitle('Could not find song'));
