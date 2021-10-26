@@ -100,7 +100,8 @@ module.exports = {
     getYoutubePlaylistID: url => {
         if (!url) return;
         const YT_REGEX = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
-        return url.match(YT_REGEX)[2];
+        const m = url.match(YT_REGEX);
+        return m ? m[2] : null;
     },
 
     /**

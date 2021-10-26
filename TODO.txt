@@ -2,10 +2,10 @@ example format again
 
 whitelist servers
 
-play -> leave -> play -> joins but doesnt play > need to play another song
 403 retry count 
 
 better youtube url validation
+
 
 
 remind command

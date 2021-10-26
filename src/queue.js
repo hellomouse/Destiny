@@ -134,6 +134,8 @@ class ServerQueue {
      */
     clear() {
         this.skip();
+        this.skipped = false;
+        this._isPlaying = false;
         this.songs = [];
     }
 
