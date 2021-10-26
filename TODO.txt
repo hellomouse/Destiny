@@ -45,7 +45,23 @@ load playlists
 - from text file
 - add to local playlists (create new, append songs to existing)
 
-reload 
+Looping
+- A/B loops
+- local playlists with limit start/end values for songs
+
+Fix "Finished playing" embed from showing when the bot leaves a voice channel
+
+Sharding, networked database?
+If instance goes down, another can take over.
+
+Command to stop an instance
+
+Flags for servers to switch between "channel stickyness"
+- Only allow commands to be used in one channel, send output there too
+- If command used in another channel, redirect all output there - already exists
+- Send command output when a command is used in another channel but don't switch current text channel
+
+reload
 
 automated tests (check for all params, help text, etc...)
 
