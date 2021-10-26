@@ -37,8 +37,8 @@ module.exports.run = async (client, message, args) => {
                 return message.channel.send(embeds.errorEmbed().setTitle('Could not load playlist'));
 
             songs = await Promise.all(playlistData.videos.map(async video =>
-                new YouTubeSong(url, message.author, message.channel)
-                    .finalizeFromData(video.id, video.title, video.duration, video.channel.name, video.views)));
+                new YouTubeSong(`https://www.youtube.com/watch?v=${video.id}`, message.author, message.channel)
+                    .finalizeFromData(video.id, video.title, video.duration / 1000, video.channel.name, video.views)));
 
             message.channel.send(embeds.playlistEmbed(
                 url, playlistData.title, playlistData.videoCount, playlistData.thumbnail));

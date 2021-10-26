@@ -6,7 +6,8 @@ whitelist servers
 
 better youtube url validation
 
-
+duration is wrong for playlists
+same song plays
 
 remind command
 
