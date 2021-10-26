@@ -67,6 +67,17 @@ class YouTubeSong extends Song {
         return this;
     }
 
+    async finalizeFromData(id, title, duration, artist, viewCount) {
+        this.id = id;
+        this.thumbnail = `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`;
+        this.title = title;
+        this.duration = duration;
+        this.formattedDuration = utils.formatDuration(duration);
+        this.artist = artist;
+        this.viewCount = viewCount;
+        return this;
+    }
+
     getEmbed(embed) {
         return embed.addField('YT Channel', this.artist.name, true);
     }
@@ -125,7 +136,7 @@ class FileSong extends Song {
 
 /**
  * Get a Song object given its url
- * @param {string} url
+ * @param {string} url Url to song
  * @param {Discord.Message.author} author
  * @param {Discord.Message.channel} channel
  * @return {Song} song
@@ -140,5 +151,5 @@ async function getSong(url, author, channel) {
         return await new FileSong(url, author, channel).finalize();
 }
 
-module.exports = getSong;
+module.exports = { getSong, Song, YouTubeSong, FileSong };
 

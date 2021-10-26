@@ -3,7 +3,7 @@ const queue = require('../queue.js');
 const embeds = require('../embeds.js');
 
 const { REQUIRE_USER_IN_VC } = require('../commands.js');
-const getSong = require('../song');
+const { YouTubeSong, Song, getSong } = require('../song');
 const YouTube = require('youtube-sr').default;
 
 /**
@@ -23,51 +23,53 @@ module.exports.run = async (client, message, args) => {
 
     if (!args[0] && message.attachments.size > 0) {
         let attachment = message.attachments.find(x => ['mp3', 'ogg', 'flac', 'webm'].some(extension => x.url.includes(extension)));
-        if (!attachment) return; // Cannot find a song url
+        if (!attachment)
+            throw new utils.FlagHelpError();
         songs.push(attachment.url);
     } else if (utils.isURL(args[0])) {
         let url = args[0];
 
         // Handle youtube playlists
-        console.log(url + ' ' + url.startsWith('https://www.youtube.com/playlist?list='));
-        if (url.startsWith('https://www.youtube.com/playlist?list='))
-            YouTube.getPlaylist(url)
-                .then(playlist => {
-                    console.log(playlist.videos[0]);
-                    console.log(Object.getOwnPropertyNames(playlist.videos));
-                });
-        else
+        let playlistID = utils.getYoutubePlaylistID(url);
+        if (playlistID) {
+            const playlistData = await YouTube.getPlaylist(url);
+            if (!playlistData)
+                return message.channel.send(embeds.errorEmbed().setTitle('Could not load playlist'));
+
+            songs = await Promise.all(playlistData.videos.map(async video =>
+                new YouTubeSong(url, message.author, message.channel)
+                    .finalizeFromData(video.id, video.title, video.duration, video.channel.name, video.views)));
+
+            message.channel.send(embeds.playlistEmbed(
+                url, playlistData.title, playlistData.videoCount, playlistData.thumbnail));
+        } else
             songs.push(await utils.getUrl(args));
     }
 
     // TODO song search by text again whered it go
 
-    let song = await getSong(songs[0], message.author, message.channel);
-    console.log(song);
-    if (!song) return message.channel.send(embeds.errorEmbed().setTitle('Could not find song'));
-
     let voiceChannel = message.member.voice.channel;
     let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
 
+    for (let s of songs) {
+        let song = s instanceof Song ? s : await getSong(s, message.author, message.channel);
+        if (song) serverQueue.songs.push(song);
+    }
+
+    let song = serverQueue.currentSong();
+    if (!song) return message.channel.send(embeds.errorEmbed().setTitle('Could not find song'));
+
     utils.log('Got music details, preparing the music to be played...');
 
-    let playingNow = false;
-
     if (!serverQueue.isPlaying()) {
-        serverQueue.songs.push(song);
-
         let connection = await voiceChannel.join();
         serverQueue.connection = connection;
         serverQueue.play();
         serverQueue.resume();
-        playingNow = true;
     } else {
-        serverQueue.songs.push(song);
         utils.log(`Added music to the queue : ${song.title}`);
-    }
-
-    if (!playingNow)
         return message.channel.send(embeds.songEmbed(song, 'Added to Queue'));
+    }
 };
 
 module.exports.names = ['play', 'p'];

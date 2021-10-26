@@ -17,7 +17,7 @@ module.exports.run = async (client, message, args) => {
 
     let queuetxt = '';
 
-    for (let i = 0; i < serverQueue.songs.length; i++) {
+    for (let i = 0; i < Math.min(10, serverQueue.songs.length); i++) {
         let minutes = `${Math.floor(serverQueue.songs[i].duration / 60)}`;
         if (minutes.length === 1)
             minutes = '0' + minutes;
@@ -26,9 +26,9 @@ module.exports.run = async (client, message, args) => {
             seconds = '0' + seconds;
 
         if (serverQueue.loop === 'song' && i === 0)
-            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) 🔄 ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedby}\`\`\n`;
+            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) 🔄 ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedBy}\`\`\n`;
         else
-            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedby}\`\`\n`;
+            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedBy}\`\`\n`;
     }
 
     utils.log('Showed music queue');

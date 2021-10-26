@@ -56,13 +56,9 @@ class Inactivity { // TODO: each ServerQueue should have it's own instance, also
 module.exports = {
     /**
      * @description Sends logs to console and adds the date/time
-     * @param {*} n
-     * @return {boolean} Is n a float?
+     * @param {*} content
      */
-    isFloat: function(n) {
-        return ((typeof n === 'number') && (n % 1 !== 0));
-    },
-    log: function(content) {
+    log: content => {
         let dateObj = new Date();
 
         let date = dateObj.getDate().toString();
@@ -85,7 +81,7 @@ module.exports = {
      * @param {string} url
      * @return {boolean} Is url?
      */
-    isURL: function(url) {
+    isURL: url => {
         if (!url) return false;
         let pattern = new RegExp('^(https?:\\/\\/)?' +
             '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
@@ -98,11 +94,21 @@ module.exports = {
     },
 
     /**
+     * @param {string} url Url to check
+     * @return {*} undefined if no playlist id, otherwise string playlits id
+     */
+    getYoutubePlaylistID: url => {
+        if (!url) return;
+        const YT_REGEX = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+        return url.match(YT_REGEX)[2];
+    },
+
+    /**
      * @description Create an ascii-table shown in the console on startup with the loaded events & commands
      * @param {object} loaded
      * @return {string} ASCII table
      */
-    showTable: function(loaded) {
+    showTable: loaded => {
         let table = new AsciiTable('Loading content...');
         table.setHeading('Commands', 'Events');
         for (let i = 0; i <= Math.max(loaded.commands.length, loaded.events.length) - 1; i++)
@@ -111,7 +117,7 @@ module.exports = {
         return table.render();
     },
 
-    getUrl: async function(words) {
+    getUrl: async words => {
         let stringOfWords = words.join(' ');
         let lookingOnYtb = new Promise(resolve => {
             YouTube.search(stringOfWords, { limit: 1 })

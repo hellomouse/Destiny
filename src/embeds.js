@@ -35,7 +35,7 @@ module.exports = {
      * @param {object} song Song obj
      * @param {string} title Title
      * @param {boolean} showDuration show duration
-     * @return {*}
+     * @return {MessageEmbed}
      */
     songEmbed: (song, title, showDuration = true) => {
         let embed = defaultEmbed()
@@ -47,6 +47,24 @@ module.exports = {
 
         if (song.thumbnail)
             embed.setThumbnail(song.thumbnail);
+        return embed;
+    },
+
+    /**
+     * Get an embed for a playlist
+     * @param {string} url URL to playlist
+     * @param {string} title Title of playlist
+     * @param {number} itemCount Approximate item count
+     * @param {string} thumbnail URL to thumbnail
+     * @return {MessageEmbed}
+     */
+    playlistEmbed: (url, title, itemCount, thumbnail) => {
+        let embed = defaultEmbed()
+            .setTitle(title)
+            .setDescription(`Loading playlist of ~${itemCount} songs`)
+            .setURL(url);
+        if (thumbnail)
+            embed.setThumbnail(thumbnail);
         return embed;
     }
 };
