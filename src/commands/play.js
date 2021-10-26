@@ -41,12 +41,10 @@ module.exports.run = async (client, message, args) => {
                     .finalizeFromData(video.id, video.title, video.duration / 1000, video.channel.name, video.views)));
 
             message.channel.send(embeds.playlistEmbed(
-                url, playlistData.title, playlistData.videoCount, playlistData.thumbnail));
-        } else
-            songs.push(await utils.getUrl(args));
-    }
-
-    // TODO song search by text again whered it go
+                url, playlistData.title, playlistData.videoCount, playlistData.thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg')));
+        }
+    } else
+        songs.push(await utils.getUrl(args));
 
     let voiceChannel = message.member.voice.channel;
     let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
