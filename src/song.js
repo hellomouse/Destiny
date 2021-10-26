@@ -3,37 +3,62 @@ const utils = require('./utils');
 const embeds = require('./embeds.js');
 const ffmpeg = require('fluent-ffmpeg');
 
+/**
+ * Base Song class, do not use directly!
+ * @author BWBellairs
+ */
 class Song {
+    /**
+     * Construct a new song
+     * @param {string} url Url of the song
+     * @param {MessageAuthor} author Author of the request
+     * @param {TextChannel} channel Channel command was run
+     */
     constructor(url, author, channel) {
         this.url = url;
-        this.thumbnails = [{ url: 'https://cdn.discordapp.com/avatars/741961294415921232/6ccf59489615bb4d7e48072449c85584.webp?size=512' }];
+        this.thumbnail = null;
         this.requestedBy = author;
         this.requestedChannel = channel;
+
         this.title = 'No title';
-        this.formattedDuration = 'NaN:NaN';
+        this.formattedDuration = 'XX:XX';
         this.duration = Infinity;
         this.artist = undefined;
     }
 
-    getEmbed(time, isPaused) {
-        return embeds
-            .songEmbed(this, `Now Playing`, false)
-            .addField('Duration', `${time} / ${this.formattedDuration}`, true)
-            .addField('Action', isPaused ? 'Paused' : 'Playing', true);
+    /**
+     * Run any async operations after construction,
+     * returns itself so you can call await song.finalize()
+     * @return {Song}
+     */
+    async finalize() {
+        return this;
     }
 
+    /**
+     * Add fields for now playing embed
+     * @param {MessageEmbed} embed Embed to modify
+     * @return {MessageEmbed}
+     */
+    getEmbed(embed) {
+        return embed;
+    }
 }
 
+/**
+ * Youtube Song
+ * @author BWBellairs
+ */
 class YouTubeSong extends Song {
     constructor(url, author, channel) {
         super(url, author, channel);
     }
 
-    async parse() {
+    async finalize() {
         let songMetadata = await ytdl.getBasicInfo(this.url);
 
         this.id = songMetadata.videoDetails.videoId;
-        this.thumbnails = [{ url: `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg` }];
+        this.thumbnail = `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`;
         this.title = songMetadata.videoDetails.title;
         this.formattedDuration = utils.formatDuration(songMetadata.videoDetails.lengthSeconds);
         this.duration = songMetadata.videoDetails.lengthSeconds;
@@ -42,12 +67,8 @@ class YouTubeSong extends Song {
         return this;
     }
 
-    getEmbed(time, isPaused) {
-        return embeds
-            .songEmbed(this, `Now Playing`, false)
-            .addField('Duration', `${time} / ${this.formattedDuration}`, true)
-            .addField('Action', isPaused ? 'Paused' : 'Playing', true)
-            .addField('YT Channel', this.artist.name, true);
+    getEmbed(embed) {
+        return embed.addField('YT Channel', this.artist.name, true);
     }
 
     get() {
@@ -59,12 +80,16 @@ class YouTubeSong extends Song {
     }
 }
 
+/**
+ * Song from a file source (url)
+ * @author BWBellairs
+ */
 class FileSong extends Song {
     constructor(url, author, channel) {
         super(url, author, channel);
     }
 
-    async parse() {
+    async finalize() {
         let metadata = await new Promise((resolve, reject) => {
             ffmpeg.ffprobe(this.url, (err, data) => {
                 resolve(data);
@@ -87,15 +112,9 @@ class FileSong extends Song {
         return this;
     }
 
-    getEmbed(time, isPaused) {
-        let embed = embeds
-            .songEmbed(this, `Now Playing`, false)
-            .addField('Duration', `${time} / ${this.formattedDuration}`, true)
-            .addField('Action', isPaused ? 'Paused' : 'Playing', true);
-
+    getEmbed(embed) {
         if (this.artist) embed.addField('Artist', this.artist, true);
         if (this.album) embed.addField('Album', this.album, true);
-
         return embed;
     }
 
@@ -105,19 +124,20 @@ class FileSong extends Song {
 }
 
 /**
- *
+ * Get a Song object given its url
  * @param {string} url
  * @param {Discord.Message.author} author
  * @param {Discord.Message.channel} channel
  * @return {Song} song
  */
 async function getSong(url, author, channel) {
+    if (!url) return;
+
     if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be'))
-        return await new YouTubeSong(url, author, channel).parse();
+        return await new YouTubeSong(url, author, channel).finalize();
 
     if (url.endsWith('.mp3') || url.endsWith('.ogg') || url.endsWith('.flac') || url.endsWith('.webm'))
-        return await new FileSong(url, author, channel).parse();
-    return undefined;
+        return await new FileSong(url, author, channel).finalize();
 }
 
 module.exports = getSong;

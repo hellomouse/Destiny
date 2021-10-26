@@ -1,6 +1,7 @@
 const utils = require('../utils');
 const queue = require('../queue.js');
 const embeds = require('../embeds.js');
+
 const { REQUIRE_USER_IN_VC } = require('../commands.js');
 const getSong = require('../song');
 const YouTube = require('youtube-sr').default;
@@ -26,6 +27,8 @@ module.exports.run = async (client, message, args) => {
         songs.push(attachment.url);
     } else if (utils.isURL(args[0])) {
         let url = args[0];
+
+        // Handle youtube playlists
         console.log(url + ' ' + url.startsWith('https://www.youtube.com/playlist?list='));
         if (url.startsWith('https://www.youtube.com/playlist?list='))
             YouTube.getPlaylist(url)
@@ -37,7 +40,10 @@ module.exports.run = async (client, message, args) => {
             songs.push(await utils.getUrl(args));
     }
 
-    let song = await getSong(url, message.author, message.channel);
+    // TODO song search by text again whered it go
+
+    let song = await getSong(songs[0], message.author, message.channel);
+    console.log(song);
     if (!song) return message.channel.send(embeds.errorEmbed().setTitle('Could not find song'));
 
     let voiceChannel = message.member.voice.channel;
@@ -67,6 +73,6 @@ module.exports.run = async (client, message, args) => {
 module.exports.names = ['play', 'p'];
 module.exports.help = {
     desc: 'Add a song to the queue',
-    syntax: '<youtube url | playlist | search query>'
+    syntax: '<youtube url | playlist | file | search query>'
 };
 module.exports.requirements = REQUIRE_USER_IN_VC;

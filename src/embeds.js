@@ -45,8 +45,8 @@ module.exports = {
             .setDescription(`[${song.title}](${song.url}) [${song.requestedBy.toString()}]`)
             .setURL(song.url);
 
-        if (song.thumbnails.length)
-            embed.setThumbnail(song.thumbnails[0].url);
+        if (song.thumbnail)
+            embed.setThumbnail(song.thumbnail);
         return embed;
     }
 };

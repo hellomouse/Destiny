@@ -25,7 +25,7 @@ class ServerQueue {
         this.connection = null;
 
         this.songs = [];
-        this.volume = 100;
+        this.volume = 50;
         this._paused = false;
         this.loop = 'none'; // in LOOP_MODES
         this.skipped = false;
@@ -67,9 +67,10 @@ class ServerQueue {
 
     /**
      * Play the current song in the queue
+     * @param {number} errorCounter Number of retries when error occurs
      * @return {*} The dispatcher
      */
-    play() {
+    play(errorCounter = 0) {
         if (this.isEmpty() || this.index < 0 || this.index >= this.size()) {
             this._isPlaying = false;
             this.textChannel.send(embeds.defaultEmbed()
@@ -87,7 +88,7 @@ class ServerQueue {
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
-        if (this.loop !== 'song')
+        if (this.loop !== 'song' && errorCounter < 1)
             song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
@@ -110,7 +111,7 @@ class ServerQueue {
         dispatcher.on('error', error => {
             console.log('dispatcher errored: ' + error);
             this.skipped = false;
-            this.play();
+            this.play(errorCounter + 1);
         });
         dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
 

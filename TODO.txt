@@ -17,6 +17,8 @@ add dB option for db volumes? (dispatcher.setVolumeDecibels)
 require percentage for percent, otherwise like 0.5?
 compute displayVolume like in aegiscommand-discord
 
+limit length of files 
+
 
 
 permissions aint workin
