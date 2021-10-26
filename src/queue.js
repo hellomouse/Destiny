@@ -108,7 +108,9 @@ class ServerQueue {
         });
 
         dispatcher.on('error', error => {
-            console.log(error);
+            console.log('dispatcher errored: ' + error);
+            this.skipped = false;
+            this.play();
         });
         dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
 
