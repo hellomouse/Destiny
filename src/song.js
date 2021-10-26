@@ -107,6 +107,8 @@ class FileSong extends Song {
             });
         });
 
+        if (!metadata) return undefined;
+
         let format = metadata.format;
         let tags = format.tags || {};
 
