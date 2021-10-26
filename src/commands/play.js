@@ -21,12 +21,9 @@ module.exports.run = async (client, message, args) => {
 
     let songs = [];
 
-    if (!args[0] && message.attachments.size > 0) {
-        let attachment = message.attachments.find(x => ['mp3', 'ogg', 'flac', 'webm'].some(extension => x.url.includes(extension)));
-        if (!attachment)
-            throw new utils.FlagHelpError();
-        songs.push(attachment.url);
-    } else if (utils.isURL(args[0])) {
+    if (!args[0] && message.attachments.size > 0)
+        songs = message.attachments.map(x => x.url);
+    else if (utils.isURL(args[0])) {
         let url = args[0];
 
         // Handle youtube playlists
@@ -42,7 +39,8 @@ module.exports.run = async (client, message, args) => {
 
             message.channel.send(embeds.playlistEmbed(
                 url, playlistData.title, playlistData.videoCount, playlistData.thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg')));
-        }
+        } else
+            songs.push(url);
     } else
         songs.push(await utils.getUrl(args));
 

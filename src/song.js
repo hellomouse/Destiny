@@ -147,7 +147,7 @@ async function getSong(url, author, channel) {
     if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be'))
         return await new YouTubeSong(url, author, channel).finalize();
 
-    if (url.endsWith('.mp3') || url.endsWith('.ogg') || url.endsWith('.flac') || url.endsWith('.webm'))
+    if (url.endsWith('.mp3') || url.endsWith('.ogg') || url.endsWith('.flac') || url.endsWith('.webm') || url.endsWith('.mp4') || url.endsWith('.mov'))
         return await new FileSong(url, author, channel).finalize();
 }
 
