@@ -141,7 +141,7 @@ class ServerQueue {
         if (this._paused) return;
         this._paused = true;
         this.connection.dispatcher.pause();
-        this.inactivity.stoppedPlaying();
+        utils.inactivity.onNotPlaying(this);
     }
 
     /** Resume currently playing song */
