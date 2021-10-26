@@ -81,6 +81,7 @@ class FileSong extends Song {
         });
 
         this.duration = format.duration || this.duration;
+        this.duration = Math.round(this.duration);
         this.formattedDuration = utils.formatDuration(this.duration);
 
         return this;
