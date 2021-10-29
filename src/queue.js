@@ -143,7 +143,7 @@ class ServerQueue {
         this.skip();
         this.skipped = false;
         this._isPlaying = false;
-        this.playedSongs = [];
+        this.shuffleWaiting = [];
         this.songs = [];
     }
 
@@ -185,6 +185,9 @@ class ServerQueue {
     add(song) {
         song.uuid = uuid.v4();
         this.songs.push(song);
+
+        if (this.shuffle)
+            this.shuffleWaiting.push(song.uuid);
     }
 }
 
