@@ -43,9 +43,10 @@ colored terminal log
 
 load playlists
 - from text file
-- add to local playlists (create new, append songs to existing)
+- add to local playlists (create new, append songs to existing) | DONE
 - remove songs from localplaylists with index?
 - remove more than one matching song from playlist?
+- listing playlists/(songs in playlists) should work the same as interactive queue command
 
 Looping
 - A/B loops
