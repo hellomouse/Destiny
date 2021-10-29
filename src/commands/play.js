@@ -3,8 +3,7 @@ const queue = require('../queue.js');
 const embeds = require('../embeds.js');
 
 const { REQUIRE_USER_IN_VC } = require('../commands.js');
-const { YouTubeSong, Song, getSong } = require('../song');
-const YouTube = require('youtube-sr').default;
+const { Song, getSong } = require('../song');
 
 /**
  * @description Play a song with the provided link
@@ -19,7 +18,7 @@ module.exports.run = async (client, message, args) => {
 
     utils.log('Looking for music details...');
 
-    let songs = await utils.getSongURLs(args, message, true);
+    let songs = await Song.getSongURLs(args, message, true);
 
     if (!songs.length)
         songs.push(await utils.getUrl(args));

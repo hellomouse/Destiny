@@ -1,7 +1,7 @@
 const ytdl = require('ytdl-core');
 const utils = require('./utils.js');
-const embeds = require('./embeds.js');
 const ffmpeg = require('fluent-ffmpeg');
+const YouTube = require('youtube-sr').default;
 
 /**
  * Base Song class, do not use directly!
@@ -42,6 +42,56 @@ class Song {
      */
     getEmbed(embed) {
         return embed;
+    }
+
+    /**
+     * @param {string} url Url to check
+     * @return {*} undefined if no playlist id, otherwise string playlits id
+     */
+    static getYoutubePlaylistID(url) {
+        if (!url) return;
+        const YT_REGEX = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+        const m = url.match(YT_REGEX);
+        return m ? m[2] : null;
+    }
+
+    static getYouTubePlaylistURLs(args) {
+        return args.filter(x => this.getYoutubePlaylistID(x));
+    }
+
+    static async getPlaylistData(url) {
+        return await YouTube.getPlaylist(url).then(playlist => playlist.fetch());
+    }
+
+    static async unpackPlaylist(url, message) {
+        let songs = [];
+
+        const playlistData = Song.getPlaylistData(url);
+        if (!playlistData)
+            return [];
+
+        songs = await Promise.all(playlistData.videos.map(async video =>
+            new YouTubeSong(`https://www.youtube.com/watch?v=${video.id}`, message.author, message.channel)
+                .finalizeFromData(video.id, video.title, video.duration / 1000, video.channel.name, video.views)));
+
+        return songs;
+    }
+
+    static async getSongURLs(args, message, unpackPlaylists = false) {
+        let songs = [];
+
+        if (message.attachments.size > 0)
+            songs = message.attachments.map(x => x.url);
+
+        for (let arg of args) {
+            let playlist = this.getYoutubePlaylistID(arg);
+            if (playlist && unpackPlaylists)
+                songs = [...songs, ...await this.unpackPlaylist(arg, message)];
+            else if (this.isURL(arg))
+                songs.push(arg);
+        }
+
+        return songs;
     }
 }
 
