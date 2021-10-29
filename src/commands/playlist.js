@@ -92,7 +92,7 @@ module.exports.run = async (client, message, args) => {
         if (!voiceChannel) return message.channel.send(embeds.errorEmbed().setDescription('You need to be in a voice channel to use this subcommand'));
         let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
         // Clear queue before playing local playlist
-        if (args[2] === '--overwrite')
+        if (['-o', '--overwrite'].includes(args[2]))
             serverQueue.clear();
 
         await play.run(client, message, playlist);
