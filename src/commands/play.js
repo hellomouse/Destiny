@@ -49,7 +49,7 @@ module.exports.run = async (client, message, args) => {
 
     for (let s of songs) {
         let song = s instanceof Song ? s : await getSong(s, message.author, message.channel);
-        if (song) serverQueue.songs.push(song);
+        if (song) serverQueue.add(song);
     }
 
     let song = serverQueue.currentSong();

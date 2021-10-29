@@ -1,8 +1,7 @@
 const config = require('../config.js');
 const utils = require('./utils.js');
 const embeds = require('./embeds.js');
-
-const ytdl = require('ytdl-core');
+const uuid = require('uuid');
 
 const LOOP_MODES = 'none,song,queue'.split(',');
 
@@ -25,12 +24,13 @@ class ServerQueue {
         this.connection = null;
 
         this.songs = [];
+        this.shuffleWaiting = []; // Songs to be played in shuffle mode
         this.volume = 50;
         this._paused = false;
         this.loop = 'none'; // in LOOP_MODES
         this.skipped = false;
 
-        this.shuffle = false; // TODO: deterministic algorithm based on seed per queue + length or something on how to shuffle
+        this.shuffle = false;
         this.index = 0;
         this._isPlaying = false;
 
@@ -103,7 +103,14 @@ class ServerQueue {
                 utils.log(`Finished playing all musics, no more musics in the queue`);
 
             if (this.loop !== 'song' || this.skipped === true)
-                this.index++;
+                if (this.shuffle) {
+                    if (this.shuffleWaiting.length === 0) this.shuffleWaiting = this.songs.map(x => x.uuid);
+                    let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length - 1);
+                    let uuidFind = this.shuffleWaiting[uuidIndex];
+                    this.index = this.songs.findIndex(x => x.uuid === uuidFind);
+                    this.shuffleWaiting.splice(uuidIndex, 1);
+                } else
+                    this.index++;
             this.skipped = false;
             this.play();
         });
@@ -136,6 +143,7 @@ class ServerQueue {
         this.skip();
         this.skipped = false;
         this._isPlaying = false;
+        this.shuffleWaiting = [];
         this.songs = [];
     }
 
@@ -145,6 +153,16 @@ class ServerQueue {
         this._paused = true;
         this.connection.dispatcher.pause();
         utils.inactivity.onNotPlaying(this);
+    }
+
+    shuffleOn() {
+        this.shuffleWaiting = this.songs.map(x => x.uuid);
+        this.shuffle = true;
+    }
+
+    shuffleOff() {
+        this.shuffleWaiting = [];
+        this.shuffle = false;
     }
 
     /** Resume currently playing song */
@@ -158,6 +176,18 @@ class ServerQueue {
         this.connection.dispatcher.resume();
         this.connection.dispatcher.pause();
         this.connection.dispatcher.resume();
+    }
+
+    /**
+     * Add a song to the queue
+     * @arg {Song} song
+    */
+    add(song) {
+        song.uuid = uuid.v4();
+        this.songs.push(song);
+
+        if (this.shuffle)
+            this.shuffleWaiting.push(song.uuid);
     }
 }
 

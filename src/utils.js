@@ -22,8 +22,8 @@ class Inactivity { // TODO: each ServerQueue should have it's own instance, also
         this.config.waitRejoinSeconds *= 1000;
         this.config.botIdleSeconds *= 1000;
 
-        this.aloneTimer = setTimeout(() => {}, 0);
-        this.inactivityTimer = setTimeout(() => {}, 0);
+        this.aloneTimer = setTimeout(() => { }, 0);
+        this.inactivityTimer = setTimeout(() => { }, 0);
     }
 
     onAlone(serverQueue) {
@@ -143,6 +143,10 @@ module.exports = {
         result += ':';
         result += sec < 10 ? '0' + sec : sec;
         return result;
+    },
+
+    getRandomInt(max) {
+        return Math.floor(Math.random() * max);
     },
 
     FlagHelpError,
