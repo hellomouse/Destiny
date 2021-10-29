@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Enmap = require('enmap');
+require('./src/local-data.js');
 
 function load(client) {
     const utils = require('./src/utils');
