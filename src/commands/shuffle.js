@@ -14,10 +14,10 @@ module.exports.run = async (client, message, args) => {
 
     if (serverQueue.shuffle) {
         serverQueue.shuffleOff();
-        message.channel.send(embeds.defaultEmbed().setDescription('Shuffle mode is now enabled'));
+        message.channel.send(embeds.defaultEmbed().setDescription('Shuffle mode is now disabled'));
     } else {
         serverQueue.shuffleOn();
-        message.channel.send(embeds.defaultEmbed().setDescription('Shuffle mode is now disabled'));
+        message.channel.send(embeds.defaultEmbed().setDescription('Shuffle mode is now enabled'));
     }
 };
 
