@@ -2,6 +2,8 @@ const embeds = require('../embeds.js');
 const utils = require('../utils');
 const localData = require('../local-data.js');
 const config = require('../../config.js');
+const queue = require('../queue.js');
+const play = require('./play.js'); // This is a hack for now
 
 /**
  * @description Manage playlists
@@ -22,7 +24,7 @@ module.exports.run = async (client, message, args) => {
     let playlistsLength = Object.keys(playlists).length;
     let hasPlaylist = localData.hasPlaylist(userId, playlistName);
     let playlist = playlists[playlistName] || [];
-    let songs = utils.getSongURLs(args.slice(2), message.attachments);
+    let songs = utils.getSongURLs(args.slice(2), message);
 
     switch (args[0] === 'list' ? args[0] : args[1]) {
     case 'create': {
@@ -81,6 +83,19 @@ module.exports.run = async (client, message, args) => {
         songs.forEach(x => localData.removeSong(userId, playlistName, x));
         message.channel.send(embeds.defaultEmbed().setDescription(`Removed ${occurences} song(s) from playlist`));
 
+        break;
+    }
+    case 'play': {
+        if (!hasPlaylist) return message.channel.send(embeds.errorEmbed().setDescription(`No such playlist exists`));
+
+        let voiceChannel = message.member.voice.channel;
+        if (!voiceChannel) return message.channel.send(embeds.errorEmbed().setDescription('You need to be in a voice channel to use this subcommand'));
+        let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
+        // Clear queue before playing local playlist
+        if (args[2] === '--overwrite')
+            serverQueue.clear();
+
+        await play.run(client, message, playlist);
         break;
     }
     default:

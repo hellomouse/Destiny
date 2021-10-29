@@ -53,6 +53,51 @@ class Inactivity { // TODO: each ServerQueue should have it's own instance, also
     }
 }
 
+/**
+ * @param {string} url Url to check
+ * @return {*} undefined if no playlist id, otherwise string playlits id
+ */
+function getYoutubePlaylistID(url) {
+    if (!url) return;
+    const YT_REGEX = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+    const m = url.match(YT_REGEX);
+    return m ? m[2] : null;
+}
+
+async function unpackPlaylist(url, message) {
+    const { YouTubeSong } = require('./song.js');
+
+    let songs = [];
+
+    const playlistData = await YouTube.getPlaylist(url).then(playlist => playlist.fetch());
+    if (!playlistData)
+        return [];
+
+    songs = await Promise.all(playlistData.videos.map(async video =>
+        new YouTubeSong(`https://www.youtube.com/watch?v=${video.id}`, message.author, message.channel)
+            .finalizeFromData(video.id, video.title, video.duration / 1000, video.channel.name, video.views)));
+
+    return songs;
+}
+
+
+/**
+ * @description Checks if the provided string is an url
+ * @param {string} url
+ * @return {boolean} Is url?
+ */
+function isURL(url) {
+    if (!url) return false;
+    let pattern = new RegExp('^(https?:\\/\\/)?' +
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+        '((\\d{1,3}\\.){3}\\d{1,3}))|' +
+        'localhost' +
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+        '(\\?[;&a-z\\d%_.~+=-]*)?' +
+        '(\\#[-a-z\\d_]*)?$', 'i');
+    return pattern.test(url);
+}
+
 module.exports = {
     /**
      * @description Sends logs to console and adds the date/time
@@ -76,33 +121,7 @@ module.exports = {
         console.log(`[ ${dmy} | ${hms} ] ${content}`);
     },
 
-    /**
-     * @description Checks if the provided string is an url
-     * @param {string} url
-     * @return {boolean} Is url?
-     */
-    isURL: url => {
-        if (!url) return false;
-        let pattern = new RegExp('^(https?:\\/\\/)?' +
-            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
-            '((\\d{1,3}\\.){3}\\d{1,3}))|' +
-            'localhost' +
-            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
-            '(\\?[;&a-z\\d%_.~+=-]*)?' +
-            '(\\#[-a-z\\d_]*)?$', 'i');
-        return pattern.test(url);
-    },
-
-    /**
-     * @param {string} url Url to check
-     * @return {*} undefined if no playlist id, otherwise string playlits id
-     */
-    getYoutubePlaylistID: url => {
-        if (!url) return;
-        const YT_REGEX = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
-        const m = url.match(YT_REGEX);
-        return m ? m[2] : null;
-    },
+    isURL,
 
     /**
      * @description Create an ascii-table shown in the console on startup with the loaded events & commands
@@ -131,15 +150,22 @@ module.exports = {
         return link;
     },
 
-    getSongURLs(args, messageAttachments) {
+    unpackPlaylist,
+    getYoutubePlaylistID,
+
+    async getSongURLs(args, message, unpackPlaylists = false) {
         let songs = [];
 
-        if (messageAttachments.size > 0)
-            songs = messageAttachments.map(x => x.url);
+        if (message.attachments.size > 0)
+            songs = message.attachments.map(x => x.url);
 
-        args.forEach(x => {
-            if (this.isURL(x) || this.getYoutubePlaylistID(x)) songs.push(x);
-        });
+        for (let arg of args) {
+            let playlist = getYoutubePlaylistID(arg);
+            if (playlist && unpackPlaylists)
+                songs = [...songs, ...await unpackPlaylist(arg, message)];
+            else if (isURL(arg))
+                songs.push(arg);
+        }
 
         return songs;
     },

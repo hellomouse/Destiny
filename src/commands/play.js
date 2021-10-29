@@ -19,29 +19,9 @@ module.exports.run = async (client, message, args) => {
 
     utils.log('Looking for music details...');
 
-    let songs = [];
+    let songs = await utils.getSongURLs(args, message, true);
 
-    if (!args[0] && message.attachments.size > 0)
-        songs = message.attachments.map(x => x.url);
-    else if (utils.isURL(args[0])) {
-        let url = args[0];
-
-        // Handle youtube playlists
-        let playlistID = utils.getYoutubePlaylistID(url);
-        if (playlistID) {
-            const playlistData = await YouTube.getPlaylist(url);
-            if (!playlistData)
-                return message.channel.send(embeds.errorEmbed().setTitle('Could not load playlist'));
-
-            songs = await Promise.all(playlistData.videos.map(async video =>
-                new YouTubeSong(`https://www.youtube.com/watch?v=${video.id}`, message.author, message.channel)
-                    .finalizeFromData(video.id, video.title, video.duration / 1000, video.channel.name, video.views)));
-
-            message.channel.send(embeds.playlistEmbed(
-                url, playlistData.title, playlistData.videoCount, playlistData.thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg')));
-        } else
-            songs.push(url);
-    } else
+    if (!songs.length)
         songs.push(await utils.getUrl(args));
 
     let voiceChannel = message.member.voice.channel;

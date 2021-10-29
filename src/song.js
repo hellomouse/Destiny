@@ -1,5 +1,5 @@
 const ytdl = require('ytdl-core');
-const utils = require('./utils');
+const utils = require('./utils.js');
 const embeds = require('./embeds.js');
 const ffmpeg = require('fluent-ffmpeg');
 
@@ -79,7 +79,7 @@ class YouTubeSong extends Song {
     }
 
     getEmbed(embed) {
-        return embed.addField('YT Channel', this.artist.name, true);
+        return embed.addField('YT Channel', this.artist, true);
     }
 
     get() {
