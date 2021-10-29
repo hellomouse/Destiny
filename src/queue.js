@@ -102,6 +102,9 @@ class ServerQueue {
             else
                 utils.log(`Finished playing all musics, no more musics in the queue`);
 
+            this.skipped = false;
+            if (this.songs.length === 0) return;
+
             if (this.loop !== 'song' || this.skipped === true)
                 if (this.shuffle) {
                     if (this.shuffleWaiting.length === 0) this.shuffleWaiting = this.songs.map(x => x.uuid);
@@ -111,7 +114,7 @@ class ServerQueue {
                     this.shuffleWaiting.splice(uuidIndex, 1);
                 } else
                     this.index++;
-            this.skipped = false;
+
             this.play();
         });
 
@@ -143,8 +146,9 @@ class ServerQueue {
         this.skip();
         this.skipped = false;
         this._isPlaying = false;
-        this.shuffleWaiting = [];
         this.songs = [];
+        this.playedSongs = [];
+        this.index = 0;
     }
 
     /** Pause currently playing song */
