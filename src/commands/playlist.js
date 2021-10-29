@@ -13,17 +13,18 @@ const config = require('../../config.js');
 module.exports.run = async (client, message, args) => {
     // TODO: validate playlist names
 
+    if ([args[0]] === 'list' && ['create', 'delete', 'add', 'remove'].includes(args[1]))
+        return message.channel.send(embeds.errorEmbed().setDescription('Cannot use `list` as a playlist name. It is a subcommand'));
+
     let userId = message.author.id;
-    let playlistName = args[0];
+    let playlistName = args[0] === 'list' ? args[1] : args[0];
     let playlists = localData.getPlaylists(userId);
     let playlistsLength = Object.keys(playlists).length;
     let hasPlaylist = localData.hasPlaylist(userId, playlistName);
     let playlist = playlists[playlistName] || [];
+    let songs = utils.getSongURLs(args.slice(2), message.attachments);
 
-    if (playlistName === 'list' && ['create', 'delete', 'add', 'remove'].includes(args[1]))
-        return message.channel.send(embeds.errorEmbed().setDescription('Cannot use `list` as a playlist name. It is a subcommand'));
-
-    switch (args[1] || args[0]) {
+    switch (args[0] === 'list' ? args[0] : args[1]) {
     case 'create': {
         if (playlistsLength === config.playlists.maximum)
             return message.channel.send(embeds.errorEmbed().setDescription(`You have reached the maximum amount of playlists you can create`));
@@ -47,12 +48,43 @@ module.exports.run = async (client, message, args) => {
     }
     case 'list': {
         if (playlistsLength === 0) return message.channel.send(embeds.defaultEmbed().setDescription('No playlists'));
-        let formattedPlaylists = Object.keys(playlists).join(', ');
-        message.channel.send(embeds.defaultEmbed().setDescription(`Your playlists:\n${formattedPlaylists}`));
+
+        if (!playlistName) {
+            let formattedPlaylists = Object.keys(playlists).join(', ');
+            message.channel.send(embeds.defaultEmbed().setDescription(`Your playlists:\n${formattedPlaylists}`));
+        } else if (playlist.length === 0)
+            message.channel.send(embeds.defaultEmbed().setDescription('Playlist is empty'));
+        else
+            message.channel.send(embeds.defaultEmbed().setDescription(`Playlist contents: ${playlist.join('\n')}`));
+
+        break;
+    }
+    case 'add': {
+        if (!hasPlaylist) return message.channel.send(embeds.errorEmbed().setDescription(`No such playlist exists`));
+        if (!songs.length) return message.channel.send(embeds.errorEmbed().setDescription(`Not a valid song(s)`));
+        if (playlist.length === config.playlists.maximumItemsPerPlaylist)
+            return message.channel.send(embeds.errorEmbed().setDescription(`Playlist has reached maximum number of items`));
+
+        songs.forEach(x => localData.addSong(userId, playlistName, x));
+        message.channel.send(embeds.defaultEmbed().setDescription(`Added ${songs.length} song(s) to playlist`));
+        break;
+    }
+    case 'remove': {
+        if (!hasPlaylist) return message.channel.send(embeds.errorEmbed().setDescription(`No such playlist exists`));
+        if (!songs.length) return message.channel.send(embeds.errorEmbed().setDescription(`Not a valid song(s)`));
+
+        let occurences = [...new Set(songs)]
+            .map(x => localData.hasSong(userId, playlistName, x) ? 1 : 0)
+            .reduce((prev, current) => prev + current);
+        if (occurences === 0) return message.channel.send(embeds.defaultEmbed().setDescription('Song(s) not found in playlist'));
+
+        songs.forEach(x => localData.removeSong(userId, playlistName, x));
+        message.channel.send(embeds.defaultEmbed().setDescription(`Removed ${occurences} song(s) from playlist`));
+
         break;
     }
     default:
-        return message.channel.send(embeds.errorEmbed().setDescription(`Not a valid subcommand`));
+        return message.channel.send(embeds.errorEmbed().setDescription('Not a valid subcommand'));
     }
 };
 

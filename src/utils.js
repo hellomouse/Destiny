@@ -131,6 +131,19 @@ module.exports = {
         return link;
     },
 
+    getSongURLs(args, messageAttachments) {
+        let songs = [];
+
+        if (messageAttachments.size > 0)
+            songs = messageAttachments.map(x => x.url);
+
+        args.forEach(x => {
+            if (this.isURL(x) || this.getYoutubePlaylistID(x)) songs.push(x);
+        });
+
+        return songs;
+    },
+
     formatDuration: sec => {
         sec = Math.round(sec);
         let min = Math.floor(sec / 60);

@@ -1,5 +1,4 @@
 const Enmap = require('enmap');
-const config = require('../config.js');
 
 class LocalData extends Enmap {
     constructor(...args) {
@@ -28,6 +27,18 @@ class LocalData extends Enmap {
 
     hasPlaylist(userId, playlistName) {
         return this.has('playlists', `${userId}.${playlistName}`);
+    }
+
+    addSong(userId, playlistName, songURL) {
+        return this.push('playlists', songURL, `${userId}.${playlistName}`);
+    }
+
+    removeSong(userId, playlistName, songURL) {
+        return this.remove('playlists', songURL, `${userId}.${playlistName}`);
+    }
+
+    hasSong(userId, playlistName, songURL) {
+        return this.get('playlists', `${userId}.${playlistName}`).filter(x => x === songURL).length;
     }
 }
 
