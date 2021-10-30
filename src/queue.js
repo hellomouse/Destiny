@@ -3,7 +3,7 @@ const utils = require('./utils.js');
 const embeds = require('./embeds.js');
 const uuid = require('uuid');
 
-const LOOP_MODES = 'none,song,queue'.split(',');
+const LOOP_MODES = 'none,off,song,queue'.split(',');
 
 /**
  * A queue for a specified server
@@ -71,7 +71,8 @@ class ServerQueue {
      * @return {*} The dispatcher
      */
     play(errorCounter = 0) {
-        if (this.isEmpty() || this.index < 0 || this.index >= this.size()) {
+        if (this.isEmpty() || this.index < 0 || this.index >= this.size() ||
+            ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length) {
             this._isPlaying = false;
             this.textChannel.send(embeds.defaultEmbed()
                 .setDescription('Finished playing!'));
@@ -107,7 +108,7 @@ class ServerQueue {
 
             if (this.loop !== 'song' || this.skipped === true)
                 if (this.shuffle) {
-                    if (this.shuffleWaiting.length === 0) this.shuffleWaiting = this.songs.map(x => x.uuid);
+                    if (this.shuffleWaiting.length === 0 && ['none', 'off'].includes(this.loop)) this.shuffleWaiting = this.songs.map(x => x.uuid);
                     let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length - 1);
                     let uuidFind = this.shuffleWaiting[uuidIndex];
                     this.index = this.songs.findIndex(x => x.uuid === uuidFind);
