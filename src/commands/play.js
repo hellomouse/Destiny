@@ -36,6 +36,28 @@ module.exports.run = async (client, message, args) => {
                 `${playlists[0].videos.length}/${playlists[0].videoCount}`,
                 playlists[0].thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg')
             );
+        else {
+            let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
+            let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
+            enqueuedEmbed = embeds.defaultEmbed()
+                .setTitle('Loading')
+                .setThumbnail(playlists[0].thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg'))
+                .setURL(playlists[0].url)
+                .setDescription(`Loading ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
+        }
+
+    if (playlists.length > 0) {
+        let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
+        let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
+        enqueuedEmbed = embeds.defaultEmbed()
+            .setTitle('Loading')
+            .setThumbnail(playlists[0].thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg'))
+            .setURL(playlists[0].url)
+            .setDescription(`Loading ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
+    } else
+        enqueuedEmbed = embeds.defaultEmbed()
+            .setTitle('Loading')
+            .setDescription(`Loading ${songs.length} songs`);
 
     message.channel.send(enqueuedEmbed);
 
