@@ -24,7 +24,7 @@ module.exports.run = async (client, message, args) => {
     let playlistsLength = Object.keys(playlists).length;
     let hasPlaylist = localData.hasPlaylist(userId, playlistName);
     let playlist = playlists[playlistName] || [];
-    let songs = await Song.getSongURLs(args.slice(2), message)[0];
+    let [songs] = await Song.getSongURLs(args.slice(2), message);
 
     switch (args[0] === 'list' ? args[0] : args[1]) {
     case 'create': {
@@ -44,7 +44,7 @@ module.exports.run = async (client, message, args) => {
             localData.deletePlaylist(userId, playlistName);
             message.channel.send(embeds.defaultEmbed().setDescription(`Successfully deleted playlist: ` + playlistName));
         }
-        if (playlist.length > 0)
+        else if (playlist.length > 0)
             message.channel.send(embeds.errorEmbed().setDescription(`Playlist has ${playlist.length} items. Please add \`--confirm\` to delete it`));
         break;
     }
