@@ -77,7 +77,7 @@ module.exports.run = async (client, message, args) => {
     if (!serverQueue.isPlaying()) {
         let connection = await voiceChannel.join();
         serverQueue.connection = connection;
-        serverQueue.play();
+        await serverQueue.play();
         serverQueue.resume();
     } else {
         utils.log(`Added music to the queue : ${song.title}`);

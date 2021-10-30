@@ -26,6 +26,7 @@
     "ffprobe-static": "^3.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "opusscript": "0.0.7",
+    "uuid": "^8.3.2",
     "youtube-sr": "^4.0.3",
     "ytdl-core": "^4.9.1"
   },

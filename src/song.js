@@ -2,6 +2,7 @@ const ytdl = require('ytdl-core');
 const utils = require('./utils.js');
 const ffmpeg = require('fluent-ffmpeg');
 const YouTube = require('youtube-sr').default;
+const Stream = require('stream');
 
 /**
  * Base Song class, do not use directly!
@@ -33,6 +34,15 @@ class Song {
      */
     async finalize() {
         return this;
+    }
+
+    /**
+     * Return a stream that starts at seekTime
+     * @param {number} seekTime Seconds to seek to
+     * @return {*} Stream object
+     */
+    async getStream(seekTime = 0) {
+        throw new Error('getStream() not implemented for this class');
     }
 
     /**
@@ -133,12 +143,28 @@ class YouTubeSong extends Song {
         return embed.addField('YT Channel', this.artist, true);
     }
 
-    get() {
-        return ytdl(this.url, {
-            filter: 'audioonly',
-            quality: 'highestaudio',
-            highWaterMark: 1 << 25
-        });
+    async getStream(seekTime = 0) {
+        if (seekTime < 1)
+            return ytdl(this.url, {
+                filter: 'audioonly',
+                quality: 'highestaudio',
+                highWaterMark: 1 << 25
+            });
+
+        const data = await ytdl.getInfo(this.url);
+        let streamUrl = data.formats.filter(format => format.mimeType.includes('audio/mp4'))[0].url;
+
+        let outputStream = new Stream.PassThrough();
+        ffmpeg(streamUrl)
+            .seekInput(seekTime)
+            .format('mp3')
+            .inputOptions( '-fflags', 'nobuffer', '-probesize', '32', '-analyzeduration', '0') // '-ss', seekTime,
+            .output(outputStream, { end: true })
+            .noVideo()
+            .on('error', e => console.error(e))
+            .addOutputOption('-strict', '-2')
+            .run();
+        return outputStream;
     }
 }
 
@@ -182,7 +208,7 @@ class FileSong extends Song {
         return embed;
     }
 
-    get() {
+    async getStream(seekTime = 0) {
         return this.url;
     }
 }
