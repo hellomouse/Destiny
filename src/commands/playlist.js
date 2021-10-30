@@ -24,7 +24,7 @@ module.exports.run = async (client, message, args) => {
     let playlistsLength = Object.keys(playlists).length;
     let hasPlaylist = localData.hasPlaylist(userId, playlistName);
     let playlist = playlists[playlistName] || [];
-    let songs = await Song.getSongURLs(args.slice(2), message);
+    let songs = await Song.getSongURLs(args.slice(2), message)[0];
 
     switch (args[0] === 'list' ? args[0] : args[1]) {
     case 'create': {

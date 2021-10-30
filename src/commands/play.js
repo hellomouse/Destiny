@@ -18,10 +18,26 @@ module.exports.run = async (client, message, args) => {
 
     utils.log('Looking for music details...');
 
-    let songs = await Song.getSongURLs(args, message, true);
+    let [songs, onlyPlaylistSongs] = await Song.getSongURLs(args, message, true);
+    let playlists = await Promise.all(
+        Song.getYouTubePlaylistURLs(args)
+            .map(x => Song.getPlaylistData(x)))
+        .then(list => list.filter(async x => x.videos.length > 0 ));
 
     if (!songs.length)
         songs.push(await utils.getUrl(args));
+
+    let enqueuedEmbed;
+    if (onlyPlaylistSongs)
+        if (playlists.length === 1)
+            enqueuedEmbed = embeds.playlistEmbed(
+                playlists[0].url,
+                playlists[0].title,
+                `${playlists[0].videos.length}/${playlists[0].videoCount}`,
+                playlists[0].thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg')
+            );
+
+    message.channel.send(enqueuedEmbed);
 
     let voiceChannel = message.member.voice.channel;
     let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);

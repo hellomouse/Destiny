@@ -21,7 +21,7 @@ module.exports.run = async (client, message, args) => {
     return message.channel.send(embeds.defaultEmbed().setDescription(':wave:'));
 };
 
-module.exports.names = ['leave', 'die', 'fuckoff'];
+module.exports.names = ['dc', 'disconnect', 'leave', 'die', 'fuckoff'];
 module.exports.help = {
     desc: 'Disconnect the bot',
     syntax: ''

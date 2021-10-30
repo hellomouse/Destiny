@@ -66,7 +66,7 @@ class Song {
     static async unpackPlaylist(url, message) {
         let songs = [];
 
-        const playlistData = Song.getPlaylistData(url);
+        const playlistData = await Song.getPlaylistData(url);
         if (!playlistData)
             return [];
 
@@ -79,6 +79,7 @@ class Song {
 
     static async getSongURLs(args, message, unpackPlaylists = false) {
         let songs = [];
+        let playlistSongs = [];
 
         if (message.attachments.size > 0)
             songs = message.attachments.map(x => x.url);
@@ -86,12 +87,12 @@ class Song {
         for (let arg of args) {
             let playlist = this.getYoutubePlaylistID(arg);
             if (playlist && unpackPlaylists)
-                songs = [...songs, ...await this.unpackPlaylist(arg, message)];
+                playlistSongs = [...playlistSongs, ...await this.unpackPlaylist(arg, message)];
             else if (utils.isURL(arg))
                 songs.push(arg);
         }
 
-        return songs;
+        return [[...songs, ...playlistSongs], songs.length === 0];
     }
 }
 
