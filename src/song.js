@@ -87,7 +87,7 @@ class Song {
             let playlist = this.getYoutubePlaylistID(arg);
             if (playlist && unpackPlaylists)
                 songs = [...songs, ...await this.unpackPlaylist(arg, message)];
-            else if (this.isURL(arg))
+            else if (utils.isURL(arg))
                 songs.push(arg);
         }
 
