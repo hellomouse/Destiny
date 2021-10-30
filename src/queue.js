@@ -72,7 +72,7 @@ class ServerQueue {
      */
     play(errorCounter = 0) {
         if (this.isEmpty() || this.index < 0 || this.index >= this.size() ||
-            ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length) {
+            ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length && this.shuffle) {
             this._isPlaying = false;
             this.textChannel.send(embeds.defaultEmbed()
                 .setDescription('Finished playing!'));
