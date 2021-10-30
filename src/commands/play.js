@@ -18,7 +18,7 @@ module.exports.run = async (client, message, args) => {
 
     utils.log('Looking for music details...');
 
-    let [songs, onlyPlaylistSongs] = await Song.getSongURLs(args, message, true);
+    let [songs, onlyPlaylistSongs] = await Song.getSongURLs(args.join(' ').split(' | '), message, true);
     let playlists = await Promise.all(
         Song.getYouTubePlaylistURLs(args)
             .map(x => Song.getPlaylistData(x)))

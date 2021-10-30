@@ -86,6 +86,7 @@ class ServerQueue {
         dispatcher.on('finish', this.onSongFinish.bind(this));
         dispatcher.on('error', async error => {
             console.log('seek dispatcher errored: ' + error);
+            this.ignoreNextSongEnd = true;
             await this.seekTo(seekTime, errorCounter + 1);
         });
         dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
@@ -157,7 +158,7 @@ class ServerQueue {
         dispatcher.on('finish', this.onSongFinish.bind(this));
         dispatcher.on('error', async error => {
             console.log('dispatcher errored: ' + error);
-            this.skipped = false;
+            this.ignoreNextSongEnd = true;
             await this.play(errorCounter + 1);
         });
         dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);

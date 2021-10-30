@@ -100,6 +100,8 @@ class Song {
                 playlistSongs = [...playlistSongs, ...await this.unpackPlaylist(arg, message)];
             else if (utils.isURL(arg))
                 songs.push(arg);
+            else
+                songs.push(await utils.getUrl(arg));
         }
 
         return [[...songs, ...playlistSongs], songs.length === 0];
