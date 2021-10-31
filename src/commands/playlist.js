@@ -43,8 +43,7 @@ module.exports.run = async (client, message, args) => {
         if (playlist.length === 0 || args[2] === '--confirm') {
             localData.deletePlaylist(userId, playlistName);
             message.channel.send(embeds.defaultEmbed().setDescription(`Successfully deleted playlist: ` + playlistName));
-        }
-        else if (playlist.length > 0)
+        } else if (playlist.length > 0)
             message.channel.send(embeds.errorEmbed().setDescription(`Playlist has ${playlist.length} items. Please add \`--confirm\` to delete it`));
         break;
     }

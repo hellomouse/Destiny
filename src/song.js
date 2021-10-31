@@ -143,7 +143,7 @@ class YouTubeSong extends Song {
     }
 
     async getStreamURL() {
-        formats = (await ytdl.getInfo(this.url)).formats;
+        let formats = (await ytdl.getInfo(this.url)).formats;
         return formats.filter(format => format.mimeType.includes('audio/mp4'))[0].url;
     }
 
@@ -159,8 +159,6 @@ class YouTubeSong extends Song {
         });
 
         return this.seek(await this.getStreamURL(), seek);
-    }
-
     }
 }
 
