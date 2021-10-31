@@ -25,7 +25,7 @@ class ServerQueue {
 
         this.songs = [];
         this.shuffleWaiting = []; // Songs to be played in shuffle mode
-        this.volume = 50;
+        this.volume = 70;
         this._paused = false;
         this.loop = 'none'; // in LOOP_MODES
         this.skipped = false;
@@ -34,6 +34,8 @@ class ServerQueue {
         this.shuffled = false;
         this.index = 0;
         this._isPlaying = false;
+
+        this.ignoreNextSongEnd = false; // Don't run anything after dispatcher ends for next end, for seeking
 
         utils.inactivity.onNotPlaying(this);
     }
@@ -67,11 +69,76 @@ class ServerQueue {
     }
 
     /**
+     * Seek current song to seekTime (validated)
+     * @param {number} seekTime Seek time in seconds
+     * @param {number} errorCounter Errors occured
+     * @return {number} Validated seek time
+     */
+    async seekTo(seekTime, errorCounter = 0) {
+        const song = this.currentSong();
+
+        seekTime = Math.max(0, seekTime);
+        seekTime = Math.min(song.duration, seekTime);
+
+        this.ignoreNextSongEnd = true;
+        this.connection.dispatcher.end();
+        let dispatcher = this.connection.play(await song.getStream(seekTime));
+
+        dispatcher.on('finish', this.onSongFinish.bind(this));
+        dispatcher.on('error', async error => {
+            console.log('seek dispatcher errored: ' + error);
+            this.ignoreNextSongEnd = true;
+            await this.seekTo(seekTime, errorCounter + 1);
+        });
+        dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
+
+        return seekTime;
+    }
+
+    /**
+     * Executes on song finish
+     */
+    async onSongFinish() {
+        if (this.ignoreNextSongEnd) {
+            this.ignoreNextSongEnd = false;
+            return;
+        }
+
+        if (this.songs[this.index + 1])
+            utils.log(`Finished playing the music : ${this.songs[this.index].title}`);
+        else
+            utils.log(`Finished playing all musics, no more musics in the queue`);
+
+        this.skipped = false;
+        if (this.songs.length === 0) return;
+
+        if (this.loop !== 'song' || this.skipped === true)
+            if (this.shuffle) {
+                if (this.shuffleWaiting.length === 0 && this.loop === 'queue')
+                    this.shuffleWaiting = this.songs.map(x => x.uuid);
+
+                let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
+                let uuidFind = this.shuffleWaiting[uuidIndex];
+
+                // Check there are more songs to shuffle
+                if (uuidFind) {
+                    this.index = this.songs.findIndex(x => x.uuid === uuidFind);
+                    this.shuffled = true;
+                }
+
+                this.shuffleWaiting.splice(uuidIndex, 1);
+            } else
+                this.index++;
+
+        await this.play();
+    }
+
+    /**
      * Play the current song in the queue
      * @param {number} errorCounter Number of retries when error occurs
      * @return {*} The dispatcher
      */
-    play(errorCounter = 0) {
+    async play(errorCounter = 0) {
         if (this.isEmpty() || this.index < 0 || this.index >= this.size() ||
             ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length && !this.shuffled) {
             this._isPlaying = false;
@@ -88,7 +155,7 @@ class ServerQueue {
 
         this.shuffled = false;
 
-        const song = this.songs[this.index];
+        const song = this.currentSong();
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
@@ -97,43 +164,13 @@ class ServerQueue {
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
-        // todo: add short link
-        let dispatcher = this.connection.play(song.get());
+        let dispatcher = this.connection.play(await song.getStream());
 
-        dispatcher.on('finish', () => {
-            if (this.songs[this.index + 1])
-                utils.log(`Finished playing the music : ${this.songs[this.index].title}`);
-            else
-                utils.log(`Finished playing all musics, no more musics in the queue`);
-
-            this.skipped = false;
-            if (this.songs.length === 0) return;
-
-            if (this.loop !== 'song' || this.skipped === true)
-                if (this.shuffle) {
-                    if (this.shuffleWaiting.length === 0 && this.loop === 'queue')
-                        this.shuffleWaiting = this.songs.map(x => x.uuid);
-
-                    let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
-                    let uuidFind = this.shuffleWaiting[uuidIndex];
-
-                    // Check there are more songs to shuffle
-                    if (uuidFind) {
-                        this.index = this.songs.findIndex(x => x.uuid === uuidFind);
-                        this.shuffled = true;
-                    }
-
-                    this.shuffleWaiting.splice(uuidIndex, 1);
-                } else
-                    this.index++;
-
-            this.play();
-        });
-
-        dispatcher.on('error', error => {
+        dispatcher.on('finish', this.onSongFinish.bind(this));
+        dispatcher.on('error', async error => {
             console.log('dispatcher errored: ' + error);
-            this.skipped = false;
-            this.play(errorCounter + 1);
+            this.ignoreNextSongEnd = true;
+            await this.play(errorCounter + 1);
         });
         dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
 
@@ -197,8 +234,8 @@ class ServerQueue {
 
     /**
      * Add a song to the queue
-     * @arg {Song} song
-    */
+     * @param {Song} song Song to add
+     */
     add(song) {
         song.uuid = uuid.v4();
         this.songs.push(song);

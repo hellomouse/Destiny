@@ -108,7 +108,7 @@ module.exports = {
     },
 
     getUrl: async words => {
-        let stringOfWords = words.join(' ');
+        let stringOfWords = words.join ? words.join(' ') : words;
         let lookingOnYtb = new Promise(resolve => {
             YouTube.search(stringOfWords, { limit: 1 })
                 .then(result => {

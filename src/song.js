@@ -2,6 +2,7 @@ const ytdl = require('ytdl-core');
 const utils = require('./utils.js');
 const ffmpeg = require('fluent-ffmpeg');
 const YouTube = require('youtube-sr').default;
+const Stream = require('stream');
 
 /**
  * Base Song class, do not use directly!
@@ -33,6 +34,27 @@ class Song {
      */
     async finalize() {
         return this;
+    }
+
+    /**
+     * Return a stream that starts at seekTime
+     * @param {string} url stream url
+     * @param {number} seekTime Seconds to seek to
+     * @return {*} Stream object
+     */
+    async seek(url, seekTime = 0) {
+        let outputStream = new Stream.PassThrough();
+        ffmpeg(url)
+            .seekInput(seekTime)
+            .format('mp3')
+            .inputOptions( '-fflags', 'nobuffer', '-probesize', '32', '-analyzeduration', '0') // '-ss', seekTime,
+            .output(outputStream, { end: true })
+            .noVideo()
+            .on('error', e => console.error(e))
+            .addOutputOption('-strict', '-2')
+            .run();
+
+        return outputStream;
     }
 
     /**
@@ -72,7 +94,7 @@ class Song {
 
         songs = await Promise.all(playlistData.videos.map(async video =>
             new YouTubeSong(`https://www.youtube.com/watch?v=${video.id}`, message.author, message.channel)
-                .finalizeFromData(video.id, video.title, video.duration / 1000, video.channel.name, video.views)));
+                .finalize(video.id, video.title, video.duration / 1000, video.channel.name, video.views)));
 
         return songs;
     }
@@ -90,6 +112,8 @@ class Song {
                 playlistSongs = [...playlistSongs, ...await this.unpackPlaylist(arg, message)];
             else if (utils.isURL(arg))
                 songs.push(arg);
+            else
+                songs.push(await utils.getUrl(arg));
         }
 
         return [[...songs, ...playlistSongs], songs.length === 0];
@@ -105,40 +129,38 @@ class YouTubeSong extends Song {
         super(url, author, channel);
     }
 
-    async finalize() {
-        let songMetadata = await ytdl.getBasicInfo(this.url);
+    async finalize(id, title, duration, artist, viewCount) {
+        let songMetadata = await ytdl.getInfo(this.url);
 
-        this.id = songMetadata.videoDetails.videoId;
+        this.id = id || songMetadata.videoDetails.videoId;
         this.thumbnail = `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`;
-        this.title = songMetadata.videoDetails.title;
-        this.formattedDuration = utils.formatDuration(songMetadata.videoDetails.lengthSeconds);
-        this.duration = songMetadata.videoDetails.lengthSeconds;
-        this.artist = songMetadata.videoDetails.author;
-        this.viewCount = songMetadata.videoDetails.viewCount;
+        this.title = title || songMetadata.videoDetails.title;
+        this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
+        this.formattedDuration = utils.formatDuration(this.duration);
+        this.artist = artist || songMetadata.videoDetails.author.name;
+        this.viewCount = viewCount || songMetadata.videoDetails.viewCount;
         return this;
     }
 
-    async finalizeFromData(id, title, duration, artist, viewCount) {
-        this.id = id;
-        this.thumbnail = `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`;
-        this.title = title;
-        this.duration = duration;
-        this.formattedDuration = utils.formatDuration(duration);
-        this.artist = artist;
-        this.viewCount = viewCount;
-        return this;
+    async getStreamURL() {
+        formats = (await ytdl.getInfo(this.url)).formats;
+        return formats.filter(format => format.mimeType.includes('audio/mp4'))[0].url;
     }
 
     getEmbed(embed) {
         return embed.addField('YT Channel', this.artist, true);
     }
 
-    get() {
-        return ytdl(this.url, {
+    async getStream(seek = 0) {
+        if (!seek) return ytdl(this.url, {
             filter: 'audioonly',
             quality: 'highestaudio',
             highWaterMark: 1 << 25
         });
+
+        return this.seek(await this.getStreamURL(), seek);
+    }
+
     }
 }
 
@@ -182,8 +204,10 @@ class FileSong extends Song {
         return embed;
     }
 
-    get() {
-        return this.url;
+    async getStream(seek = 0) {
+        if (seek === 0) return this.url;
+
+        return this.seek(this.url, seek);
     }
 }
 

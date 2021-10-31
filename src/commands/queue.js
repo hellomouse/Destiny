@@ -26,9 +26,9 @@ module.exports.run = async (client, message, args) => {
             seconds = '0' + seconds;
 
         if (serverQueue.loop === 'song' && i === 0)
-            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) 🔄 ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedBy}\`\`\n`;
+            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) 🔄 ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedBy.tag}\`\`\n`;
         else
-            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedBy}\`\`\n`;
+            queuetxt += `\`\`${i + 1}. (${minutes}:${seconds}) ${serverQueue.songs[i].title} requested by ${serverQueue.songs[i].requestedBy.tag}\`\`\n`;
     }
 
     utils.log('Showed music queue');
