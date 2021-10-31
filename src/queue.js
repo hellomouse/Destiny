@@ -31,6 +31,7 @@ class ServerQueue {
         this.skipped = false;
 
         this.shuffle = false;
+        this.shuffled = false;
         this.index = 0;
         this._isPlaying = false;
 
@@ -72,7 +73,7 @@ class ServerQueue {
      */
     play(errorCounter = 0) {
         if (this.isEmpty() || this.index < 0 || this.index >= this.size() ||
-            ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length && this.shuffle) {
+            ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length && !this.shuffled) {
             this._isPlaying = false;
             this.textChannel.send(embeds.defaultEmbed()
                 .setDescription('Finished playing!'));
@@ -84,6 +85,8 @@ class ServerQueue {
 
         this._isPlaying = true;
         utils.inactivity.onPlaying();
+
+        this.shuffled = false;
 
         const song = this.songs[this.index];
         this.textChannel = song.requestedChannel; // Update text channel
@@ -108,10 +111,18 @@ class ServerQueue {
 
             if (this.loop !== 'song' || this.skipped === true)
                 if (this.shuffle) {
-                    if (this.shuffleWaiting.length === 0 && ['none', 'off'].includes(this.loop)) this.shuffleWaiting = this.songs.map(x => x.uuid);
-                    let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length - 1);
+                    if (this.shuffleWaiting.length === 0 && this.loop === 'queue')
+                        this.shuffleWaiting = this.songs.map(x => x.uuid);
+
+                    let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
                     let uuidFind = this.shuffleWaiting[uuidIndex];
-                    this.index = this.songs.findIndex(x => x.uuid === uuidFind);
+
+                    // Check there are more songs to shuffle
+                    if (uuidFind) {
+                        this.index = this.songs.findIndex(x => x.uuid === uuidFind);
+                        this.shuffled = true;
+                    }
+
                     this.shuffleWaiting.splice(uuidIndex, 1);
                 } else
                     this.index++;
@@ -161,7 +172,8 @@ class ServerQueue {
     }
 
     shuffleOn() {
-        this.shuffleWaiting = this.songs.map(x => x.uuid);
+        let uuidFind = this.currentSong() ? this.currentSong().uuid : '';
+        this.shuffleWaiting = this.songs.filter(x => x.uuid !== uuidFind).map(x => x.uuid);
         this.shuffle = true;
     }
 
@@ -191,7 +203,7 @@ class ServerQueue {
         song.uuid = uuid.v4();
         this.songs.push(song);
 
-        if (this.shuffle)
+        if (this.shuffle && this.songs.length > 1)
             this.shuffleWaiting.push(song.uuid);
     }
 }

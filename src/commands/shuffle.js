@@ -1,6 +1,6 @@
 const embeds = require('../embeds.js');
 const queue = require('../queue.js');
-const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } = require('../commands.js');
+const { REQUIRE_USER_IN_VC } = require('../commands.js');
 
 /**
  * @description Shuffle the playlist
@@ -10,7 +10,7 @@ const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } = require('../commands.js'
  * @return {Promise<Message>} sent message
  */
 module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.get(message.guild.id);
+    const serverQueue = queue.queueManager.getOrCreate(message, message.member.voice.channel);
 
     if (serverQueue.shuffle) {
         serverQueue.shuffleOff();
@@ -26,4 +26,4 @@ module.exports.help = {
     desc: 'Shuffle playlist',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_USER_IN_VC;
+module.exports.requirements = REQUIRE_USER_IN_VC;
