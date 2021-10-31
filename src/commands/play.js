@@ -63,14 +63,12 @@ module.exports.run = async (client, message, args) => {
 
     let voiceChannel = message.member.voice.channel;
     let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
+    let song;
 
     for (let s of songs) {
-        let song = s instanceof Song ? s : await getSong(s, message.author, message.channel);
+        song = s instanceof Song ? s : await getSong(s, message.author, message.channel);
         if (song) serverQueue.add(song);
     }
-
-    let song = serverQueue.currentSong();
-    if (!song) return message.channel.send(embeds.errorEmbed().setTitle('Could not find song'));
 
     utils.log('Got music details, preparing the music to be played...');
 
