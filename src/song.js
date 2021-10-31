@@ -130,7 +130,16 @@ class YouTubeSong extends Song {
     }
 
     async finalize(id, title, duration, artist, viewCount) {
-        let songMetadata = await ytdl.getInfo(this.url);
+        const defaultSongMetadata = {
+            videoDetails: {
+                videoId: id,
+                title: 'Unknown Title',
+                lengthSeconds: 0,
+                author: { name: 'Unknown' },
+                viewCount: 0
+            }
+        };
+        let songMetadata = !id ? await ytdl.getInfo(this.url) : defaultSongMetadata;
 
         this.id = id || songMetadata.videoDetails.videoId;
         this.thumbnail = `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`;

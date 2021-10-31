@@ -25,7 +25,7 @@ module.exports.run = async (client, message, args) => {
         .then(list => list.filter(async x => x.videos.length > 0 ));
 
     if (!songs.length)
-        songs.push(await utils.getUrl(args));
+        songs.push(await utils.searchYoutube(args));
 
     let enqueuedEmbed;
     if (onlyPlaylistSongs)
