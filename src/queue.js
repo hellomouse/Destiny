@@ -25,7 +25,7 @@ class ServerQueue {
 
         this.songs = [];
         this.shuffleWaiting = []; // Songs to be played in shuffle mode
-        this.volume = 50;
+        this.volume = 70;
         this._paused = false;
         this.loop = 'none'; // in LOOP_MODES
         this.skipped = false;
