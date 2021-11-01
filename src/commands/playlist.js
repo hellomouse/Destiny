@@ -86,6 +86,7 @@ module.exports.run = async (client, message, args) => {
     }
     case 'play': {
         if (!hasPlaylist) return message.channel.send(embeds.errorEmbed().setDescription(`No such playlist exists`));
+        if (playlist.length === 0) return message.channel.send(embeds.defaultEmbed().setDescription(`Playlist is empty`));
 
         let voiceChannel = message.member.voice.channel;
         if (!voiceChannel) return message.channel.send(embeds.errorEmbed().setDescription('You need to be in a voice channel to use this subcommand'));

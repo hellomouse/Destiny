@@ -20,7 +20,7 @@ class LocalData extends Enmap {
     }
 
     getPlaylists(userId) {
-        if (!this.has('playlists', userId)) return {};
+        if (!this.get('playlists', userId)) return {};
 
         return this.get('playlists', userId);
     }
