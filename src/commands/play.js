@@ -18,7 +18,8 @@ module.exports.run = async (client, message, args) => {
 
     utils.log('Looking for music details...');
 
-    let [songs, onlyPlaylistSongs] = await Song.getSongURLs(args.join(' ').split(' | '), message, true);
+    let [songs, onlyPlaylistSongs, updatedArgs] = await Song.getSongURLs(args.join(' ').split(' | '), message, true);
+    args = updatedArgs;
     let playlists = await Promise.all(
         Song.getYouTubePlaylistURLs(args)
             .map(x => Song.getPlaylistData(x)))
@@ -26,9 +27,6 @@ module.exports.run = async (client, message, args) => {
 
     let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
     let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
-
-    if (!songs.length)
-        songs.push(await utils.searchYoutube(args));
 
     let enqueuedEmbed;
     if (playlists.length === 0)
@@ -39,7 +37,7 @@ module.exports.run = async (client, message, args) => {
         if (playlists.length === 1)
             enqueuedEmbed = embeds.playlistEmbed(playlists[0], undefined, `Added ${playlists[0].videos.length}/${playlists[0].videoCount} songs`);
         else
-            enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${actualVideoNum}/${expectedVideoNum} songs`);
+            enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
     else
         enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
 

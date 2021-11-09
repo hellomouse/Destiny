@@ -3,6 +3,7 @@ const utils = require('./utils.js');
 const ffmpeg = require('fluent-ffmpeg');
 const YouTube = require('youtube-sr').default;
 const Stream = require('stream');
+const request = require('request');
 
 /**
  * Base Song class, do not use directly!
@@ -102,9 +103,27 @@ class Song {
     static async getSongURLs(args, message, unpackPlaylists = false) {
         let songs = [];
         let playlistSongs = [];
+        let attachmentSongs = [];
 
         if (message.attachments.size > 0)
-            songs = message.attachments.map(x => x.url);
+            attachmentSongs = message.attachments.map(x => x.url);
+
+        // A file could link to itself? Maybe have recursive depth limit
+        // Currently, only file playlists can be used from attatchments but what about .txt links in args?
+        // ^ also means recursion is impossible unless you guess the link to be generated for the attatchment
+        attachmentSongs = await Promise.all(attachmentSongs.flatMap(async song =>
+            await new Promise((resolve, reject) => {
+                if (!song.endsWith('.txt')) resolve(song);
+                request(song, async (error, response, body) => {
+                    if (error) resolve([]);
+
+                    let lines = body.split('\n');
+                    let [songs_] = await this.getSongURLs(lines, { attachments: [] }, false);
+                    resolve(songs_);
+                });
+            })));
+
+        args = [...args, ...attachmentSongs.flat()];
 
         for (let arg of args) {
             let playlist = this.getYoutubePlaylistID(arg);
@@ -116,7 +135,7 @@ class Song {
                 await utils.getUrl(arg).then(song => songs.push(song)).catch(err => {});
         }
 
-        return [[...songs, ...playlistSongs], songs.length === 0];
+        return [[...songs, ...playlistSongs], songs.length === 0, args];
     }
 }
 
