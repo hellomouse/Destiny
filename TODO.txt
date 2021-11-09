@@ -44,7 +44,7 @@ colored terminal log
 Each ServerQueue should have it's own instance, also not all timers are cleared. Only dereferenced
 
 load playlists
-- from text file
+- from text file | DONE
 - add to local playlists (create new, append songs to existing) | DONE
 - remove songs from localplaylists with index?
 - remove more than one matching song from playlist?
