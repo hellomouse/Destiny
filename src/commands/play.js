@@ -24,40 +24,24 @@ module.exports.run = async (client, message, args) => {
             .map(x => Song.getPlaylistData(x)))
         .then(list => list.filter(async x => x.videos.length > 0 ));
 
+    let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
+    let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
+
     if (!songs.length)
         songs.push(await utils.searchYoutube(args));
 
     let enqueuedEmbed;
-    if (onlyPlaylistSongs)
+    if (playlists.length === 0)
+        enqueuedEmbed = embeds.defaultEmbed()
+            .setTitle('Added to Queue')
+            .setDescription(`Added ${songs.length} songs`);
+    else if (onlyPlaylistSongs)
         if (playlists.length === 1)
-            enqueuedEmbed = embeds.playlistEmbed(
-                playlists[0].url,
-                playlists[0].title,
-                `${playlists[0].videos.length}/${playlists[0].videoCount}`,
-                playlists[0].thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg')
-            );
-        else {
-            let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
-            let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
-            enqueuedEmbed = embeds.defaultEmbed()
-                .setTitle('Loading')
-                .setThumbnail(playlists[0].thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg'))
-                .setURL(playlists[0].url)
-                .setDescription(`Loading ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
-        }
-
-    if (playlists.length > 0) {
-        let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
-        let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
-        enqueuedEmbed = embeds.defaultEmbed()
-            .setTitle('Loading')
-            .setThumbnail(playlists[0].thumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg'))
-            .setURL(playlists[0].url)
-            .setDescription(`Loading ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
-    } else
-        enqueuedEmbed = embeds.defaultEmbed()
-            .setTitle('Loading')
-            .setDescription(`Loading ${songs.length} songs`);
+            enqueuedEmbed = embeds.playlistEmbed(playlists[0], undefined, `Added ${playlists[0].videos.length}/${playlists[0].videoCount} songs`);
+        else
+            enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${playlists[0].videos.length}/${playlists[0].videoCount} songs`);
+    else
+        enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
 
     message.channel.send(enqueuedEmbed);
 
@@ -77,9 +61,6 @@ module.exports.run = async (client, message, args) => {
         serverQueue.connection = connection;
         await serverQueue.play();
         serverQueue.resume();
-    } else {
-        utils.log(`Added music to the queue : ${song.title}`);
-        return message.channel.send(embeds.songEmbed(song, 'Added to Queue'));
     }
 };
 

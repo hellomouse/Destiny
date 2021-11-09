@@ -130,6 +130,9 @@ class ServerQueue {
             } else
                 this.index++;
 
+        if (this.loop === 'queue')
+            this.index %= this.size();
+
         await this.play();
     }
 
@@ -147,8 +150,6 @@ class ServerQueue {
             utils.inactivity.onNotPlaying(this);
             return;
         }
-        if (this.loop === 'queue')
-            this.index %= this.size();
 
         this._isPlaying = true;
         utils.inactivity.onPlaying();

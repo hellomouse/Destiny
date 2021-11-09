@@ -52,19 +52,21 @@ module.exports = {
 
     /**
      * Get an embed for a playlist
-     * @param {string} url URL to playlist
-     * @param {string} title Title of playlist
-     * @param {number} itemCount Approximate item count
-     * @param {string} thumbnail URL to thumbnail
+     * @param {playlist} playlist
+     * @param {string} title Custom title
+     * @param {string} description embed description
      * @return {MessageEmbed}
      */
-    playlistEmbed: (url, title, itemCount, thumbnail) => {
+    playlistEmbed: (playlist, title, description) => {
         let embed = defaultEmbed()
-            .setTitle(title)
-            .setDescription(`Loading playlist of ~${itemCount} songs`)
-            .setURL(url);
-        if (thumbnail)
-            embed.setThumbnail(thumbnail);
+            .setTitle(playlist.title)
+            .setURL(playlist.url);
+        if (title)
+            embed.setTitle(title);
+        if (playlist.thumbnail)
+            embed.setThumbnail(playlist.thumbnail);
+        if (description)
+            embed.setDescription(description);
         return embed;
     }
 };

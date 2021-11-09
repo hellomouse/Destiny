@@ -113,7 +113,7 @@ class Song {
             else if (utils.isURL(arg))
                 songs.push(arg);
             else
-                songs.push(await utils.getUrl(arg));
+                await utils.getUrl(arg).then(song => songs.push(song)).catch(err => {});
         }
 
         return [[...songs, ...playlistSongs], songs.length === 0];

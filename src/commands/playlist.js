@@ -95,7 +95,7 @@ module.exports.run = async (client, message, args) => {
         if (['-o', '--overwrite'].includes(args[2]))
             serverQueue.clear();
 
-        await play.run(client, message, playlist);
+        await play.run(client, message, [playlist.join(' | ')]);
         break;
     }
     default:
