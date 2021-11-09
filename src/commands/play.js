@@ -39,7 +39,7 @@ module.exports.run = async (client, message, args) => {
         if (playlists.length === 1)
             enqueuedEmbed = embeds.playlistEmbed(playlists[0], undefined, `Added ${playlists[0].videos.length}/${playlists[0].videoCount} songs`);
         else
-            enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${playlists[0].videos.length}/${playlists[0].videoCount} songs`);
+            enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${actualVideoNum}/${expectedVideoNum} songs`);
     else
         enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
 
