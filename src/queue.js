@@ -11,6 +11,10 @@ const LOOP_MODES = 'none,off,song,queue'.split(',');
  * @author Bowserinator
  */
 class ServerQueue {
+    static consts = {
+        DEFAULT_VOLUME: 70
+    };
+
     /**
      * Construct a server queue
      * @param {Message} message Message for the play command
@@ -25,7 +29,7 @@ class ServerQueue {
 
         this.songs = [];
         this.shuffleWaiting = []; // Songs to be played in shuffle mode
-        this.volume = 70;
+        this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this._paused = false;
         this.loop = 'none'; // in LOOP_MODES
         this.skipped = false;
@@ -163,7 +167,8 @@ class ServerQueue {
         this._isPlaying = true;
 
         if (this.lastNowPlayingMessage)
-            this.lastNowPlayingMessage.delete();
+            this.lastNowPlayingMessage.delete()
+                .catch(err => console.log(err));
 
         if (this.loop !== 'song' && errorCounter < 1)
             this.lastNowPlayingMessage = await song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
@@ -196,14 +201,21 @@ class ServerQueue {
     /**
      * Stop current song from playing and
      * clear the queue
+     * @param {boolean} restoreDefaults Restore ServerQueue defaults
      */
-    clear() {
+    clear(restoreDefaults = false) {
         this.skip();
         this.skipped = false;
         this._isPlaying = false;
         this.songs = [];
         this.shuffleWaiting = [];
         this.index = 0;
+
+        if (restoreDefaults) {
+            this.setLoopMode('off');
+            this.shuffleOff();
+            this.setVolume(ServerQueue.consts.DEFAULT_VOLUME);
+        }
     }
 
     /** Pause currently playing song */
@@ -223,6 +235,10 @@ class ServerQueue {
     shuffleOff() {
         this.shuffleWaiting = [];
         this.shuffle = false;
+    }
+
+    setVolume(volume) {
+        this.volume = volume;
     }
 
     /** Resume currently playing song */

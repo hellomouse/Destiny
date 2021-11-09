@@ -15,7 +15,7 @@ module.exports.run = async (client, message, args) => {
         return;
 
     utils.log('Stopped playing music');
-    serverQueue.clear();
+    serverQueue.clear(true);
     serverQueue.voiceChannel.leave();
 
     return message.channel.send(embeds.defaultEmbed().setDescription(':wave:'));
