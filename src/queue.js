@@ -35,6 +35,8 @@ class ServerQueue {
         this.index = 0;
         this._isPlaying = false;
 
+        this.lastNowPlayingMessage;
+
         this.ignoreNextSongEnd = false; // Don't run anything after dispatcher ends for next end, for seeking
 
         utils.inactivity.onNotPlaying(this);
@@ -160,8 +162,11 @@ class ServerQueue {
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
+        if (this.lastNowPlayingMessage)
+            this.lastNowPlayingMessage.delete();
+
         if (this.loop !== 'song' && errorCounter < 1)
-            song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
+            this.lastNowPlayingMessage = await song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
