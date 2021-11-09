@@ -74,6 +74,14 @@ class ServerQueue {
         return this._isPlaying;
     }
 
+    async sendNowPlayingEmbed(song) {
+        if (this.lastNowPlayingMessage)
+            this.lastNowPlayingMessage.delete()
+                .catch(err => console.log(err));
+
+        this.lastNowPlayingMessage = await song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
+    }
+
     /**
      * Seek current song to seekTime (validated)
      * @param {number} seekTime Seek time in seconds
@@ -166,12 +174,8 @@ class ServerQueue {
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
-        if (this.lastNowPlayingMessage)
-            this.lastNowPlayingMessage.delete()
-                .catch(err => console.log(err));
-
-        if (this.loop !== 'song' && errorCounter < 1)
-            this.lastNowPlayingMessage = await song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
+        if (errorCounter < 1)
+            await this.sendNowPlayingEmbed(song);
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
