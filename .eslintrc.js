@@ -11,9 +11,9 @@ module.exports = {
             experimentalObjectRestSpread: true
         }
     },
-    extends: ['eslint:recommended', '@hellomouse'],
+    extends: ['eslint:recommended', '@hellomouse/typescript'],
     rules: {
-        'indent': ['error', 4],
+        '@typescript-eslint/indent': ['error', 4],
         'curly': ['error', 'multi'],
         'padded-blocks': [
             'error',
