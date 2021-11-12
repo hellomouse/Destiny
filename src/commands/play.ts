@@ -4,6 +4,7 @@ import embeds from'../embeds';
 
 import REQUIRE_USER_IN_VC from '../commands';
 import { Song, getSong } from '../song';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Play a song with the provided link
@@ -12,7 +13,7 @@ import { Song, getSong } from '../song';
  * @param {Array<string>} args args[0] must be a link, or args is the song name
  * @return {Promise<Message>} sent message
  */
-export const run = async (client, message, args) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     if (!args[0] && message.attachments.size === 0)
         throw new utils.FlagHelpError();
 

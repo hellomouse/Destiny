@@ -4,6 +4,7 @@ import localData from '../local-data';
 import config from '../../config';
 import { queueManager } from '../queue';
 import { run as playRun } from './play.js'; // This is a hack for now
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Manage playlists
@@ -12,7 +13,7 @@ import { run as playRun } from './play.js'; // This is a hack for now
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-export const run = async (client, message, args) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     // TODO: validate playlist names
 
     if ([args[0]] === 'list' && ['create', 'delete', 'add', 'remove'].includes(args[1]))

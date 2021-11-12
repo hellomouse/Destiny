@@ -8,7 +8,7 @@ function load(client: Client) {
 
     if (!process.env.TOKEN)
         try {
-            require('./config.ts');
+            require('./config.js');
         } catch (e) {
             console.error('No config file found, create it or use environnement variables.');
             process.exit(1);
@@ -45,7 +45,7 @@ function load(client: Client) {
         fs.readdir('./src/events/', (err, files) => {
             if (err) return console.error;
             files.forEach(file => {
-                if (!file.endsWith('.ts')) return;
+                if (!file.endsWith('.js')) return;
                 let path = require.resolve('./src/events/${file}');
                 delete require.cache[path];
                 let evt = require(path);
@@ -100,5 +100,5 @@ client.lastToken = null;
 load(client);
 
 /* ----------------------------------------------- */
-
-require('repl').start('> ').context.client = client;
+import { start } from 'repl';
+start('> ').context.client = client;

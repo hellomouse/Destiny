@@ -43,7 +43,7 @@ class LocalData extends Enmap {
 }
 
 
-export = new LocalData({
+export default new LocalData({
     name: 'local-data',
     fetchAll: true,
     autoEnsure: {

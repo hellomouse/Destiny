@@ -6,10 +6,11 @@ import commands from '../commands.js';
 import { queueManager } from '../queue.js';
 
 import prefix = config.prefix;
+import { Client, Message } from 'discord.js';
 
 const MAX_LEN = 1000; // TODO: remove
 
-export default async (client, message) => {
+export default async (client: Client, message: Message) => {
     if (message.content.indexOf(prefix) === 0) {
         // Ignore self messages
         if (message.author.id === client.user.id)

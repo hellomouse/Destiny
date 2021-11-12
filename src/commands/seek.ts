@@ -2,6 +2,7 @@ import embeds from '../embeds.js';
 import utils from '../utils';
 import { queueManager } from '../queue.js';
 import commands from '../commands.js';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Seek to a given timestamp
@@ -10,7 +11,7 @@ import commands from '../commands.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-export const run = async (client, message, args) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     if (!args[0])
         throw new utils.FlagHelpError();
 

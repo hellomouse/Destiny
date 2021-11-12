@@ -2,6 +2,7 @@ import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import utils from '../utils.js';
 import commands from '../commands.js';
+import { Client, Message } from 'discord.js';
 
 const MAX_VOLUME = utils.MAX_VOLUME;
 
@@ -12,7 +13,7 @@ const MAX_VOLUME = utils.MAX_VOLUME;
  * @param {Array<string>} args args[0]: Volume as integer from 0 to 100
  * @return {Promise<Message>} sent message
  */
-export const run = async (client, message, args) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.getOrCreate(message, message.member.voice.channel);
 
     if (args.length > 1)

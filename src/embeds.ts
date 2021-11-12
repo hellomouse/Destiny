@@ -37,7 +37,7 @@ export = {
      * @param {boolean} showDuration show duration
      * @return {MessageEmbed}
      */
-    songEmbed: (song, title, showDuration = true) => {
+    songEmbed: (song, title: string, showDuration = true) => {
         let embed = defaultEmbed()
             .setTitle(showDuration ?
                 `${title} (${song.formattedDuration})` :
@@ -57,7 +57,7 @@ export = {
      * @param {string} description embed description
      * @return {MessageEmbed}
      */
-    playlistEmbed: (playlist, title, description) => {
+    playlistEmbed: (playlist, title: string, description: string) => {
         let embed = defaultEmbed()
             .setTitle(playlist.title)
             .setURL(playlist.url);

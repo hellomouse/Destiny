@@ -2,6 +2,7 @@ import strings from '../strings.json';
 import utils from '../utils';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Show the guild's song queue
@@ -10,7 +11,7 @@ import { queueManager } from '../queue.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-export const run = async (client, message, args) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild.id);
     if (!serverQueue || serverQueue.size() === 0)
         return message.channel.send(embeds.songQueueEmpty());

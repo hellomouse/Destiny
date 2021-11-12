@@ -2,6 +2,7 @@ import utils from '../utils';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import commands from '../commands.js';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Skip the current song
@@ -10,7 +11,7 @@ import commands from '../commands.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-export const run = async (client, message, args) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild.id);
     utils.log(`Skipped music : ${serverQueue.songs[0].title}`);
     serverQueue.skip();
