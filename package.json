@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "start": "node build/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
