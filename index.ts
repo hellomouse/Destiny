@@ -46,7 +46,7 @@ function load(client: Client) {
             if (err) return console.error;
             files.forEach(file => {
                 if (!file.endsWith('.js')) return;
-                let path = require.resolve('./src/events/${file}');
+                let path = require.resolve(`./src/events/${file}`);
                 delete require.cache[path];
                 let evt = require(path);
                 let evtName = file.split('.')[0];
@@ -61,7 +61,7 @@ function load(client: Client) {
     fs.readdir('./src/commands/', async (err, files) => {
         if (err) return console.error;
         files.forEach(file => {
-            if (!file.endsWith('.ts')) return;
+            if (!file.endsWith('.js')) return;
             let path = require.resolve(`./src/commands/${file}`);
             delete require.cache[path];
             let props = require(path);
