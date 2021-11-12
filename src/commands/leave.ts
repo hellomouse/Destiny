@@ -1,6 +1,6 @@
-const utils = require('../utils');
-const embeds = require('../embeds.js');
-const queue = require('../queue.js');
+import utils = require('../utils');
+import embeds = require('../embeds.js');
+import queue = require('../queue.js');
 
 /**
  * @description Stops the music and make the bot leave the channel

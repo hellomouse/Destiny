@@ -1,7 +1,10 @@
-const config = require('../config.js');
-const utils = require('./utils.js');
-const embeds = require('./embeds.js');
-const uuid = require('uuid');
+import config = require('../config.js');
+import utils = require('./utils.js');
+import embeds = require('./embeds.js');
+
+import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel } from 'discord.js';
+import type { Song } from './song';
+import { VoiceConnection } from '@discordjs/voice';
 
 const LOOP_MODES = 'none,off,song,queue'.split(',');
 
@@ -10,7 +13,26 @@ const LOOP_MODES = 'none,off,song,queue'.split(',');
  * Tracks current song, dispatcher, etc...
  * @author Bowserinator
  */
-class ServerQueue {
+export class ServerQueue {
+
+    public serverID: string | undefined;
+    public textChannel: TextChannel | DMChannel | NewsChannel;
+    public voiceChannel: VoiceChannel;
+    public connection?: VoiceConnection;
+    public connection.dispatcher = 
+    public songs: Array<Song>;
+    public shuffleWaiting: Array<string>;
+    public volume: number;
+    public _paused: boolean;
+    public loop: 'song' | 'none' | 'off' | 'queue';
+    public skipped: boolean;
+    public shuffle: boolean;
+    public shuffled: boolean;
+    public index: number;
+    public _isPlaying: boolean;
+    public lastNowPlayingMessage?: Message;
+    public ignoreNextSongEnd: boolean;
+
     static consts = {
         DEFAULT_VOLUME: 70
     };
@@ -20,12 +42,12 @@ class ServerQueue {
      * @param {Message} message Message for the play command
      * @param {VoiceChannel} voiceChannel Voice channel to play in
      */
-    constructor(message, voiceChannel) {
-        this.serverID = message.guild.id;
+    constructor(message: Message, voiceChannel: VoiceChannel) {
+        this.serverID = message.guild?.id;
         this.textChannel = message.channel;
         this.voiceChannel = voiceChannel;
 
-        this.connection = null;
+        this.connection = undefined;
 
         this.songs = [];
         this.shuffleWaiting = []; // Songs to be played in shuffle mode
@@ -58,11 +80,11 @@ class ServerQueue {
         return this.songs.length;
     }
 
-    index() {
+    getIndex() {
         return this.index;
     }
 
-    setLoopMode(loop) {
+    setLoopMode(loop: 'song' | 'none' | 'off' | 'queue') {
         this.loop = loop;
     }
 
@@ -74,7 +96,7 @@ class ServerQueue {
         return this._isPlaying;
     }
 
-    async sendNowPlayingEmbed(song) {
+    async sendNowPlayingEmbed(song: Song) {
         if (this.lastNowPlayingMessage)
             this.lastNowPlayingMessage.delete()
                 .catch(err => console.log(err));
@@ -88,18 +110,18 @@ class ServerQueue {
      * @param {number} errorCounter Errors occured
      * @return {number} Validated seek time
      */
-    async seekTo(seekTime, errorCounter = 0) {
+    async seekTo(seekTime: number, errorCounter = 0) {
         const song = this.currentSong();
 
         seekTime = Math.max(0, seekTime);
         seekTime = Math.min(song.duration, seekTime);
 
         this.ignoreNextSongEnd = true;
-        this.connection.dispatcher.end();
-        let dispatcher = this.connection.play(await song.getStream(seekTime));
+        this.connection?.dispatcher.end();
+        let dispatcher = this.connection?.play(await song.getStream(seekTime));
 
         dispatcher.on('finish', this.onSongFinish.bind(this));
-        dispatcher.on('error', async error => {
+        dispatcher.on('error', async (error: string) => {
             console.log('seek dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
             await this.seekTo(seekTime, errorCounter + 1);
@@ -126,7 +148,7 @@ class ServerQueue {
         this.skipped = false;
         if (this.songs.length === 0) return;
 
-        if (this.loop !== 'song' || this.skipped === true)
+        if (this.loop !== 'song' || this.skipped)
             if (this.shuffle) {
                 if (this.shuffleWaiting.length === 0 && this.loop === 'queue')
                     this.shuffleWaiting = this.songs.map(x => x.uuid);
@@ -179,10 +201,10 @@ class ServerQueue {
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
-        let dispatcher = this.connection.play(await song.getStream());
+        let dispatcher = this.connection?.play(await song.getStream());
 
         dispatcher.on('finish', this.onSongFinish.bind(this));
-        dispatcher.on('error', async error => {
+        dispatcher.on('error', async (error: string) => {
             console.log('dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
             await this.play(errorCounter + 1);
@@ -198,7 +220,7 @@ class ServerQueue {
      */
     skip() {
         this.skipped = true;
-        if (this.connection.dispatcher)
+        if (this.connection?.dispatcher)
             this.connection.dispatcher.end();
     }
 
@@ -226,7 +248,7 @@ class ServerQueue {
     pause() {
         if (this._paused) return;
         this._paused = true;
-        this.connection.dispatcher.pause();
+        this.connection?.dispatcher.pause();
         utils.inactivity.onNotPlaying(this);
     }
 
@@ -241,7 +263,7 @@ class ServerQueue {
         this.shuffle = false;
     }
 
-    setVolume(volume) {
+    setVolume(volume: number) {
         this.volume = volume;
     }
 
@@ -253,17 +275,16 @@ class ServerQueue {
         // Hacky fix for a bug that was never fixed
         // This resume-pause-resume must be followed if running
         // node > v14.15.5
-        this.connection.dispatcher.resume();
-        this.connection.dispatcher.pause();
-        this.connection.dispatcher.resume();
+        this.connection?.dispatcher.resume();
+        this.connection?.dispatcher.pause();
+        this.connection?.dispatcher.resume();
     }
 
     /**
      * Add a song to the queue
      * @param {Song} song Song to add
      */
-    add(song) {
-        song.uuid = uuid.v4();
+    add(song: Song) {
         this.songs.push(song);
 
         if (this.shuffle && this.songs.length > 1)
@@ -275,7 +296,9 @@ class ServerQueue {
  * Queue manager
  * @author Bowserinator
  */
-class QueueManager {
+export class QueueManager {
+    private _queues: Record<string, ServerQueue | undefined>;
+
     constructor() {
         this._queues = {};
     }
@@ -288,9 +311,9 @@ class QueueManager {
      * @param {VoiceChannel} voiceChannel voice channel
      * @return {ServerQueue} Server queue instance for server
      */
-    getOrCreate(message, voiceChannel) {
-        const serverID = message.guild.id;
-        if (this._queues[serverID])
+    getOrCreate(message: Message, voiceChannel: VoiceChannel) {
+        const serverID = message.guild?.id;
+        if (serverID && this._queues[serverID])
             return this._queues[serverID];
         return this.add(new ServerQueue(message, voiceChannel));
     }
@@ -307,11 +330,13 @@ class QueueManager {
      * @param {ServerQueue} queue Queue to add
      * @return {ServerQueue} Queue instance
      */
-    add(queue) {
+    add(queue: ServerQueue) {
+        if (queue.serverID === undefined) return;
+
         if (this._queues[queue.serverID])
             return this._queues[queue.serverID];
         if (config.onlyOneVoiceChannel) {
-            Object.values(this._queues).filter(x => x).forEach(q => q.clear());
+            Object.values(this._queues).filter(x => x).forEach(q => q?.clear());
             this._queues = {};
         }
         this._queues[queue.serverID] = queue;
@@ -323,9 +348,11 @@ class QueueManager {
      * if it exists.
      * @param {string} serverID guild ID
      */
-    remove(serverID) {
-        if (this._queues[serverID])
-            this._queues[serverID].clear();
+    remove(serverID: string) {           
+        if (this._queues[serverID]) {
+            let serverQueue = this._queues[serverID];
+            if (serverQueue) serverQueue.clear();
+        }
         this._queues[serverID] = undefined;
     }
 
@@ -334,11 +361,11 @@ class QueueManager {
      * @param {string} serverID guild ID
      * @return {ServerQueue}
      */
-    get(serverID) {
+    get(serverID: string) {
         return this._queues[serverID];
     }
 }
 
 const queueManager = new QueueManager();
 
-module.exports = { ServerQueue, queueManager, LOOP_MODES };
+export { queueManager, LOOP_MODES };

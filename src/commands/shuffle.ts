@@ -1,6 +1,6 @@
-const embeds = require('../embeds.js');
-const queue = require('../queue.js');
-const { REQUIRE_USER_IN_VC } = require('../commands.js');
+import embeds = require('../embeds.js');
+import queue = require('../queue.js');
+import { REQUIRE_USER_IN_VC } from '../commands.js';
 
 /**
  * @description Shuffle the playlist

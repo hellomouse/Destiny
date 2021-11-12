@@ -1,5 +1,5 @@
-const utils = require('../utils');
-const queue = require('../queue.js');
+import utils = require('../utils');
+import queue = require('../queue.js');
 
 module.exports = async (oldVoiceState, newVoiceState) => {
     let serverQueue = queue.queueManager.get(newVoiceState.guild.id);

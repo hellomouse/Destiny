@@ -1,15 +1,15 @@
-const { MessageEmbed } = require('discord.js');
-const config = require('../config.js');
+import { MessageEmbed } from 'discord.js';
+import config = require('../config.js');
 
 // Default embed
 const defaultEmbed = () => new MessageEmbed()
-    .setColor();
+    //.setColor();
     // .setTimestamp();
 
 // Error embeds
 const errorEmbed = () => defaultEmbed().setColor(0xFF0000);
 
-module.exports = {
+export = {
     defaultEmbed,
     errorEmbed,
 

@@ -1,6 +1,6 @@
-const embeds = require('../embeds.js');
-const utils = require('../utils');
-const queue = require('../queue.js');
+import embeds = require('../embeds.js');
+import utils = require('../utils');
+import queue = require('../queue.js');
 const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } = require('../commands.js');
 
 /**

@@ -1,7 +1,7 @@
-const utils = require('../utils');
-const queue = require('../queue.js');
-const embeds = require('../embeds.js');
-const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } = require('../commands.js');
+import utils = require('../utils');
+import queue = require('../queue');
+import embeds = require('../embeds');
+import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } from '../commands';
 
 /**
  * @description Get current playing song

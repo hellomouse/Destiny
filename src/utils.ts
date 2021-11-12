@@ -1,17 +1,25 @@
-const AsciiTable = require('ascii-table/ascii-table');
-const YouTube = require('youtube-sr').default;
+import AsciiTable from 'ascii-table/ascii-table';
+import YouTube from 'youtube-sr';
 
-const embeds = require('./embeds.js');
-const config = require('../config');
+import embeds from './embeds.js';
+import config from '../config';
+import type { ServerQueue } from './queue';
 
 class FlagHelpError extends Error {
-    constructor(message) {
+    constructor(message: string) {
         super(message);
         this.name = 'FlagHelpError';
     }
 }
-
+ 
 class Inactivity {
+    private config: {
+        waitRejoinSeconds: number,
+        botIdleSeconds: number
+    };
+    private aloneTimer: NodeJS.Timeout;
+    private inactivityTimer: NodeJS.Timeout;
+
     constructor() {
         this.config = Object.assign({
             waitRejoinSeconds: 60,
@@ -26,7 +34,7 @@ class Inactivity {
         this.inactivityTimer = setTimeout(() => { }, 0);
     }
 
-    onAlone(serverQueue) {
+    onAlone(serverQueue: ServerQueue) {
         clearTimeout(this.aloneTimer);
         if (this.config.waitRejoinSeconds < 0) return;
         setTimeout(() => {
@@ -39,7 +47,7 @@ class Inactivity {
         clearTimeout(this.aloneTimer);
     }
 
-    onNotPlaying(serverQueue) {
+    onNotPlaying(serverQueue: ServerQueue) {
         clearTimeout(this.inactivityTimer);
         if (this.config.botIdleSeconds < 0) return;
         setTimeout(() => {
@@ -53,12 +61,12 @@ class Inactivity {
     }
 }
 
-module.exports = {
+export = {
     /**
      * @description Sends logs to console and adds the date/time
      * @param {*} content
      */
-    log: content => {
+    log: (content: any) => {
         let dateObj = new Date();
 
         let date = dateObj.getDate().toString();
@@ -81,7 +89,7 @@ module.exports = {
      * @param {string} url
      * @return {boolean} Is url?
      */
-    isURL: url => {
+    isURL: (url: string): boolean => {
         if (!url) return false;
         let pattern = new RegExp('^(https?:\\/\\/)?' +
             '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
@@ -98,7 +106,7 @@ module.exports = {
      * @param {object} loaded
      * @return {string} ASCII table
      */
-    showTable: loaded => {
+    showTable: (loaded: {commands: Array<string>, events: Array<string>}) => {
         let table = new AsciiTable('Loading content...');
         table.setHeading('Commands', 'Events');
         for (let i = 0; i <= Math.max(loaded.commands.length, loaded.events.length) - 1; i++)
@@ -107,21 +115,20 @@ module.exports = {
         return table.render();
     },
 
-    getUrl: async words => {
-        let stringOfWords = words.join ? words.join(' ') : words;
-        let lookingOnYtb = new Promise((resolve, reject) => {
-            YouTube.search(stringOfWords, { limit: 1 })
+    getUrl: async (words: string | Array<string>): Promise<string> => {
+        let stringOfWords = Array.isArray(words) ? words.join(' ') : words;
+        let lookingOnYtb: Promise<string> = new Promise((resolve, reject) => {
+            YouTube.search(stringOfWords, { type: 'playlist', limit: 1 })
                 .then(result => {
                     resolve('https://www.youtube.com/watch?v=' + result[0].id);
                 })
                 .catch(err => reject(err));
         });
 
-        let link = await lookingOnYtb;
-        return link;
+        return await lookingOnYtb;
     },
 
-    formatDuration: sec => {
+    formatDuration: (sec: number) => {
         sec = Math.round(sec);
         let min = Math.floor(sec / 60);
         let hours = Math.floor(min / 60);
@@ -135,7 +142,7 @@ module.exports = {
         return result;
     },
 
-    getRandomInt(max) {
+    getRandomInt(max:number): number {
         return Math.floor(Math.random() * max);
     },
 

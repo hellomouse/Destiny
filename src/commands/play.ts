@@ -1,9 +1,9 @@
-const utils = require('../utils');
-const queue = require('../queue.js');
-const embeds = require('../embeds.js');
+import utils from'../utils';
+import queue from'../queue';
+import embeds from'../embeds';
 
-const { REQUIRE_USER_IN_VC } = require('../commands.js');
-const { Song, getSong } = require('../song');
+import REQUIRE_USER_IN_VC from '../commands';
+import { Song, getSong } from '../song';
 
 /**
  * @description Play a song with the provided link
@@ -26,9 +26,6 @@ module.exports.run = async (client, message, args) => {
 
     let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
     let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
-
-    if (!songs.length)
-        songs.push(await utils.searchYoutube(args));
 
     let enqueuedEmbed;
     if (playlists.length === 0)

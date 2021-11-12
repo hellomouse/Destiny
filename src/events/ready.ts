@@ -1,4 +1,4 @@
-const utils = require('../utils');
+import utils = require('../utils');
 
 module.exports = client => {
     // client.user.setActivity("gud music", {type: "LISTENING"});

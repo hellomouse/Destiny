@@ -1,7 +1,7 @@
-const embeds = require('../embeds.js');
-const queue = require('../queue.js');
-const utils = require('../utils.js');
-const { REQUIRE_USER_IN_VC } = require('../commands.js');
+import embeds = require('../embeds.js');
+import queue = require('../queue.js');
+import utils = require('../utils.js');
+import { REQUIRE_USER_IN_VC } from '../commands.js';
 
 const MAX_VOLUME = utils.MAX_VOLUME;
 

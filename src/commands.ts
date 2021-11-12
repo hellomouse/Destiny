@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     // Enums for command requirements
     // Multiple requirements can be ORed together
     REQUIRE_QUEUE_NON_EMPTY: 1,

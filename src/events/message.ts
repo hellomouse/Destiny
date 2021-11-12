@@ -1,11 +1,11 @@
-const strings = require('../strings.json');
-const utils = require('../utils');
-const embeds = require('../embeds.js');
-const config = require('../../config.js');
-const commands = require('../commands.js');
-const queue = require('../queue.js');
+import strings = require('../strings.json');
+import utils = require('../utils');
+import embeds = require('../embeds.js');
+import config = require('../../config.js');
+import commands = require('../commands.js');
+import queue = require('../queue.js');
 
-const prefix = config.prefix;
+import prefix = config.prefix;
 
 const MAX_LEN = 1000; // TODO: remove
 

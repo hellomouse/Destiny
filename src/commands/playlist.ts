@@ -1,9 +1,9 @@
-const embeds = require('../embeds.js');
-const { Song } = require('../song.js');
-const localData = require('../local-data.js');
-const config = require('../../config.js');
-const queue = require('../queue.js');
-const play = require('./play.js'); // This is a hack for now
+import embeds from '../embeds';
+import Song from '../song';
+import localData from '../local-data';
+import config from '../../config';
+import queue from '../queue';
+import play from './play.js'; // This is a hack for now
 
 /**
  * @description Manage playlists

@@ -1,7 +1,8 @@
-const utils = require('../utils');
-const embeds = require('../embeds.js');
-const queue = require('../queue.js');
-const { REQUIRE_USER_IN_VC } = require('../commands.js');
+import utils from '../utils';
+import embeds from '../embeds.js';
+import { queueManager } from '../queue.js';
+import REQUIRE_USER_IN_VC from '../commands';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Make the bot join the current voice channel the user is in
@@ -10,9 +11,13 @@ const { REQUIRE_USER_IN_VC } = require('../commands.js');
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
+module.exports.run = async (client: Client, message: Message, args: Array<string>) => {
+    if (!message || !message.member) return;
+
     const voiceChannel = message.member.voice.channel;
-    const serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
+    if (!voiceChannel) return; // You need to be in a voice channel
+
+    const serverQueue = queueManager.getOrCreate(message, voiceChannel);
     const connection = await voiceChannel.join();
 
     serverQueue.connection = connection;

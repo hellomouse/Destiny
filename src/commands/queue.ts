@@ -1,7 +1,7 @@
-const strings = require('../strings.json');
-const utils = require('../utils');
-const embeds = require('../embeds.js');
-const queue = require('../queue.js');
+import strings = require('../strings.json');
+import utils = require('../utils');
+import embeds = require('../embeds.js');
+import queue = require('../queue.js');
 
 /**
  * @description Show the guild's song queue

@@ -1,4 +1,4 @@
-const Enmap = require('enmap');
+import Enmap = require('enmap');
 
 class LocalData extends Enmap {
     constructor(...args) {
@@ -43,7 +43,7 @@ class LocalData extends Enmap {
 }
 
 
-module.exports = new LocalData({
+export = new LocalData({
     name: 'local-data',
     fetchAll: true,
     autoEnsure: {

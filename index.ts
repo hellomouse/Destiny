@@ -1,14 +1,14 @@
-const fs = require('fs');
-const Enmap = require('enmap');
-require('./src/local-data.js');
+import fs = require('fs');
+import Enmap = require('enmap');
+import './src/local-data.js';
 
-function load(client) {
-    const utils = require('./src/utils');
+function load(client: Client) {
+    let utils = require('./src/utils');
     let config = require('./config.js');
 
     if (!process.env.TOKEN)
         try {
-            require('./config.js');
+            require('./config.ts');
         } catch (e) {
             console.error('No config file found, create it or use environnement variables.');
             process.exit(1);
@@ -45,15 +45,15 @@ function load(client) {
         fs.readdir('./src/events/', (err, files) => {
             if (err) return console.error;
             files.forEach(file => {
-                if (!file.endsWith('.js')) return;
-                const path = require.resolve(`./src/events/${file}`);
+                if (!file.endsWith('.ts')) return;
+                let path = require.resolve('./src/events/${file}');
                 delete require.cache[path];
-                const evt = require(path);
+                let evt = require(path);
                 let evtName = file.split('.')[0];
                 loaded.events.push(evtName);
                 client.on(evtName, evt.bind(null, client));
             });
-            resolve();
+            resolve(undefined);
         });
     });
 
@@ -61,8 +61,8 @@ function load(client) {
     fs.readdir('./src/commands/', async (err, files) => {
         if (err) return console.error;
         files.forEach(file => {
-            if (!file.endsWith('.js')) return;
-            const path = require.resolve(`./src/commands/${file}`);
+            if (!file.endsWith('.ts')) return;
+            let path = require.resolve(`./src/commands/${file}`);
             delete require.cache[path];
             let props = require(path);
             props.names.forEach(name => {
@@ -92,8 +92,8 @@ function load(client) {
     loaded.commands.push('reload');
 }
 
-const Discord = require('discord.js');
-const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS] });
+import { Client, Intents } from 'discord.js';
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 client.lastToken = null;
 
