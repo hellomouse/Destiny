@@ -1,5 +1,5 @@
 import utils from'../utils';
-import queue from'../queue';
+import { queueManager } from'../queue';
 import embeds from'../embeds';
 
 import REQUIRE_USER_IN_VC from '../commands';
@@ -12,7 +12,7 @@ import { Song, getSong } from '../song';
  * @param {Array<string>} args args[0] must be a link, or args is the song name
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
+export const run = async (client, message, args) => {
     if (!args[0] && message.attachments.size === 0)
         throw new utils.FlagHelpError();
 
@@ -43,7 +43,7 @@ module.exports.run = async (client, message, args) => {
     message.channel.send(enqueuedEmbed);
 
     let voiceChannel = message.member.voice.channel;
-    let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
+    let serverQueue = queueManager.getOrCreate(message, voiceChannel);
     let song;
 
     for (let s of songs) {
@@ -61,9 +61,9 @@ module.exports.run = async (client, message, args) => {
     }
 };
 
-module.exports.names = ['play', 'p'];
-module.exports.help = {
+export const names = ['play', 'p'];
+export const help = {
     desc: 'Add a song to the queue',
     syntax: '<youtube url | playlist | file | search query>'
 };
-module.exports.requirements = REQUIRE_USER_IN_VC;
+export const requirements = REQUIRE_USER_IN_VC;

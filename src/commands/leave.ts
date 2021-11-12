@@ -1,6 +1,7 @@
-import utils = require('../utils');
-import embeds = require('../embeds.js');
-import queue = require('../queue.js');
+import utils from '../utils';
+import embeds from '../embeds.js';
+import { queueManager } from '../queue.js';
+import Discord, { Client, Message } from 'discord.js';
 
 /**
  * @description Stops the music and make the bot leave the channel
@@ -9,8 +10,8 @@ import queue = require('../queue.js');
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.get(message.guild.id);
+export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message> => {
+    const serverQueue = queueManager.get(message.guild.id);
     if (!serverQueue) // Not in VC, ignore
         return;
 
@@ -21,8 +22,8 @@ module.exports.run = async (client, message, args) => {
     return message.channel.send(embeds.defaultEmbed().setDescription(':wave:'));
 };
 
-module.exports.names = ['dc', 'disconnect', 'leave', 'die', 'fuckoff'];
-module.exports.help = {
+export const names = ['dc', 'disconnect', 'leave', 'die', 'fuckoff'];
+export const help = {
     desc: 'Disconnect the bot',
     syntax: ''
 };

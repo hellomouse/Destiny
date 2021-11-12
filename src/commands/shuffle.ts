@@ -1,6 +1,6 @@
-import embeds = require('../embeds.js');
-import queue = require('../queue.js');
-import { REQUIRE_USER_IN_VC } from '../commands.js';
+import embeds from '../embeds.js';
+import { queueManager } from '../queue.js';
+import commands from '../commands.js';
 
 /**
  * @description Shuffle the playlist
@@ -9,8 +9,8 @@ import { REQUIRE_USER_IN_VC } from '../commands.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.getOrCreate(message, message.member.voice.channel);
+export const run = async (client, message, args) => {
+    const serverQueue = queueManager.getOrCreate(message, message.member.voice.channel);
 
     if (serverQueue.shuffle) {
         serverQueue.shuffleOff();
@@ -21,9 +21,9 @@ module.exports.run = async (client, message, args) => {
     }
 };
 
-module.exports.names = ['shuffle'];
-module.exports.help = {
+export const names = ['shuffle'];
+export const help = {
     desc: 'Shuffle playlist',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_USER_IN_VC;
+export const requirements = commands.REQUIRE_USER_IN_VC;

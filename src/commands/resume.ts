@@ -1,7 +1,7 @@
-import embeds = require('../embeds.js');
-import utils = require('../utils');
-import queue = require('../queue.js');
-import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } from '../commands';
+import embeds from '../embeds.js';
+import utils from '../utils';
+import { queueManager } from '../queue.js';
+import commands from '../commands';
 
 /**
  * @description Resume current song
@@ -10,17 +10,17 @@ import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } from '../commands';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.get(message.guild.id);
+export const run = async (client, message, args) => {
+    const serverQueue = queueManager.get(message.guild.id);
     serverQueue.resume();
 
     utils.log(`Resumed music playback`);
     return message.channel.send(embeds.defaultEmbed().setDescription(`:play_pause: Playback resumed`));
 };
 
-module.exports.names = ['resume', 'unpause'];
-module.exports.help = {
+export const names = ['resume', 'unpause'];
+export const help = {
     desc: 'Resume playback',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_USER_IN_VC;
+export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_USER_IN_VC;

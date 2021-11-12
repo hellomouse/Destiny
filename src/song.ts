@@ -3,7 +3,7 @@ import utils from './utils.js';
 import ffmpeg from 'fluent-ffmpeg';
 import YouTube from 'youtube-sr';
 import Stream from 'stream';
-import uuid = require('uuid');
+import uuid from 'uuid';
 import type { DMChannel, Message, MessageEmbed, NewsChannel, TextChannel, User } from 'discord.js';
 
 /**

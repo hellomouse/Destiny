@@ -1,15 +1,15 @@
-import strings = require('../strings.json');
-import utils = require('../utils');
-import embeds = require('../embeds.js');
-import config = require('../../config.js');
-import commands = require('../commands.js');
-import queue = require('../queue.js');
+import strings from '../strings.json';
+import utils from '../utils';
+import embeds from '../embeds.js';
+import config from '../../config.js';
+import commands from '../commands.js';
+import { queueManager } from '../queue.js';
 
 import prefix = config.prefix;
 
 const MAX_LEN = 1000; // TODO: remove
 
-module.exports = async (client, message) => {
+export default async (client, message) => {
     if (message.content.indexOf(prefix) === 0) {
         // Ignore self messages
         if (message.author.id === client.user.id)
@@ -33,12 +33,12 @@ module.exports = async (client, message) => {
 
         if (cmd.requirements) {
             if (cmd.requirements & commands.REQUIRE_QUEUE_NON_EMPTY) {
-                const serverQueue = queue.queueManager.get(message.guild.id);
+                const serverQueue = queueManager.get(message.guild.id);
                 if (!serverQueue)
                     return message.channel.send(embeds.songQueueEmpty());
             }
             if (cmd.requirements & commands.REQUIRE_IS_PLAYING) {
-                const serverQueue = queue.queueManager.get(message.guild.id);
+                const serverQueue = queueManager.get(message.guild.id);
                 if (!serverQueue.isPlaying())
                     return message.channel.send(embeds.queueNotPlaying());
             }

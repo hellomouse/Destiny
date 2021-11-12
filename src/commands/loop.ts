@@ -1,7 +1,8 @@
-import embeds = require('../embeds.js');
-import utils = require('../utils');
-import queue = require('../queue.js');
-import { REQUIRE_USER_IN_VC } from '../commands.js';
+import embeds from '../embeds.js';
+import utils from '../utils';
+import { queueManager, LOOP_MODES } from '../queue.js';
+import commands from '../commands.js';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Loop the current song
@@ -10,15 +11,15 @@ import { REQUIRE_USER_IN_VC } from '../commands.js';
  * @param {Array<string>} args Optional loop mode
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.getOrCreate(message, message.member.voice.channel);
+export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message> => {
+    const serverQueue = queueManager.getOrCreate(message, message.member.voice.channel);
 
-    let loopMode = queue.LOOP_MODES[(queue.LOOP_MODES.indexOf(serverQueue.loop) + 1) % queue.LOOP_MODES.length];
+    let loopMode = LOOP_MODES[(LOOP_MODES.indexOf(serverQueue.loop) + 1) % queue.LOOP_MODES.length];
     if (args[0]) {
-        if (!queue.LOOP_MODES.includes(args[0].toLowerCase()))
+        if (!LOOP_MODES.includes(args[0].toLowerCase()))
             return message.channel.send(embeds.errorEmbed()
                 .setTitle(`Invalid loop mode \`${args[0].toLowerCase()}\``)
-                .setDescription(`Loop mode should be one of \`${queue.LOOP_MODES.join(', ')}\``));
+                .setDescription(`Loop mode should be one of \`${LOOP_MODES.join(', ')}\``));
         loopMode = args[0].toLowerCase();
     }
 
@@ -27,9 +28,9 @@ module.exports.run = async (client, message, args) => {
     return message.channel.send(embeds.defaultEmbed().setDescription(`Loop mode now set to \`${loopMode}\``));
 };
 
-module.exports.names = ['loop', 'l'];
-module.exports.help = {
+export const names = ['loop', 'l'];
+export const help = {
     desc: 'Change looping settings',
     syntax: '[loop | none | queue]'
 };
-module.exports.requirements = REQUIRE_USER_IN_VC;
+export const requirements = commands.REQUIRE_USER_IN_VC;

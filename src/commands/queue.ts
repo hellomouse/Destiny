@@ -1,7 +1,7 @@
-import strings = require('../strings.json');
-import utils = require('../utils');
-import embeds = require('../embeds.js');
-import queue = require('../queue.js');
+import strings from '../strings.json';
+import utils from '../utils';
+import embeds from '../embeds.js';
+import { queueManager } from '../queue.js';
 
 /**
  * @description Show the guild's song queue
@@ -10,8 +10,8 @@ import queue = require('../queue.js');
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.get(message.guild.id);
+export const run = async (client, message, args) => {
+    const serverQueue = queueManager.get(message.guild.id);
     if (!serverQueue || serverQueue.size() === 0)
         return message.channel.send(embeds.songQueueEmpty());
 
@@ -36,8 +36,8 @@ module.exports.run = async (client, message, args) => {
 };
 
 
-module.exports.names = ['queue', 'q'];
-module.exports.help = {
+export const names = ['queue', 'q'];
+export const help = {
     desc: 'View the current song queue',
     syntax: ''
 };

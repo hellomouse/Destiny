@@ -1,7 +1,7 @@
-import utils = require('../utils');
-import embeds = require('../embeds.js');
-import queue = require('../queue.js');
-import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } from '../commands.js';
+import utils from '../utils';
+import embeds from '../embeds.js';
+import { queueManager } from '../queue.js';
+import commands from '../commands.js';
 
 /**
  * @description Skip the current song
@@ -10,17 +10,17 @@ import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } from '../commands.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.get(message.guild.id);
+export const run = async (client, message, args) => {
+    const serverQueue = queueManager.get(message.guild.id);
     utils.log(`Skipped music : ${serverQueue.songs[0].title}`);
     serverQueue.skip();
 
     return message.channel.send(embeds.songEmbed(serverQueue.currentSong(), 'Skipping', false));
 };
 
-module.exports.names = ['skip', 's'];
-module.exports.help = {
+export const names = ['skip', 's'];
+export const help = {
     desc: 'Skip the current song',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_USER_IN_VC;
+export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_USER_IN_VC;

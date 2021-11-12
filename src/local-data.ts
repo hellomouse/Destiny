@@ -1,4 +1,4 @@
-import Enmap = require('enmap');
+import Enmap from 'enmap';
 
 class LocalData extends Enmap {
     constructor(...args) {

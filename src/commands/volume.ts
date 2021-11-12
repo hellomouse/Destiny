@@ -1,7 +1,7 @@
-import embeds = require('../embeds.js');
-import queue = require('../queue.js');
-import utils = require('../utils.js');
-import { REQUIRE_USER_IN_VC } from '../commands.js';
+import embeds from '../embeds.js';
+import { queueManager } from '../queue.js';
+import utils from '../utils.js';
+import commands from '../commands.js';
 
 const MAX_VOLUME = utils.MAX_VOLUME;
 
@@ -12,8 +12,8 @@ const MAX_VOLUME = utils.MAX_VOLUME;
  * @param {Array<string>} args args[0]: Volume as integer from 0 to 100
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.getOrCreate(message, message.member.voice.channel);
+export const run = async (client, message, args) => {
+    const serverQueue = queueManager.getOrCreate(message, message.member.voice.channel);
 
     if (args.length > 1)
         throw new utils.FlagHelpError();
@@ -34,9 +34,9 @@ module.exports.run = async (client, message, args) => {
     return serverQueue.connection.dispatcher.setVolumeLogarithmic(floatVolume / utils.VOLUME_BASE_UNIT);
 };
 
-module.exports.names = ['volume', 'v', 'vol'];
-module.exports.help = {
+export const names = ['volume', 'v', 'vol'];
+export const help = {
     desc: 'Set the volume of the music',
     syntax: '<volume 0-200>'
 };
-module.exports.requirements = REQUIRE_USER_IN_VC;
+export const requirements = commands.REQUIRE_USER_IN_VC;

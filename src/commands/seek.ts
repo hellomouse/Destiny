@@ -1,7 +1,7 @@
-import embeds = require('../embeds.js');
-import utils = require('../utils');
-import queue = require('../queue.js');
-import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } from '../commands.js';
+import embeds from '../embeds.js';
+import utils from '../utils';
+import { queueManager } from '../queue.js';
+import commands from '../commands.js';
 
 /**
  * @description Seek to a given timestamp
@@ -10,11 +10,11 @@ import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } from '../commands.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
+export const run = async (client, message, args) => {
     if (!args[0])
         throw new utils.FlagHelpError();
 
-    const serverQueue = queue.queueManager.get(message.guild.id);
+    const serverQueue = queueManager.get(message.guild.id);
 
     let seekTime = +args[0];
     if (Number.isNaN(+args[0])) {
@@ -40,9 +40,9 @@ module.exports.run = async (client, message, args) => {
     return message.channel.send(embeds.defaultEmbed().setDescription(`Seeking to \`${utils.formatDuration(seekTime)}\``));
 };
 
-module.exports.names = ['seek'];
-module.exports.help = {
+export const names = ['seek'];
+export const help = {
     desc: 'Seek to a given timestamp',
     syntax: '<Time in seconds | XXhXXmXXs | XX:XX:XX>'
 };
-module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_USER_IN_VC;
+export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_USER_IN_VC;

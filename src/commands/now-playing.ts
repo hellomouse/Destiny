@@ -1,7 +1,8 @@
-import utils = require('../utils');
-import queue = require('../queue');
-import embeds = require('../embeds');
-import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } from '../commands';
+import utils from '../utils';
+import { queueManager } from '../queue';
+import embeds from '../embeds';
+import commands from '../commands';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Get current playing song
@@ -10,8 +11,8 @@ import { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_IS_PLAYING } from '../commands';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.get(message.guild.id);
+export const run = async (client: Client, message: Message, args) => {
+    const serverQueue = queueManager.get(message.guild.id);
     const song = serverQueue.currentSong();
 
     if (!song) return message.channel.send(embeds.queueNotPlaying());
@@ -26,9 +27,9 @@ module.exports.run = async (client, message, args) => {
     return message.channel.send(embed);
 };
 
-module.exports.names = ['nowplaying', 'now_playing', 'np', 'playing', 'song', 'current'];
-module.exports.help = {
+export const names = ['nowplaying', 'now_playing', 'np', 'playing', 'song', 'current'];
+export const help = {
     desc: 'Get the currently playing song',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_IS_PLAYING;
+export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_IS_PLAYING;

@@ -1,8 +1,8 @@
-import utils = require('../utils');
-import queue = require('../queue.js');
+import utils from '../utils';
+import { queueManager } from '../queue.js';
 
-module.exports = async (oldVoiceState, newVoiceState) => {
-    let serverQueue = queue.queueManager.get(newVoiceState.guild.id);
+export default async (oldVoiceState, newVoiceState) => {
+    let serverQueue = queueManager.get(newVoiceState.guild.id);
     if (serverQueue === undefined) return;
 
     let voiceChannel = serverQueue.voiceChannel;

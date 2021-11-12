@@ -2,8 +2,8 @@ import embeds from '../embeds';
 import Song from '../song';
 import localData from '../local-data';
 import config from '../../config';
-import queue from '../queue';
-import play from './play.js'; // This is a hack for now
+import { queueManager } from '../queue';
+import { run as playRun } from './play.js'; // This is a hack for now
 
 /**
  * @description Manage playlists
@@ -12,7 +12,7 @@ import play from './play.js'; // This is a hack for now
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
+export const run = async (client, message, args) => {
     // TODO: validate playlist names
 
     if ([args[0]] === 'list' && ['create', 'delete', 'add', 'remove'].includes(args[1]))
@@ -90,12 +90,12 @@ module.exports.run = async (client, message, args) => {
 
         let voiceChannel = message.member.voice.channel;
         if (!voiceChannel) return message.channel.send(embeds.errorEmbed().setDescription('You need to be in a voice channel to use this subcommand'));
-        let serverQueue = queue.queueManager.getOrCreate(message, voiceChannel);
+        let serverQueue = queueManager.getOrCreate(message, voiceChannel);
         // Clear queue before playing local playlist
         if (['-o', '--overwrite'].includes(args[2]))
             serverQueue.clear();
 
-        await play.run(client, message, [playlist.join(' | ')]);
+        await playRun(client, message, [playlist.join(' | ')]);
         break;
     }
     default:
@@ -103,8 +103,8 @@ module.exports.run = async (client, message, args) => {
     }
 };
 
-module.exports.names = ['playlist', 'playlists', 'pl'];
-module.exports.help = {
+export const names = ['playlist', 'playlists', 'pl'];
+export const help = {
     desc: 'Manage user playlists',
     syntax: ''
 };

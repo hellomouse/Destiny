@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import config = require('../config.js');
+import config from '../config.js';
 
 // Default embed
 const defaultEmbed = () => new MessageEmbed()

@@ -1,5 +1,5 @@
-import fs = require('fs');
-import Enmap = require('enmap');
+import fs from 'fs';
+import Enmap from 'enmap';
 import './src/local-data.js';
 
 function load(client: Client) {

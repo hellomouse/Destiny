@@ -1,6 +1,6 @@
-import config = require('../config.js');
-import utils = require('./utils.js');
-import embeds = require('./embeds.js');
+import config from '../config.js';
+import utils from './utils.js';
+import embeds from './embeds.js';
 
 import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel } from 'discord.js';
 import type { Song } from './song';

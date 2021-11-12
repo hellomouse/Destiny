@@ -11,7 +11,7 @@ import { Client, Message } from 'discord.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client: Client, message: Message, args: Array<string>) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     if (!message || !message.member) return;
 
     const voiceChannel = message.member.voice.channel;
@@ -27,9 +27,9 @@ module.exports.run = async (client: Client, message: Message, args: Array<string
         .setDescription(`Joining ${voiceChannel.toString()}`));
 };
 
-module.exports.names = ['summon', 'join', 'j'];
-module.exports.help = {
+export const names = ['summon', 'join', 'j'];
+export const help = {
     desc: 'Summon the bot to the voice channel the user is in',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_USER_IN_VC;
+export const requirements = REQUIRE_USER_IN_VC;

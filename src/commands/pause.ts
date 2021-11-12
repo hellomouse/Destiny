@@ -1,6 +1,6 @@
-import embeds = require('../embeds.js');
-import utils = require('../utils');
-import queue = require('../queue.js');
+import embeds from '../embeds.js';
+import utils from '../utils';
+import { queueManager } from '../queue.js';
 const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } = require('../commands.js');
 
 /**
@@ -10,17 +10,17 @@ const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } = require('../commands.js'
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-module.exports.run = async (client, message, args) => {
-    const serverQueue = queue.queueManager.get(message.guild.id);
+export const run = async (client, message, args) => {
+    const serverQueue = queueManager.get(message.guild.id);
     serverQueue.pause();
 
     utils.log(`Paused music playback`);
     return message.channel.send(embeds.defaultEmbed().setDescription(`:pause_button: Playback paused`));
 };
 
-module.exports.names = ['pause', 'unresume'];
-module.exports.help = {
+export const names = ['pause', 'unresume'];
+export const help = {
     desc: 'Pause playback',
     syntax: ''
 };
-module.exports.requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_USER_IN_VC;
+export const requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_USER_IN_VC;

@@ -61,7 +61,7 @@ class Inactivity {
     }
 }
 
-export = {
+export default {
     /**
      * @description Sends logs to console and adds the date/time
      * @param {*} content
