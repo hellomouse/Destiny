@@ -1,6 +1,6 @@
-import utils from'../utils';
-import { queueManager } from'../queue';
-import embeds from'../embeds';
+import utils from '../utils';
+import { queueManager } from '../queue';
+import embeds from '../embeds';
 
 import REQUIRE_USER_IN_VC from '../commands';
 import { Song, getSong } from '../song';
@@ -43,7 +43,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     message.channel.send(enqueuedEmbed);
 
-    let voiceChannel = message.member.voice.channel;
+    let voiceChannel = message.member!.voice.channel!;
     let serverQueue = queueManager.getOrCreate(message, voiceChannel);
     let song;
 
@@ -55,7 +55,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     utils.log('Got music details, preparing the music to be played...');
 
     if (!serverQueue.isPlaying()) {
-        let connection = await voiceChannel.join();
+        let connection = await voiceChannel!.join();
         serverQueue.connection = connection;
         await serverQueue.play();
         serverQueue.resume();

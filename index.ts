@@ -1,5 +1,6 @@
 import fs from 'fs';
 import Enmap from 'enmap';
+import { Client, Command } from './src/types.js';
 import './src/local-data.js';
 
 function load(client: Client) {
@@ -39,7 +40,7 @@ function load(client: Client) {
 
     /* ----------------------------------------------- */
 
-    let loaded = { events: [], commands: [] };
+    let loaded: { events: string[], commands: string[]} = { events: [], commands: [] };
 
     let promise = new Promise(resolve => {
         fs.readdir('./src/events/', (err, files) => {
@@ -64,10 +65,12 @@ function load(client: Client) {
             if (!file.endsWith('.js')) return;
             let path = require.resolve(`./src/commands/${file}`);
             delete require.cache[path];
-            let props = require(path);
-            props.names.forEach(name => {
-                client.commands.set(name, props);
-            });
+            let props: Command = require(path);
+            if (Array.isArray(props.names))
+                props.names.forEach(name => {
+                    client.commands.set(name, props);
+                });
+
             let cmdName = file.split('.')[0];
             loaded.commands.push(cmdName);
         });
@@ -77,7 +80,7 @@ function load(client: Client) {
     });
 
     client.commands.set('reload', {
-        run: function reload(cl, message, args) {
+        run: function reload(cl: Client, message: Message, args: string[]) {
             client._events = {};
 
             load(cl);
@@ -92,8 +95,8 @@ function load(client: Client) {
     loaded.commands.push('reload');
 }
 
-import { Client, Intents } from 'discord.js';
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+import { Client as DiscordClient, Intents, Message } from 'discord.js';
+const client = new DiscordClient({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] }) as Client;
 
 client.lastToken = null;
 

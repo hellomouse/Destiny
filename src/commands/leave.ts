@@ -1,7 +1,7 @@
 import utils from '../utils';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
-import Discord, { Client, Message } from 'discord.js';
+import { Client, Message } from 'discord.js';
 
 /**
  * @description Stops the music and make the bot leave the channel
@@ -10,8 +10,8 @@ import Discord, { Client, Message } from 'discord.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message> => {
-    const serverQueue = queueManager.get(message.guild.id);
+export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message|void> => {
+    const serverQueue = queueManager.get(message.guild!.id);
     if (!serverQueue) // Not in VC, ignore
         return;
 

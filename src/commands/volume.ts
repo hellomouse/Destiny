@@ -14,14 +14,14 @@ const MAX_VOLUME = utils.MAX_VOLUME;
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
-    const serverQueue = queueManager.getOrCreate(message, message.member.voice.channel);
+    const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
     if (args.length > 1)
         throw new utils.FlagHelpError();
 
     if (args.length === 0)
         return message.channel.send(embeds.defaultEmbed()
-            .setDescription(`The current volume is **${serverQueue.volume}%**`));
+            .setDescription(`The current volume is **${serverQueue!.volume}%**`));
 
     let floatVolume = +args;
     if (Number.isNaN(floatVolume) || floatVolume < 0 || floatVolume > MAX_VOLUME)
@@ -31,8 +31,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     message.channel.send(embeds.defaultEmbed()
         .setDescription(`Volume set to **${floatVolume.toFixed(2)}%**`));
 
-    serverQueue.volume = floatVolume;
-    return serverQueue.connection.dispatcher.setVolumeLogarithmic(floatVolume / utils.VOLUME_BASE_UNIT);
+    serverQueue!.volume = floatVolume;
+    return serverQueue!.connection!.dispatcher.setVolumeLogarithmic(floatVolume / utils.VOLUME_BASE_UNIT);
 };
 
 export const names = ['volume', 'v', 'vol'];

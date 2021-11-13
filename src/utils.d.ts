@@ -1,1 +1,0 @@
-declare module 'ascii-table/ascii-table';

@@ -1,4 +1,4 @@
-import AsciiTable from 'ascii-table/ascii-table';
+import AsciiTable from 'ascii-table';
 import YouTube from 'youtube-sr';
 
 import embeds from './embeds.js';
@@ -6,12 +6,12 @@ import config from '../config';
 import type { ServerQueue } from './queue';
 
 class FlagHelpError extends Error {
-    constructor(message: string) {
+    constructor(message?: string) {
         super(message);
         this.name = 'FlagHelpError';
     }
 }
- 
+
 class Inactivity {
     private config: {
         waitRejoinSeconds: number,

@@ -1,15 +1,18 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, Message, MessageEmbed } from 'discord.js';
+import { Playlist } from 'youtube-sr';
 import config from '../config.js';
+import Song from './song.js';
+import { Command } from './types';
 
 // Default embed
-const defaultEmbed = () => new MessageEmbed()
-    //.setColor();
-    // .setTimestamp();
+const defaultEmbed = () => new MessageEmbed();
+// .setColor();
+// .setTimestamp();
 
 // Error embeds
 const errorEmbed = () => defaultEmbed().setColor(0xFF0000);
 
-export = {
+export default {
     defaultEmbed,
     errorEmbed,
 
@@ -17,7 +20,7 @@ export = {
     songQueueEmpty: () => defaultEmbed().setDescription('The queue is empty'),
     queueNotPlaying: () => defaultEmbed().setDescription('Nothing is playing right now'),
 
-    helpEmbed: cmd => {
+    helpEmbed: (cmd: Command) => {
         let embed = defaultEmbed()
             .setDescription((cmd.help && cmd.help.desc) ? cmd.help.desc : 'No description provided')
             .setFooter(`Type ${config.prefix}list to list commands, or ${config.prefix}help <command> for more info on a given command`)
@@ -25,7 +28,8 @@ export = {
 
         if (cmd.help && cmd.help.syntax)
             embed = embed.addField('Syntax', `\`${config.prefix}${cmd.names[0]} ${cmd.help.syntax}\``, true);
-        embed = embed.addField('Aliases', cmd.names.join(', '), true);
+        if (Array.isArray(cmd.names))
+            embed = embed.addField('Aliases', cmd.names.join(', '), true);
 
         return embed;
     },
@@ -37,11 +41,11 @@ export = {
      * @param {boolean} showDuration show duration
      * @return {MessageEmbed}
      */
-    songEmbed: (song, title: string, showDuration = true) => {
+    songEmbed: (song: Song, title: string, showDuration = true) => {
         let embed = defaultEmbed()
-            .setTitle(showDuration ?
-                `${title} (${song.formattedDuration})` :
-                title)
+            .setTitle(showDuration
+                ? `${title} (${song.formattedDuration})`
+                : title)
             .setDescription(`[${song.title}](${song.url}) [${song.requestedBy.toString()}]`)
             .setURL(song.url);
 
@@ -57,14 +61,14 @@ export = {
      * @param {string} description embed description
      * @return {MessageEmbed}
      */
-    playlistEmbed: (playlist, title: string, description: string) => {
+    playlistEmbed: (playlist: Playlist, title: string | undefined, description: string) => {
         let embed = defaultEmbed()
             .setTitle(playlist.title)
-            .setURL(playlist.url);
+            .setURL(playlist.url!);
         if (title)
             embed.setTitle(title);
         if (playlist.thumbnail)
-            embed.setThumbnail(playlist.thumbnail);
+            embed.setThumbnail(playlist.thumbnail!.url!);
         if (description)
             embed.setDescription(description);
         return embed;

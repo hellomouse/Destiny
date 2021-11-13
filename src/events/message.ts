@@ -6,20 +6,21 @@ import commands from '../commands.js';
 import { queueManager } from '../queue.js';
 
 import prefix = config.prefix;
-import { Client, Message } from 'discord.js';
+import { Message } from 'discord.js';
+import { Client } from '../types';
 
 const MAX_LEN = 1000; // TODO: remove
 
 export default async (client: Client, message: Message) => {
     if (message.content.indexOf(prefix) === 0) {
         // Ignore self messages
-        if (message.author.id === client.user.id)
+        if (message.author.id === client.user!.id)
             return;
 
         // Verify sender and server are allowed
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
-        const command = args.shift().toLowerCase();
+        const command = args.shift()!.toLowerCase();
         const cmd = client.commands.get(command);
 
         if (!cmd) return;
@@ -34,16 +35,16 @@ export default async (client: Client, message: Message) => {
 
         if (cmd.requirements) {
             if (cmd.requirements & commands.REQUIRE_QUEUE_NON_EMPTY) {
-                const serverQueue = queueManager.get(message.guild.id);
+                const serverQueue = queueManager.get(message.guild!.id);
                 if (!serverQueue)
                     return message.channel.send(embeds.songQueueEmpty());
             }
             if (cmd.requirements & commands.REQUIRE_IS_PLAYING) {
-                const serverQueue = queueManager.get(message.guild.id);
+                const serverQueue = queueManager.get(message.guild!.id)!;
                 if (!serverQueue.isPlaying())
                     return message.channel.send(embeds.queueNotPlaying());
             }
-            if (cmd.requirements & commands.REQUIRE_USER_IN_VC && !message.member.voice.channel)
+            if (cmd.requirements & commands.REQUIRE_USER_IN_VC && !message.member!.voice.channel)
                 return message.channel.send(embeds.notInVoiceChannelEmbed());
         }
 

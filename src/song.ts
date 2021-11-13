@@ -86,7 +86,7 @@ export default class Song {
      */
     static getYoutubePlaylistID(url: string) {
         if (!url) return;
-        const YT_REGEX = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+        const YT_REGEX = /^.*(youtu.be\/|list=)([^#&?]*).*/;
         const m = url.match(YT_REGEX);
         return m ? m[2] : null;
     }
@@ -113,7 +113,7 @@ export default class Song {
         return songs;
     }
 
-    static async getSongURLs(args: Array<string>, message: Message, unpackPlaylists = false) {
+    static async getSongURLs(args: Array<string>, message: Message, unpackPlaylists = false): Promise<[(string | YouTubeSong)[], boolean]> {
         let songs: Array<string> = [];
         let playlistSongs: Array<string | YouTubeSong> = [];
 
@@ -215,7 +215,7 @@ class FileSong extends Song {
         let searchTags = ['title', 'artist', 'album'];
         Object.entries(tags).forEach(([tag, value]) => {
             tag = tag.toLowerCase();
-            if (searchTags.includes(tag)) Object.assign(this, {tag: value});
+            if (searchTags.includes(tag)) Object.assign(this, { tag: value });
         });
 
         this.duration = format.duration || this.duration;

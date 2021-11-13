@@ -15,12 +15,12 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     if (!args[0])
         throw new utils.FlagHelpError();
 
-    const serverQueue = queueManager.get(message.guild.id);
+    const serverQueue = queueManager.get(message.guild!.id)!;
 
     let seekTime = +args[0];
     if (Number.isNaN(+args[0])) {
         // Try to match format: XXhXXm or AA:BB:CC
-        const getN = (match, n) => match && match[n] ? +match[n].replace(/[^0-9]/g, '') : 0;
+        const getN = (match: RegExpMatchArray, n: number) => match && match[n] ? +match[n].replace(/[^0-9]/g, '') : 0;
         const TIMESTAMP_REGEX_1 = /^(\d+:)?(\d+):(\d+)$/im;
         const TIMESTAMP_REGEX_2 = /^(\d+h)?(\d+m)?(\d+s)?$/im;
 

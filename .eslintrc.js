@@ -12,8 +12,9 @@ module.exports = {
         }
     },
     extends: ['eslint:recommended', '@hellomouse/typescript'],
+    ignorePatterns: ['build/**'],
     rules: {
-        '@typescript-eslint/indent': ['error', 4],
+        '@typescript-eslint/indent': ['error', 4, { SwitchCase: 2 }],
         'curly': ['error', 'multi'],
         'padded-blocks': [
             'error',

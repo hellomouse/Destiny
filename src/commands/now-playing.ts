@@ -11,13 +11,13 @@ import { Client, Message } from 'discord.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-export const run = async (client: Client, message: Message, args) => {
-    const serverQueue = queueManager.get(message.guild.id);
+export const run = async (client: Client, message: Message, args: Array<string>) => {
+    const serverQueue = queueManager.get(message.guild!.id)!;
     const song = serverQueue.currentSong();
 
     if (!song) return message.channel.send(embeds.queueNotPlaying());
 
-    const time = utils.formatDuration(serverQueue.connection.dispatcher.streamTime / 1000);
+    const time = utils.formatDuration(serverQueue.connection!.dispatcher.streamTime / 1000);
     const embed = song.getEmbed(
         embeds.songEmbed(song, 'Now Playing', false)
             .addField('Duration', `${time} / ${song.formattedDuration}`, true)

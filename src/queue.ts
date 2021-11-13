@@ -2,11 +2,11 @@ import config from '../config.js';
 import utils from './utils.js';
 import embeds from './embeds.js';
 
-import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel } from 'discord.js';
-import type { Song } from './song';
-import { VoiceConnection } from '@discordjs/voice';
+import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel, VoiceConnection } from 'discord.js';
+import type { FileSong, Song, YouTubeSong } from './song';
 
-const LOOP_MODES = 'none,off,song,queue'.split(',');
+const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
+type LOOP_MODES = typeof LOOP_MODES[number];
 
 /**
  * A queue for a specified server
@@ -19,8 +19,7 @@ export class ServerQueue {
     public textChannel: TextChannel | DMChannel | NewsChannel;
     public voiceChannel: VoiceChannel;
     public connection?: VoiceConnection;
-    public connection.dispatcher = 
-    public songs: Array<Song>;
+    public songs: Array<YouTubeSong | FileSong>;
     public shuffleWaiting: Array<string>;
     public volume: number;
     public _paused: boolean;
@@ -118,7 +117,7 @@ export class ServerQueue {
 
         this.ignoreNextSongEnd = true;
         this.connection?.dispatcher.end();
-        let dispatcher = this.connection?.play(await song.getStream(seekTime));
+        let dispatcher = this.connection?.play(await song.getStream(seekTime))!;
 
         dispatcher.on('finish', this.onSongFinish.bind(this));
         dispatcher.on('error', async (error: string) => {
@@ -201,7 +200,7 @@ export class ServerQueue {
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
-        let dispatcher = this.connection?.play(await song.getStream());
+        let dispatcher = this.connection?.play(await song.getStream())!;
 
         dispatcher.on('finish', this.onSongFinish.bind(this));
         dispatcher.on('error', async (error: string) => {
@@ -284,7 +283,7 @@ export class ServerQueue {
      * Add a song to the queue
      * @param {Song} song Song to add
      */
-    add(song: Song) {
+    add(song: YouTubeSong | FileSong) {
         this.songs.push(song);
 
         if (this.shuffle && this.songs.length > 1)
@@ -311,11 +310,13 @@ export class QueueManager {
      * @param {VoiceChannel} voiceChannel voice channel
      * @return {ServerQueue} Server queue instance for server
      */
-    getOrCreate(message: Message, voiceChannel: VoiceChannel) {
+    getOrCreate(message: Message, voiceChannel: VoiceChannel): ServerQueue {
         const serverID = message.guild?.id;
-        if (serverID && this._queues[serverID])
-            return this._queues[serverID];
-        return this.add(new ServerQueue(message, voiceChannel));
+        if (typeof serverID !== 'undefined')
+            if (typeof this._queues[serverID] !== 'undefined')
+                return this._queues[serverID]!;
+
+        return this.add(new ServerQueue(message, voiceChannel))!;
     }
 
     /**
@@ -348,7 +349,7 @@ export class QueueManager {
      * if it exists.
      * @param {string} serverID guild ID
      */
-    remove(serverID: string) {           
+    remove(serverID: string) {
         if (this._queues[serverID]) {
             let serverQueue = this._queues[serverID];
             if (serverQueue) serverQueue.clear();

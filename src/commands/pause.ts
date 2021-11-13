@@ -2,7 +2,7 @@ import embeds from '../embeds.js';
 import utils from '../utils';
 import { queueManager } from '../queue.js';
 import { Client, Message } from 'discord.js';
-const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } = require('../commands.js');
+import commands from '../commands.js';
 
 /**
  * @description Pause current song
@@ -12,7 +12,7 @@ const { REQUIRE_QUEUE_NON_EMPTY, REQUIRE_USER_IN_VC } = require('../commands.js'
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
-    const serverQueue = queueManager.get(message.guild.id);
+    const serverQueue = queueManager.get(message.guild!.id)!;
     serverQueue.pause();
 
     utils.log(`Paused music playback`);
@@ -24,4 +24,4 @@ export const help = {
     desc: 'Pause playback',
     syntax: ''
 };
-export const requirements = REQUIRE_QUEUE_NON_EMPTY | REQUIRE_USER_IN_VC;
+export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_USER_IN_VC;

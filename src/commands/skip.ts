@@ -12,11 +12,11 @@ import { Client, Message } from 'discord.js';
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
-    const serverQueue = queueManager.get(message.guild.id);
-    utils.log(`Skipped music : ${serverQueue.songs[0].title}`);
-    serverQueue.skip();
+    const serverQueue = queueManager.get(message.guild!.id);
+    utils.log(`Skipped music : ${serverQueue!.songs[0].title}`);
+    serverQueue!.skip();
 
-    return message.channel.send(embeds.songEmbed(serverQueue.currentSong(), 'Skipping', false));
+    return message.channel.send(embeds.songEmbed(serverQueue!.currentSong(), 'Skipping', false));
 };
 
 export const names = ['skip', 's'];

@@ -12,18 +12,19 @@ import { Client, Message } from 'discord.js';
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message> => {
-    const serverQueue = queueManager.getOrCreate(message, message.member.voice.channel);
+    const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
-    let loopMode = LOOP_MODES[(LOOP_MODES.indexOf(serverQueue.loop) + 1) % queue.LOOP_MODES.length];
-    if (args[0]) {
-        if (!LOOP_MODES.includes(args[0].toLowerCase()))
+    let loopMode = LOOP_MODES[(LOOP_MODES.indexOf(serverQueue.loop) + 1) % LOOP_MODES.length];
+    if (args[0])
+        if (!LOOP_MODES.includes(args[0].toLowerCase() as LOOP_MODES)) {
+            loopMode = args[0].toLowerCase() as LOOP_MODES;
             return message.channel.send(embeds.errorEmbed()
                 .setTitle(`Invalid loop mode \`${args[0].toLowerCase()}\``)
                 .setDescription(`Loop mode should be one of \`${LOOP_MODES.join(', ')}\``));
-        loopMode = args[0].toLowerCase();
-    }
+        }
 
-    serverQueue.setLoopMode(loopMode);
+
+    serverQueue.setLoopMode(loopMode as LOOP_MODES);
     utils.log(`Loop mode set to ${loopMode}`);
     return message.channel.send(embeds.defaultEmbed().setDescription(`Loop mode now set to \`${loopMode}\``));
 };

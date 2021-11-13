@@ -1,11 +1,11 @@
 import Enmap from 'enmap';
 
 class LocalData extends Enmap {
-    constructor(...args) {
+    constructor(...args: any[]) {
         super(...args);
     }
 
-    createPlaylist(userId, playlistName) {
+    createPlaylist(userId: string, playlistName: string) {
         if (!playlistName) return undefined;
 
         if (!this.has('playlists', userId))
@@ -15,30 +15,30 @@ class LocalData extends Enmap {
         return this.get('playlists', `${userId}.${playlistName}`);
     }
 
-    deletePlaylist(userId, playlistName) {
+    deletePlaylist(userId: string, playlistName: string) {
         this.delete('playlists', `${userId}.${playlistName}`);
     }
 
-    getPlaylists(userId) {
+    getPlaylists(userId: string) {
         if (!this.get('playlists', userId)) return {};
 
         return this.get('playlists', userId);
     }
 
-    hasPlaylist(userId, playlistName) {
+    hasPlaylist(userId: string, playlistName: string) {
         return this.has('playlists', `${userId}.${playlistName}`);
     }
 
-    addSong(userId, playlistName, songURL) {
+    addSong(userId: string, playlistName: string, songURL: string) {
         return this.push('playlists', songURL, `${userId}.${playlistName}`);
     }
 
-    removeSong(userId, playlistName, songURL) {
+    removeSong(userId: string, playlistName: string, songURL: string) {
         return this.remove('playlists', songURL, `${userId}.${playlistName}`);
     }
 
-    hasSong(userId, playlistName, songURL) {
-        return this.get('playlists', `${userId}.${playlistName}`).filter(x => x === songURL).length;
+    hasSong(userId: string, playlistName: string, songURL: string) {
+        return this.get('playlists', `${userId}.${playlistName}`).filter((x: string) => x === songURL).length;
     }
 }
 

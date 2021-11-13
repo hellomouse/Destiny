@@ -12,7 +12,7 @@ import { Client, Message } from 'discord.js';
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
-    const serverQueue = queueManager.get(message.guild.id);
+    const serverQueue = queueManager.get(message.guild!.id)!;
     serverQueue.resume();
 
     utils.log(`Resumed music playback`);
