@@ -30,8 +30,13 @@ class ServerQueue {
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this._paused = false;
 
-        this.loop = 'none';
-        this.loopEndTimeout;
+        this.loop = {
+            mode: 'none',
+            startTime: 0,
+            endTime: Infinity,
+            timeout: undefined,
+            repeats: Infinity
+        };
         
         this.skipped = false;
 
@@ -64,22 +69,25 @@ class ServerQueue {
     }
 
     loopEndTimeoutHandler() {
-        if (!(this.loopMode > 0)) {
-            clearTimeout(this.loopEndTimeout);
+        if (!(this.loop.mode > 0)) {
+            clearTimeout(this.loop.timeout);
             return;
         }
 
-        let loopEnd = this.loopMode * 1000; // convert to milliseconds
+        let loopEnd = this.loop.mode * 1000; // convert to milliseconds
         if (this.connection && this.connection.dispatcher) {
             let streamTime = this.connection.dispatcher.streamTime;
             if (streamTime >= loopEnd) {
-                clearTimeout(this.loopEndTimeout);
-                this.seekTo(0);
-                this.loopEndTimeout = setTimeout(() => this.loopEndTimeoutHandler(), loopEnd);;
+                clearTimeout(this.loop.timeout);
+                this.loop.repeats -= 1;
+                if (this.loop.repeats > 0) {
+                    this.seekTo(0);
+                    this.loop.timeout = setTimeout(() => this.loopEndTimeoutHandler(), loopEnd);
+                }
             }
             else {
-                clearTimeout(this.loopEndTimeout);
-                this.loopEndTimeout = setTimeout(() => this.loopEndTimeoutHandler(), streamTime - loopEnd);
+                clearTimeout(this.loop.timeout);
+                this.loop.timeout = setTimeout(() => this.loopEndTimeoutHandler(), streamTime - loopEnd);
             }
 
         }
@@ -87,30 +95,30 @@ class ServerQueue {
 
     setLoopMode(loopMode) {
         if (loopMode > 0) {
-            this.loopMode = loopMode;
+            this.loop.mode = loopMode;
             this.loopEndTimeoutHandler();
-            return this.loopMode;
+            return this.loop.mode;
         }
         switch (loopMode) {
             case 'none':
             case 'off':
-                this.loopMode = 'off';
+                this.loop.mode = 'off';
                 break;
             case 'song':
             case 'current':
-                this.loopMode = 'song';
+                this.loop.mode = 'song';
                 break;
             case 'queue':
-                this.loopMode = 'queue';
+                this.loop.mode = 'queue';
                 break;
             default:
                 return undefined;
         }
-        return this.loopMode;
+        return this.loop.mode;
     }
 
     getLoopMode() {
-        return this.loopMode;
+        return this.loop.mode;
     }
 
     currentSong() {
@@ -177,9 +185,9 @@ class ServerQueue {
         this.skipped = false;
         if (this.songs.length === 0) return;
 
-        if (this.loop !== 'song' || this.skipped === true)
+        if (this.loop.mode !== 'song' || this.skipped === true)
             if (this.shuffle) {
-                if (this.shuffleWaiting.length === 0 && this.loop === 'queue')
+                if (this.shuffleWaiting.length === 0 && this.loop.mode === 'queue')
                     this.shuffleWaiting = this.songs.map(x => x.uuid);
 
                 let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
@@ -195,7 +203,7 @@ class ServerQueue {
             } else
                 this.index++;
 
-        if (this.loop === 'queue')
+        if (this.loop.mode === 'queue')
             this.index %= this.size();
 
         await this.play();
@@ -208,7 +216,7 @@ class ServerQueue {
      */
     async play(errorCounter = 0) {
         if (this.isEmpty() || this.index < 0 || this.index >= this.size() ||
-            this.loop !== 'queue' && ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length && this.shuffle && !this.shuffled) {
+            this.loop.mode !== 'queue' && ['none', 'off'].includes(this.loop.mode) && !this.shuffleWaiting.length && this.shuffle && !this.shuffled) {
             this._isPlaying = false;
             this.textChannel.send(embeds.defaultEmbed()
                 .setDescription('Finished playing!'));
@@ -223,6 +231,7 @@ class ServerQueue {
 
         const song = this.currentSong();
         this.textChannel = song.requestedChannel; // Update text channel
+        this.loop.repeats = song.repeats;
         this._isPlaying = true;
 
         if (errorCounter < 1)

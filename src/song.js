@@ -25,6 +25,7 @@ class Song {
         this.formattedDuration = 'XX:XX';
         this.duration = Infinity;
         this.artist = undefined;
+        this.repeats = Infinity;
     }
 
     /**

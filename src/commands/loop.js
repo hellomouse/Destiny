@@ -14,10 +14,25 @@ module.exports.run = async (client, message, args) => {
     const serverQueue = queue.queueManager.getOrCreate(message, message.member.voice.channel);
 
     if (args[0]) {
-        let seekB = await utils.getTimeFromArgument(args[0]);
-        if (seekB > 0) {
-            loopMode = serverQueue.setLoopMode(seekB);
-            loopInfoText = "Looping song from 00:00 to " + seekB;
+        let times = args[0].split(/,|:|-/);
+
+        let loopStart = await utils.getTimeFromArgument(times[0]);
+        let loopEnd = await utils.getTimeFromArgument(times[1]);
+        if (times.length > 0) {
+            if (loopEnd === loopStart) return message.channel.send(embeds.errorEmbed()
+                .setTitle('Invalid A/B loop')
+                .setDescription('Loop start and end times cannot be the same')); 
+
+            if (loopEnd < loopStart) return message.channel.send(embeds.errorEmbed()
+                .setTitle('Invalid A/B loop')
+                .setDescription('Loop start time must precede it\'s end')); 
+
+            if (loopEnd === undefined) return message.channel.send(embeds.errorEmbed()
+                .setTitle('Invalid A/B loop')
+                .setDescription('Both loop start and end positions must be provided')); 
+
+            loopMode = serverQueue.setLoopMode(loopEnd);
+            loopInfoText = "Looping song from 00:00 to " + loopEnd;
         }
         else {
             loopMode = serverQueue.setLoopMode(args[0]);
