@@ -31,7 +31,10 @@ class ServerQueue {
         this.shuffleWaiting = []; // Songs to be played in shuffle mode
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this._paused = false;
+
         this.loop = 'none'; // in LOOP_MODES
+        this.loopEndTimeout;
+        
         this.skipped = false;
 
         this.shuffle = false;
@@ -62,8 +65,54 @@ class ServerQueue {
         return this.index;
     }
 
-    setLoopMode(loop) {
-        this.loop = loop;
+    loopEndTimeoutHandler() {
+        if (!(this.loopMode > 0)) {
+            clearTimeout(this.loopEndTimeout);
+            return;
+        }
+
+        let loopEnd = this.loopMode * 1000; // convert to milliseconds
+        if (this.connection.dispatcher) {
+            let streamTime = this.connection.dispatcher.streamTime;
+            if (streamTime >= loopEnd) {
+                clearTimeout(this.loopEndTimeout);
+                this.seekTo(0);
+                this.loopEndTimeout = setTimeout(() => this.loopEndTimeoutHandler(), loopEnd);;
+            }
+            else {
+                clearTimeout(this.loopEndTimeout);
+                this.loopEndTimeout = setTimeout(() => this.loopEndTimeoutHandler(), streamTime - loopEnd);
+            }
+
+        }
+    }
+
+    setLoopMode(loopMode) {
+        if (loopMode > 0) {
+            this.loopMode = loopMode;
+            this.loopEndTimeoutHandler();
+            return this.loopMode;
+        }
+        switch (loopMode) {
+            case 'none':
+            case 'off':
+                this.loopMode = 'off';
+                break;
+            case 'song':
+            case 'current':
+                this.loopMode = 'song';
+                break;
+            case 'queue':
+                this.loopMode = 'queue';
+                break;
+            default:
+                return undefined;
+        }
+        return this.loopMode;
+    }
+
+    getLoopMode() {
+        return this.loopMode;
     }
 
     currentSong() {
@@ -95,10 +144,14 @@ class ServerQueue {
         seekTime = Math.min(song.duration, seekTime);
 
         this.ignoreNextSongEnd = true;
-        this.connection.dispatcher.end();
+        if (this.connection.dispatcher)
+            this.connection.dispatcher.end();
         let dispatcher = this.connection.play(await song.getStream(seekTime));
 
         dispatcher.on('finish', this.onSongFinish.bind(this));
+        dispatcher.on('start', () => {
+            this.loopEndTimeoutHandler();
+        })
         dispatcher.on('error', async error => {
             console.log('seek dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
@@ -182,6 +235,9 @@ class ServerQueue {
         let dispatcher = this.connection.play(await song.getStream());
 
         dispatcher.on('finish', this.onSongFinish.bind(this));
+        dispatcher.on('start', () => {
+            this.loopEndTimeoutHandler();
+        })
         dispatcher.on('error', async error => {
             console.log('dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;

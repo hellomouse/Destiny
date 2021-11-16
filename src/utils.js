@@ -139,6 +139,30 @@ module.exports = {
         return Math.floor(Math.random() * max);
     },
 
+    async getTimeFromArgument(arg) {
+        if (arg === undefined) return undefined;
+
+        seekTime = +arg;
+        if (Number.isNaN(+arg)) {
+            // Try to match format: XXhXXm or AA:BB:CC
+            const getN = (match, n) => match && match[n] ? +match[n].replace(/[^0-9]/g, '') : 0;
+            const TIMESTAMP_REGEX_1 = /^(\d+:)?(\d+):(\d+)$/im;
+            const TIMESTAMP_REGEX_2 = /^(\d+h)?(\d+m)?(\d+s)?$/im;
+    
+            let m = arg.match(TIMESTAMP_REGEX_1);
+            if (m) seekTime = getN(m, 1) * 60 * 60 + getN(m, 2) * 60 + getN(m, 3);
+    
+            if (!m) {
+                m = arg.match(TIMESTAMP_REGEX_2);
+                if (m) seekTime = getN(m, 1) * 60 * 60 + getN(m, 2) * 60 + getN(m, 3);
+            }
+
+            return seekTime;
+        }
+
+        return seekTime;
+    },
+
     FlagHelpError,
 
     inactivity: new Inactivity(),
