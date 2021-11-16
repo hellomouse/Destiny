@@ -3,8 +3,6 @@ const utils = require('./utils.js');
 const embeds = require('./embeds.js');
 const uuid = require('uuid');
 
-const LOOP_MODES = 'none,off,song,queue'.split(',');
-
 /**
  * A queue for a specified server
  * Tracks current song, dispatcher, etc...
@@ -32,7 +30,7 @@ class ServerQueue {
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this._paused = false;
 
-        this.loop = 'none'; // in LOOP_MODES
+        this.loop = 'none';
         this.loopEndTimeout;
         
         this.skipped = false;
@@ -72,7 +70,7 @@ class ServerQueue {
         }
 
         let loopEnd = this.loopMode * 1000; // convert to milliseconds
-        if (this.connection.dispatcher) {
+        if (this.connection && this.connection.dispatcher) {
             let streamTime = this.connection.dispatcher.streamTime;
             if (streamTime >= loopEnd) {
                 clearTimeout(this.loopEndTimeout);
@@ -397,4 +395,4 @@ class QueueManager {
 
 const queueManager = new QueueManager();
 
-module.exports = { ServerQueue, queueManager, LOOP_MODES };
+module.exports = { ServerQueue, queueManager };
