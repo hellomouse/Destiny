@@ -1,9 +1,14 @@
 module.exports = {
-    token: "your token",
-    prefix: "your prefix",
+    token: "bot_token",
+    prefix: "bot_prefix",
     inactivity: {
         waitRejoinSeconds: 60, // Number of seconds to wait for someone to rejoin the VC when it is empty before the bot leaves. Use -1 to disable this.
         botIdleSeconds: 600 // Inactivity in seconds before it leaves. Use -1 to disable this.
+    },
+    songManager: {
+        softNumLimit: 1000000, // When number of songs in cache surpasses this, launch a cleanup
+        hardNumLimit: 10000000, // Maximum size of songs cache
+        cacheCleanTimeoutDuration: 300 // Number of seconds between cleanups
     }
 
 };

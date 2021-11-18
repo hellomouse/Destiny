@@ -1,5 +1,6 @@
 import ytdl from 'ytdl-core';
 import utils from './utils.js';
+import config from './config';
 import ffmpeg from 'fluent-ffmpeg';
 import YouTube from 'youtube-sr';
 import Stream from 'stream';
@@ -11,11 +12,11 @@ import type { DMChannel, Message, MessageEmbed, NewsChannel, TextChannel, User }
  * @author BWBellairs
  */
 export default class Song {
+    public id: string;
+    public references: number;
     public url: string;
     public readonly uuid: string;
     public thumbnail?: string;
-    public requestedBy: User;
-    public requestedChannel: TextChannel | NewsChannel | DMChannel;
 
     public title: string;
     public formattedDuration: string;
@@ -29,11 +30,11 @@ export default class Song {
      * @param {TextChannel} channel Channel command was run
      */
     constructor(url: string, author: User, channel: TextChannel | NewsChannel | DMChannel) {
+        this.id = uuid.v4();
+        this.references = 0;
         this.url = url;
         this.uuid = uuid.v4();
         this.thumbnail = undefined;
-        this.requestedBy = author;
-        this.requestedChannel = channel;
 
         this.title = 'No title';
         this.formattedDuration = 'XX:XX';
@@ -238,6 +239,70 @@ class FileSong extends Song {
     }
 }
 
+enum SongManagerErrors {
+    CacheFull,
+    SongAlreadyExists
+}
+export class SongManager {
+    private static songs: Map<string, Song>;
+    private static cacheCleanTimeout: NodeJS.Timeout;
+    private static cacheCleanTimeoutDestroyed: boolean;
+    private static cacheCleanTimeoutDuration: number;
+
+    constructor() {
+        SongManager.songs = new Map();
+        SongManager.cacheCleanTimeout = setTimeout(() => {}, 0);
+        SongManager.cacheCleanTimeoutDuration = config.songManager.cacheCleanTimeoutDuration *= 1000;
+        SongManager.cacheCleanTimeoutDestroyed = true;
+    }
+
+    static addSong(song: Song) {
+        if (SongManager.songs.size >= config.songManager.hardNumLimit) return SongManagerErrors.CacheFull;
+        if (SongManager.getSong(song.id)) return SongManagerErrors.SongAlreadyExists;
+
+        SongManager.songs.set(song.id, song);
+
+        SongManager.checkCleanup();
+    }
+
+    static getSong(id: string) {
+        return SongManager.songs.get(id);
+    }
+
+    static clean() {
+        SongManager.songs.forEach((song: Song, key: string, songs: Map<string, Song>) => {
+            if (song.references === 0) songs.delete(key);
+        });
+        SongManager.cacheCleanTimeoutDestroyed = true;
+    }
+
+    static checkCleanup() {
+        if (this.songs.size > config.songManager.softNumLimit)
+            if (SongManager.cacheCleanTimeoutDestroyed) {
+                SongManager.cacheCleanTimeoutDestroyed = false;
+                SongManager.cacheCleanTimeout = setTimeout(SongManager.clean, SongManager.cacheCleanTimeoutDuration);
+            }
+    }
+}
+
+new SongManager();
+
+class SongReferemce {
+    public readonly id: string;
+    public readonly requestedBy: User;
+    public requestedChannel: TextChannel | NewsChannel | DMChannel;
+
+    constructor(id: string, requestedBy: User, requestedChannel: TextChannel | NewsChannel | DMChannel) {
+        this.id = id;
+        this.requestedBy = requestedBy;
+        this.requestedChannel = requestedChannel;
+    }
+
+    get song() {
+        return SongManager.getSong(this.id);
+    }
+}
+
 /**
  * Get a Song object given its url
  * @param {string} url Url to song
@@ -255,5 +320,5 @@ async function getSong(url: string, author: User, channel: TextChannel | NewsCha
         return await new FileSong(url, author, channel).finalize();
 }
 
-export { getSong, Song, YouTubeSong, FileSong };
+export { getSong, Song, YouTubeSong, FileSong, SongManagerErrors };
 
