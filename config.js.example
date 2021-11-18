@@ -9,8 +9,8 @@ module.exports = {
         softNumLimit: 1000000, // When number of songs in cache surpasses this, launch a cleanup
         hardNumLimit: 10000000, // Maximum size of songs cache
         cacheCleanTimeoutDuration: 300 // Number of seconds between cleanups
-    }
-
+    },
+    allowed: []
 };
 
 /* remove .example from the name of this file */

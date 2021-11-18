@@ -1,12 +1,12 @@
 import strings from '../strings.json';
 import utils from '../utils';
-import embeds from '../embeds.js';
-import config from '../../config.js';
-import commands from '../commands.js';
-import { queueManager } from '../queue.js';
+import embeds from '../embeds';
+import config from '../../config';
+import commands from '../commands';
+import { queueManager } from '../queue';
 
 import prefix = config.prefix;
-import { Message } from 'discord.js';
+import { DMChannel, Message, NewsChannel, ThreadChannel } from 'discord.js';
 import { Client } from '../types';
 
 const MAX_LEN = 1000; // TODO: remove
@@ -47,6 +47,10 @@ export default async (client: Client, message: Message) => {
             if (cmd.requirements & commands.REQUIRE_USER_IN_VC && !message.member!.voice.channel)
                 return message.channel.send(embeds.notInVoiceChannelEmbed());
         }
+
+        if (message.channel instanceof NewsChannel || message.channel instanceof DMChannel ||
+            message.channel instanceof ThreadChannel)
+            return; // commands cannot be run in those channels for now
 
         try {
             await cmd.run(client, message, args);

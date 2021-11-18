@@ -1,5 +1,4 @@
 import { Client, Message, MessageEmbed } from 'discord.js';
-import { Playlist } from 'youtube-sr';
 import config from '../config.js';
 import Song from './song.js';
 import { Command } from './types';
@@ -61,7 +60,8 @@ export default {
      * @param {string} description embed description
      * @return {MessageEmbed}
      */
-    playlistEmbed: (playlist: Playlist, title: string | undefined, description: string) => {
+    playlistEmbed: (playlist: {title: string, url: string, thumbnail: {url: string}},
+        title: string | undefined, description: string) => {
         let embed = defaultEmbed()
             .setTitle(playlist.title)
             .setURL(playlist.url!);

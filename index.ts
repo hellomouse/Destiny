@@ -1,11 +1,11 @@
 import fs from 'fs';
-import Enmap from 'enmap';
 import { Client, Command } from './src/types.js';
+import Enmap from 'enmap';
 import './src/local-data.js';
 
-function load(client: Client) {
-    let utils = require('./src/utils');
-    let config = require('./config.js');
+async function load(client: Client) {
+    let utils = (await import('./src/utils')).default;
+    let config = (await import('./config')).default;
 
     if (!process.env.TOKEN)
         try {
@@ -20,7 +20,7 @@ function load(client: Client) {
     }
     if (!process.env.ALLOWED)
         try {
-            config.allowed = require('./allowed.json').allowed;
+            config.allowed = (await import('./allowed.json')).allowed;
         } catch (e) {
             config.allowed = [];
         }
@@ -42,14 +42,14 @@ function load(client: Client) {
 
     let loaded: { events: string[], commands: string[]} = { events: [], commands: [] };
 
-    let promise = new Promise(resolve => {
+    await new Promise(resolve => {
         fs.readdir('./src/events/', (err, files) => {
             if (err) return console.error;
-            files.forEach(file => {
+            files.forEach(async file => {
                 if (!file.endsWith('.js')) return;
                 let path = require.resolve(`./src/events/${file}`);
                 delete require.cache[path];
-                let evt = require(path);
+                let evt = (await import(path)).default;
                 let evtName = file.split('.')[0];
                 loaded.events.push(evtName);
                 client.on(evtName, evt.bind(null, client));
@@ -59,24 +59,26 @@ function load(client: Client) {
     });
 
 
-    fs.readdir('./src/commands/', async (err, files) => {
-        if (err) return console.error;
-        files.forEach(file => {
-            if (!file.endsWith('.js')) return;
-            let path = require.resolve(`./src/commands/${file}`);
-            delete require.cache[path];
-            let props: Command = require(path);
-            if (Array.isArray(props.names))
-                props.names.forEach(name => {
-                    client.commands.set(name, props);
-                });
+    await new Promise(resolve => {
+        fs.readdir('./src/commands/', async (err, files) => {
+            if (err) return console.error;
+            files.forEach(async file => {
+                if (!file.endsWith('.js')) return;
+                let path = require.resolve(`./src/commands/${file}`);
+                delete require.cache[path];
+                let props: Promise<Command> = import(path);
+                if (Array.isArray(props.names))
+                    props.names.forEach(name => {
+                        client.commands.set(name, props);
+                    });
 
-            let cmdName = file.split('.')[0];
-            loaded.commands.push(cmdName);
+                let cmdName = file.split('.')[0];
+                loaded.commands.push(cmdName);
+            });
+            resolve(undefined);
         });
-        promise.then(() => {
-            utils.log(`Table of commands and events :\n${utils.showTable(loaded)}`);
-        });
+    }).then(() => {
+        utils.log(`Table of commands and events :\n${utils.showTable(loaded)}`);
     });
 
     client.commands.set('reload', {

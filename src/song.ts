@@ -1,11 +1,11 @@
 import ytdl from 'ytdl-core';
 import utils from './utils.js';
-import config from './config';
+import config from '../config';
 import ffmpeg from 'fluent-ffmpeg';
-import YouTube from 'youtube-sr';
+import playlist from 'ytpl';
 import Stream from 'stream';
 import uuid from 'uuid';
-import type { DMChannel, Message, MessageEmbed, NewsChannel, TextChannel, User } from 'discord.js';
+import type { Message, MessageEmbed, TextChannel, User } from 'discord.js';
 
 /**
  * Base Song class, do not use directly!
@@ -29,7 +29,7 @@ export default class Song {
      * @param {MessageAuthor} author Author of the request
      * @param {TextChannel} channel Channel command was run
      */
-    constructor(url: string, author: User, channel: TextChannel | NewsChannel | DMChannel) {
+    constructor(url: string, author: User, channel: TextChannel) {
         this.id = uuid.v4();
         this.references = 0;
         this.url = url;
@@ -62,7 +62,7 @@ export default class Song {
         ffmpeg(url)
             .seekInput(seekTime)
             .format('mp3')
-            .inputOptions( '-fflags', 'nobuffer', '-probesize', '32', '-analyzeduration', '0') // '-ss', seekTime,
+            .inputOptions('-fflags', 'nobuffer', '-probesize', '32', '-analyzeduration', '0') // '-ss', seekTime,
             .output(outputStream, { end: true })
             .noVideo()
             .on('error', e => console.error(e))
@@ -81,6 +81,84 @@ export default class Song {
         return embed;
     }
 
+    static async getSongURLs(args: Array<string>, message: Message,
+        unpackPlaylists = false): Promise<[(Song | Promise<Song> | undefined)[], boolean]> {
+        let songs: Array<Song | undefined> = [];
+        let playlistSongs: Array<Promise<Song>> = [];
+
+        if (message.attachments.size > 0)
+            args = [...args, ...message.attachments.map(x => x.url)];
+
+        for (let arg of args) {
+            let isPlaylist = YouTubeSong.getYoutubePlaylistID(arg);
+            if (isPlaylist && unpackPlaylists)
+                playlistSongs = [...playlistSongs, ...await YouTubeSong.unpackPlaylist(arg, message)];
+            else if (utils.isURL(arg))
+                songs.push(await getSong(arg, message.author, message.channel));
+            else
+                await utils.getUrl(arg).then(song => songs.push(song)).catch(err => { });
+        }
+
+        return [[...songs, ...playlistSongs], songs.length === 0];
+    }
+}
+
+/**
+ * Youtube Song
+ * @author BWBellairs
+ */
+class YouTubeSong extends Song {
+    public youtubeId?: string;
+    public viewCount?: number;
+
+    constructor(url: string, author: User, channel: TextChannel) {
+        super(url, author, channel);
+    }
+
+    async finalize(id?: string, title?: string, duration?: number,
+        artist?: string, viewCount?: number): Promise<YouTubeSong> {
+        const defaultSongMetadata = {
+            videoDetails: {
+                videoId: id,
+                title: 'Unknown Title',
+                lengthSeconds: 0,
+                author: { name: 'Unknown' },
+                viewCount: 0
+            }
+        };
+        let songMetadata = !id ? await ytdl.getInfo(this.url) : defaultSongMetadata;
+
+        this.youtubeId = id || songMetadata.videoDetails.videoId;
+        this.id = `${this.youtubeId}_${uuid.v4()}`;
+        this.thumbnail = `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
+        this.title = title || songMetadata.videoDetails.title;
+        this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
+        this.formattedDuration = utils.formatDuration(this.duration);
+        this.artist = artist || songMetadata.videoDetails.author.name;
+        this.viewCount = viewCount || +songMetadata.videoDetails.viewCount;
+
+        return this;
+    }
+
+    async getStreamURL() {
+        let formats = (await ytdl.getInfo(this.url)).formats;
+        return formats.filter(format => format.mimeType?.includes('audio/mp4'))[0].url;
+    }
+
+    getEmbed(embed: MessageEmbed) {
+        return embed.addField('YT Channel', this.artist || 'No artist', true);
+    }
+
+    async getStream(seek = 0) {
+        if (!seek) return ytdl(this.url, {
+            filter: 'audioonly',
+            quality: 'highestaudio',
+            highWaterMark: 1 << 25
+        });
+
+        return this.seek(await this.getStreamURL(), seek);
+    }
+
     /**
      * @param {string} url Url to check
      * @return {*} undefined if no playlist id, otherwise string playlits id
@@ -97,96 +175,30 @@ export default class Song {
     }
 
     static async getPlaylistData(url: string) {
-        return await YouTube.getPlaylist(url).then(playlist => playlist.fetch());
+        return await playlist(url);
     }
 
     static async unpackPlaylist(url: string, message: Message) {
-        let songs = [];
+        let songs: Array<Promise<Song>> = [];
 
-        const playlistData = await Song.getPlaylistData(url);
+        const playlistData = await YouTubeSong.getPlaylistData(url);
         if (!playlistData)
             return [];
 
-        songs = await Promise.all(playlistData.videos.map(async video =>
-            new YouTubeSong(`https://www.youtube.com/watch?v=${video.id}`, message.author, message.channel)
-                .finalize(video.id, video.title, video.duration / 1000, video.channel?.name, video.views)));
-
-        return songs;
-    }
-
-    static async getSongURLs(args: Array<string>, message: Message, unpackPlaylists = false): Promise<[(string | YouTubeSong)[], boolean]> {
-        let songs: Array<string> = [];
-        let playlistSongs: Array<string | YouTubeSong> = [];
-
-        if (message.attachments.size > 0)
-            songs = message.attachments.map(x => x.url);
-
-        for (let arg of args) {
-            let playlist = this.getYoutubePlaylistID(arg);
-            if (playlist && unpackPlaylists)
-                playlistSongs = [...playlistSongs, ...await this.unpackPlaylist(arg, message)];
-            else if (utils.isURL(arg))
-                songs.push(arg);
-            else
-                await utils.getUrl(arg).then(song => songs.push(song)).catch(err => {});
-        }
-
-        return [[...songs, ...playlistSongs], songs.length === 0];
-    }
-}
-
-/**
- * Youtube Song
- * @author BWBellairs
- */
-class YouTubeSong extends Song {
-    public id?: string;
-    public viewCount?: number;
-
-    constructor(url: string, author: User, channel: TextChannel | NewsChannel | DMChannel) {
-        super(url, author, channel);
-    }
-
-    async finalize(id?: string, title?: string, duration?: number, artist?: string, viewCount?: number): Promise<YouTubeSong> {
-        const defaultSongMetadata = {
-            videoDetails: {
-                videoId: id,
-                title: 'Unknown Title',
-                lengthSeconds: 0,
-                author: { name: 'Unknown' },
-                viewCount: 0
-            }
-        };
-        let songMetadata = !id ? await ytdl.getInfo(this.url) : defaultSongMetadata;
-
-        this.id = id || songMetadata.videoDetails.videoId;
-        this.thumbnail = `https://img.youtube.com/vi/${this.id}/maxresdefault.jpg`;
-        this.title = title || songMetadata.videoDetails.title;
-        this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
-        this.formattedDuration = utils.formatDuration(this.duration);
-        this.artist = artist || songMetadata.videoDetails.author.name;
-        this.viewCount = viewCount || +songMetadata.videoDetails.viewCount;
-
-        return this;
-    }
-
-    async getStreamURL() {
-        let formats = (await ytdl.getInfo(this.url)).formats;
-        return formats.filter(format => format.mimeType?.includes('audio/mp4'))[0].url;
-    }
-
-    getEmbed(embed: MessageEmbed) {
-        return embed.addField('YT Channel', this.artist, true);
-    }
-
-    async getStream(seek = 0) {
-        if (!seek) return ytdl(this.url, {
-            filter: 'audioonly',
-            quality: 'highestaudio',
-            highWaterMark: 1 << 25
+        playlistData.items.forEach((song: playlist.Item) => {
+            songs.push(new YouTubeSong(
+                `https://www.youtube.com/watch?v=${song.id}`,
+                message.author,
+                message.channel
+            ).finalize(
+                song.id,
+                song.title,
+                song.durationSec || undefined,
+                song.author.name
+            ));
         });
 
-        return this.seek(await this.getStreamURL(), seek);
+        return songs;
     }
 }
 
@@ -197,7 +209,7 @@ class YouTubeSong extends Song {
 class FileSong extends Song {
     public album?: string;
 
-    constructor(url: string, author: User, channel: TextChannel | NewsChannel | DMChannel) {
+    constructor(url: string, author: User, channel: TextChannel) {
         super(url, author, channel);
     }
 
@@ -239,9 +251,11 @@ class FileSong extends Song {
     }
 }
 
+// eslint-disable-next-line no-shadow
 enum SongManagerErrors {
     CacheFull,
-    SongAlreadyExists
+    SongAlreadyExists,
+    SongDoesNotExist
 }
 export class SongManager {
     private static songs: Map<string, Song>;
@@ -251,7 +265,7 @@ export class SongManager {
 
     constructor() {
         SongManager.songs = new Map();
-        SongManager.cacheCleanTimeout = setTimeout(() => {}, 0);
+        SongManager.cacheCleanTimeout = setTimeout(() => { }, 0);
         SongManager.cacheCleanTimeoutDuration = config.songManager.cacheCleanTimeoutDuration *= 1000;
         SongManager.cacheCleanTimeoutDestroyed = true;
     }
@@ -267,6 +281,13 @@ export class SongManager {
 
     static getSong(id: string) {
         return SongManager.songs.get(id);
+    }
+
+    static getSongReference(id: string, requestedBy: User, requestedChannel: TextChannel) {
+        let song = SongManager.getSong(id);
+        if (song === undefined) return SongManagerErrors.SongDoesNotExist;
+
+        return new SongReferemce(song.id, requestedBy, requestedChannel);
     }
 
     static clean() {
@@ -290,9 +311,9 @@ new SongManager();
 class SongReferemce {
     public readonly id: string;
     public readonly requestedBy: User;
-    public requestedChannel: TextChannel | NewsChannel | DMChannel;
+    public requestedChannel: TextChannel;
 
-    constructor(id: string, requestedBy: User, requestedChannel: TextChannel | NewsChannel | DMChannel) {
+    constructor(id: string, requestedBy: User, requestedChannel: TextChannel) {
         this.id = id;
         this.requestedBy = requestedBy;
         this.requestedChannel = requestedChannel;
@@ -310,8 +331,8 @@ class SongReferemce {
  * @param {Discord.Message.channel} channel
  * @return {Song} song
  */
-async function getSong(url: string, author: User, channel: TextChannel | NewsChannel | DMChannel) {
-    if (!url) return;
+async function getSong(url: string, author: User, channel: TextChannel) {
+    if (!url) return undefined;
 
     if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be'))
         return await new YouTubeSong(url, author, channel).finalize();

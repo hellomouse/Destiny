@@ -1,9 +1,9 @@
 import AsciiTable from 'ascii-table';
-import YouTube from 'youtube-sr';
 
-import embeds from './embeds.js';
+import embeds from './embeds';
 import config from '../config';
 import type { ServerQueue } from './queue';
+import ytsr from 'ytsr';
 
 class FlagHelpError extends Error {
     constructor(message?: string) {
@@ -115,17 +115,11 @@ export default {
         return table.render();
     },
 
-    getUrl: async (words: string | Array<string>): Promise<string> => {
+    getUrl: async (words: string | Array<string>): Promise<ytsr.Result> => {
         let stringOfWords = Array.isArray(words) ? words.join(' ') : words;
-        let lookingOnYtb: Promise<string> = new Promise((resolve, reject) => {
-            YouTube.search(stringOfWords, { type: 'playlist', limit: 1 })
-                .then(result => {
-                    resolve('https://www.youtube.com/watch?v=' + result[0].id);
-                })
-                .catch(err => reject(err));
-        });
+        let lookingOnYtb = ytsr(stringOfWords, { limit: 1 });
 
-        return await lookingOnYtb;
+        return lookingOnYtb;
     },
 
     formatDuration: (sec: number) => {
