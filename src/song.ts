@@ -4,7 +4,7 @@ import config from '../config';
 import ffmpeg from 'fluent-ffmpeg';
 import playlist from 'ytpl';
 import Stream from 'stream';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import type { Message, MessageEmbed, TextChannel, User } from 'discord.js';
 
 /**
@@ -15,7 +15,6 @@ export default class Song {
     public id: string;
     public references: number;
     public url: string;
-    public readonly uuid: string;
     public thumbnail?: string;
 
     public title: string;
@@ -30,10 +29,9 @@ export default class Song {
      * @param {TextChannel} channel Channel command was run
      */
     constructor(url: string, author: User, channel: TextChannel) {
-        this.id = uuid.v4();
+        this.id = uuidv4();
         this.references = 0;
         this.url = url;
-        this.uuid = uuid.v4();
         this.thumbnail = undefined;
 
         this.title = 'No title';
@@ -129,7 +127,7 @@ class YouTubeSong extends Song {
         let songMetadata = !id ? await ytdl.getInfo(this.url) : defaultSongMetadata;
 
         this.youtubeId = id || songMetadata.videoDetails.videoId;
-        this.id = `${this.youtubeId}_${uuid.v4()}`;
+        this.id = `${this.youtubeId}_${this.id}`;
         this.thumbnail = `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
         this.title = title || songMetadata.videoDetails.title;
         this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
