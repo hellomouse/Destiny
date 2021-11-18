@@ -10,7 +10,7 @@ import { Client, Message } from 'discord.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
-export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message|void> => {
+export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message | void> => {
     const serverQueue = queueManager.get(message.guild!.id);
     if (!serverQueue) // Not in VC, ignore
         return;
