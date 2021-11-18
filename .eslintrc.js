@@ -36,7 +36,8 @@ module.exports = {
             { blankLine: 'any', prev: ['const', 'let'], next: '*' },
             { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] }
         ],
-        'no-shadow': 'error',
+        'no-shadow': 'off',
+        '@typescript-eslint/no-shadow': 'error',
         'no-useless-return': 'error',
         'block-scoped-var': 'error',
         'no-else-return': 'error',

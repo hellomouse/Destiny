@@ -251,7 +251,6 @@ class FileSong extends Song {
     }
 }
 
-// eslint-disable-next-line no-shadow
 enum SongManagerErrors {
     CacheFull,
     SongAlreadyExists,
