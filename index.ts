@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { readdir } from 'fs/promises';
 import { Client, Command } from './src/types.js';
 import Enmap from 'enmap';
 import './src/local-data.js';
@@ -42,44 +42,41 @@ async function load(client: Client) {
 
     let loaded: { events: string[], commands: string[]} = { events: [], commands: [] };
 
-    await new Promise(resolve => {
-        fs.readdir('./src/events/', (err, files) => {
-            if (err) return console.error;
-            files.forEach(async file => {
-                if (!file.endsWith('.js')) return;
-                let path = require.resolve(`./src/events/${file}`);
-                delete require.cache[path];
-                let evt = (await import(path)).default;
-                let evtName = file.split('.')[0];
-                loaded.events.push(evtName);
-                client.on(evtName, evt.bind(null, client));
-            });
-            resolve(undefined);
-        });
-    });
+    try {
+        let files = await readdir('./src/events/');
+        for (let file of files) {
+            if (!file.endsWith('.js')) continue;
+            let path = require.resolve(`./src/events/${file}`);
+            delete require.cache[path];
+            let evt = (await import(path)).default;
+            let evtName = file.split('.')[0];
+            loaded.events.push(evtName);
+            client.on(evtName, evt.bind(null, client));
+        }
+    } catch (error) {
+        utils.log(error);
+    }
 
+    try {
+        let files = await readdir('./src/commands/');
+        for (let file of files) {
+            if (!file.endsWith('.js')) continue;
+            let path = require.resolve(`./src/commands/${file}`);
+            delete require.cache[path];
+            let props: Command = await import(path);
+            if (Array.isArray(props.names))
+                props.names.forEach(name => {
+                    client.commands.set(name, props);
+                });
 
-    await new Promise(resolve => {
-        fs.readdir('./src/commands/', async (err, files) => {
-            if (err) return console.error;
-            files.forEach(async file => {
-                if (!file.endsWith('.js')) return;
-                let path = require.resolve(`./src/commands/${file}`);
-                delete require.cache[path];
-                let props: Promise<Command> = import(path);
-                if (Array.isArray(props.names))
-                    props.names.forEach(name => {
-                        client.commands.set(name, props);
-                    });
+            let cmdName = file.split('.')[0];
+            loaded.commands.push(cmdName);
+        }
+    } catch (error) {
+        utils.log(error);
+    }
 
-                let cmdName = file.split('.')[0];
-                loaded.commands.push(cmdName);
-            });
-            resolve(undefined);
-        });
-    }).then(() => {
-        utils.log(`Table of commands and events :\n${utils.showTable(loaded)}`);
-    });
+    utils.log(`Table of commands and events :\n${utils.showTable(loaded)}`);
 
     client.commands.set('reload', {
         run: function reload(cl: Client, message: Message, args: string[]) {
