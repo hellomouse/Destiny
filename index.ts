@@ -43,34 +43,33 @@ async function load(client: Client) {
     let loaded: { events: string[], commands: string[]} = { events: [], commands: [] };
 
     try {
-        let files = await readdir('./src/events/');
+        let files = [
+            ...(await readdir('./src/events/')).map(x => ({ name: x, type: 'events' })),
+            ...(await readdir('./src/commands/')).map(x => ({ name: x, type: 'commands' }))
+        ];
         for (let file of files) {
-            if (!file.endsWith('.js')) continue;
-            let path = require.resolve(`./src/events/${file}`);
+            if (!file.name.endsWith('.js')) continue;
+            let path = require.resolve(`./src/${file.type}/${file.name}`);
             delete require.cache[path];
-            let evt = (await import(path)).default;
-            let evtName = file.split('.')[0];
-            loaded.events.push(evtName);
-            client.on(evtName, evt.bind(null, client));
-        }
-    } catch (error) {
-        utils.log(error);
-    }
 
-    try {
-        let files = await readdir('./src/commands/');
-        for (let file of files) {
-            if (!file.endsWith('.js')) continue;
-            let path = require.resolve(`./src/commands/${file}`);
-            delete require.cache[path];
-            let props: Command = await import(path);
-            if (Array.isArray(props.names))
-                props.names.forEach(name => {
-                    client.commands.set(name, props);
-                });
-
-            let cmdName = file.split('.')[0];
-            loaded.commands.push(cmdName);
+            let name = file.name.split('.')[0];
+            switch (file.type) {
+                    case 'events': {
+                        let evt = (await import(path)).default;
+                        loaded.events.push(name);
+                        client.on(name, evt.bind(null, client));
+                        break;
+                    }
+                    case 'commands': {
+                        let props: Command = await import(path);
+                        if (Array.isArray(props.names))
+                            props.names.forEach(propName => {
+                                client.commands.set(propName, props);
+                            });
+                        loaded.commands.push(name);
+                        break;
+                    }
+            }
         }
     } catch (error) {
         utils.log(error);
