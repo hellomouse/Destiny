@@ -10,7 +10,10 @@ declare module 'config' {
         songManager: {
             softNumLimit: number;
             hardNumLimit: number;
-            cacheCleanTimeoutDuration: number
+            cacheCleanTimeoutDuration: number;
+            metadataRefreshInterval: {
+                YouTubeSong?: number;
+            }
         };
         allowed: Array<string>;
     }

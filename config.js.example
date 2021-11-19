@@ -8,7 +8,10 @@ module.exports = {
     songManager: {
         softNumLimit: 1000000, // When number of songs in cache surpasses this, launch a cleanup
         hardNumLimit: 10000000, // Maximum size of songs cache
-        cacheCleanTimeoutDuration: 300 // Number of seconds between cleanups
+        cacheCleanTimeoutDuration: 300, // Number of seconds between cleanups
+        metadataRefreshInterval: { // Interval in seconds for song metadata refresh
+            YouTubeSong: 3600
+        } 
     },
     allowed: []
 };

@@ -17,6 +17,8 @@ export default class Song {
     public url: string;
     public thumbnail?: string;
 
+    public metadataTTL: number;
+
     public title: string;
     public formattedDuration: string;
     public duration: number;
@@ -31,6 +33,7 @@ export default class Song {
     constructor(url: string, author: User, channel: TextChannel) {
         this.id = uuidv4();
         this.references = 0;
+        this.metadataTTL = Infinity;
         this.url = url;
         this.thumbnail = undefined;
 
@@ -128,6 +131,7 @@ class YouTubeSong extends Song {
 
         this.youtubeId = id || songMetadata.videoDetails.videoId;
         this.id = `${this.youtubeId}_${this.id}`;
+        this.metadataTTL = Date.now() + (config.songManager.metadataRefreshInterval.YouTubeSong || this.metadataTTL);
         this.thumbnail = `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
         this.title = title || songMetadata.videoDetails.title;
         this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
@@ -268,16 +272,20 @@ export class SongManager {
         SongManager.cacheCleanTimeoutDestroyed = true;
     }
 
-    static addSong(song: Song) {
+    static async addSong(song: Song) {
         if (SongManager.songs.size >= config.songManager.hardNumLimit) return SongManagerErrors.CacheFull;
-        if (SongManager.getSong(song.id)) return SongManagerErrors.SongAlreadyExists;
+        if (await SongManager.getSong(song.id)) return SongManagerErrors.SongAlreadyExists;
 
         SongManager.songs.set(song.id, song);
 
         SongManager.checkCleanup();
     }
 
-    static getSong(id: string) {
+    static async getSong(id: string) {
+        let song = SongManager.songs.get(id);
+        if (song === undefined) return undefined;
+
+        if (Date.now() > song.metadataTTL) return SongManager.songs.get(id)?.finalize();
         return SongManager.songs.get(id);
     }
 
