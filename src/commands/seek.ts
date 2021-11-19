@@ -1,7 +1,7 @@
 import embeds from '../embeds.js';
 import utils from '../utils';
 import { queueManager } from '../queue.js';
-import commands from '../commands.js';
+import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -46,4 +46,4 @@ export const help = {
     desc: 'Seek to a given timestamp',
     syntax: '<Time in seconds | XXhXXmXXs | XX:XX:XX>'
 };
-export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_USER_IN_VC;
+export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY | COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

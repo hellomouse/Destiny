@@ -1,7 +1,7 @@
 import utils from '../utils';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
-import REQUIRE_USER_IN_VC from '../commands';
+import COMMAMD_REQUIREMENTS from '../commands';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -32,4 +32,5 @@ export const help = {
     desc: 'Summon the bot to the voice channel the user is in',
     syntax: ''
 };
-export const requirements = REQUIRE_USER_IN_VC;
+
+export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

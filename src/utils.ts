@@ -140,10 +140,13 @@ export default {
         return Math.floor(Math.random() * max);
     },
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     FlagHelpError,
 
     inactivity: new Inactivity(),
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     VOLUME_BASE_UNIT: 100, // what is = 100% volume, note volume command assumes this is 100 (it uses a % sign)
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     MAX_VOLUME: 200
 };

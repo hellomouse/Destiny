@@ -2,7 +2,7 @@ import strings from '../strings.json';
 import utils from '../utils';
 import embeds from '../embeds';
 import config from '../../config';
-import commands from '../commands';
+import COMMAMD_REQUIREMENTS from '../commands';
 import { queueManager } from '../queue';
 
 import prefix = config.prefix;
@@ -34,18 +34,18 @@ export default async (client: Client, message: Message) => {
         }
 
         if (cmd.requirements) {
-            if (cmd.requirements & commands.REQUIRE_QUEUE_NON_EMPTY) {
+            if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY) {
                 const serverQueue = queueManager.get(message.guild!.id);
                 if (!serverQueue)
-                    return message.channel.send(embeds.songQueueEmpty());
+                    return message.reply({ embeds: [embeds.songQueueEmpty()] });
             }
-            if (cmd.requirements & commands.REQUIRE_IS_PLAYING) {
+            if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_IS_PLAYING) {
                 const serverQueue = queueManager.get(message.guild!.id)!;
                 if (!serverQueue.isPlaying())
-                    return message.channel.send(embeds.queueNotPlaying());
+                    return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
             }
-            if (cmd.requirements & commands.REQUIRE_USER_IN_VC && !message.member!.voice.channel)
-                return message.channel.send(embeds.notInVoiceChannelEmbed());
+            if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC && !message.member!.voice.channel)
+                return message.channel.send({ embeds: [embeds.notInVoiceChannelEmbed()] } );
         }
 
         if (message.channel instanceof NewsChannel || message.channel instanceof DMChannel ||

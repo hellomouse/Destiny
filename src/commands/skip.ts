@@ -1,7 +1,7 @@
 import utils from '../utils';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
-import commands from '../commands.js';
+import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -24,4 +24,4 @@ export const help = {
     desc: 'Skip the current song',
     syntax: ''
 };
-export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_USER_IN_VC;
+export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY | COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

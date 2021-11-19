@@ -1,7 +1,7 @@
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import utils from '../utils.js';
-import commands from '../commands.js';
+import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 const MAX_VOLUME = utils.MAX_VOLUME;
@@ -40,4 +40,4 @@ export const help = {
     desc: 'Set the volume of the music',
     syntax: '<volume 0-200>'
 };
-export const requirements = commands.REQUIRE_USER_IN_VC;
+export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

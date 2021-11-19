@@ -2,7 +2,7 @@ import utils from '../utils';
 import { queueManager } from '../queue';
 import embeds from '../embeds';
 
-import REQUIRE_USER_IN_VC from '../commands';
+import COMMAMD_REQUIREMENTS from '../commands';
 import { Song, getSong } from '../song';
 import { Client, Message } from 'discord.js';
 
@@ -67,4 +67,4 @@ export const help = {
     desc: 'Add a song to the queue',
     syntax: '<youtube url | playlist | file | search query>'
 };
-export const requirements = REQUIRE_USER_IN_VC;
+export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

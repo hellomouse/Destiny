@@ -1,7 +1,7 @@
 import utils from '../utils';
 import { queueManager } from '../queue';
 import embeds from '../embeds';
-import commands from '../commands';
+import COMMAMD_REQUIREMENTS from '../commands';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -32,4 +32,4 @@ export const help = {
     desc: 'Get the currently playing song',
     syntax: ''
 };
-export const requirements = commands.REQUIRE_QUEUE_NON_EMPTY | commands.REQUIRE_IS_PLAYING;
+export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY | COMMAMD_REQUIREMENTS.REQUIRE_IS_PLAYING;

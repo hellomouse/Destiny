@@ -1,7 +1,7 @@
 import embeds from '../embeds.js';
 import utils from '../utils';
 import { queueManager, LOOP_MODES } from '../queue.js';
-import commands from '../commands.js';
+import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -34,4 +34,4 @@ export const help = {
     desc: 'Change looping settings',
     syntax: '[loop | none | queue]'
 };
-export const requirements = commands.REQUIRE_USER_IN_VC;
+export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;
