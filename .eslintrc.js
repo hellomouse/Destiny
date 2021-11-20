@@ -10,7 +10,8 @@ module.exports = {
         sourceType: 'module',
         ecmaFeatures: {
             experimentalObjectRestSpread: true
-        }
+        },
+        project: './tsconfig.json'
     },
     extends: ['@hellomouse/typescript'],
     ignorePatterns: ['build/**'],
