@@ -296,7 +296,7 @@ export class SongManager {
         let song = await SongManager.getSong(id);
         if (typeof song === 'undefined') return SongManagerErrors.SongDoesNotExist;
 
-        return new SongReferemce(song.id, requestedBy, requestedChannel);
+        return new SongReference(song.id, requestedBy, requestedChannel);
     }
 
     static clean() {
@@ -317,7 +317,7 @@ export class SongManager {
 
 new SongManager();
 
-class SongReferemce {
+class SongReference {
     public readonly id: string;
     public readonly requestedBy: User;
     public requestedChannel: TextChannel;
