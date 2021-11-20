@@ -24,6 +24,7 @@
     "build"
   ],
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    ".eslintrc.js"
   ],
 }
