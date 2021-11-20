@@ -86,19 +86,20 @@ export default class Song {
     }
 
     static async getSongURLs(args: Array<string>, message: Message,
-        unpackPlaylists = false): Promise<[(Song | string | Promise<Song> | undefined)[], boolean]> {
-        let songs: Array<Song | string | undefined> = [];
-        let playlistSongs: Array<Promise<Song>> = [];
+        unpackPlaylists = false): Promise<[(YouTubeSong | FileSong | string)[], boolean]> {
+        let songs: Array<YouTubeSong | FileSong | string> = [];
+        let playlistSongs: Array<YouTubeSong> = [];
 
         if (message.attachments.size > 0)
             args = [...args, ...message.attachments.map(x => x.url)];
 
         for (let arg of args) {
             let isPlaylist = YouTubeSong.getYoutubePlaylistID(arg);
-            if (isPlaylist && unpackPlaylists)
-                playlistSongs = [...playlistSongs, ...await YouTubeSong.unpackPlaylist(arg, message)];
-            else if (utils.isURL(arg))
-                songs.push(await getSong(arg, message.author, message.channel));
+            if (isPlaylist && unpackPlaylists) {
+                let unpackedPlaylist = await YouTubeSong.unpackPlaylist(arg, message);
+                playlistSongs = [...playlistSongs, ...await Promise.all(unpackedPlaylist)];
+            } else if (utils.isURL(arg))
+                songs.push((await getSong(arg, message.author, message.channel))!);
             else
                 await utils.getUrl(arg).then(song => songs.push(song)).catch(err => { });
         }
@@ -184,7 +185,7 @@ class YouTubeSong extends Song {
     }
 
     static async unpackPlaylist(url: string, message: Message) {
-        let songs: Array<Promise<Song>> = [];
+        let songs: Array<Promise<YouTubeSong>> = [];
 
         const playlistData = await YouTubeSong.getPlaylistData(url);
         if (!playlistData)
