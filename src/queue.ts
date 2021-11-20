@@ -17,7 +17,7 @@ type LOOP_MODES = typeof LOOP_MODES[number];
 export class ServerQueue {
 
     public serverID: string | undefined;
-    public voiceChannel: VoiceChannel;
+    public voiceChannel: VoiceChannel | StageChannel;
     public textChannel: Message['channel'];
     public connection?: VoiceConnection;
     public songs: Array<YouTubeSong | FileSong>;
@@ -43,7 +43,7 @@ export class ServerQueue {
      * @param {Message} message Message for the play command
      * @param {VoiceChannel} voiceChannel Voice channel to play in
      */
-    constructor(message: Message, voiceChannel: VoiceChannel) {
+    constructor(message: Message, voiceChannel: VoiceChannel | StageChannel) {
         this.serverID = message.guild?.id;
         this.textChannel = message.channel;
         this.voiceChannel = voiceChannel;
@@ -317,7 +317,7 @@ export class QueueManager {
      * @param {VoiceChannel} voiceChannel voice channel
      * @return {ServerQueue} Server queue instance for server
      */
-    getOrCreate(message: Message, voiceChannel: VoiceChannel): ServerQueue {
+    getOrCreate(message: Message, voiceChannel: VoiceChannel | StageChannel): ServerQueue {
         const serverID = message.guild?.id;
         if (typeof serverID !== 'undefined') {
             let queue = this._queues[serverID];
