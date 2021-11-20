@@ -3,7 +3,7 @@ import Enmap from 'enmap';
 
 export interface Command {
     requirements?: number;
-    run: (client: Client, message: Message, args: Array<string>) => Promise<Message | void>
+    run: (client: Client, message: Message, args: Array<string>) => Promise<Message | void>;
     help: {
         desc: string;
         syntax: string;

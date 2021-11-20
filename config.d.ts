@@ -12,11 +12,11 @@ export default interface Config {
         cacheCleanTimeoutDuration: number;
         metadataRefreshInterval: {
             YouTubeSong?: number;
-        }
+        };
     };
     inactivity?: {
         waitRejoinSeconds?: number;
         botIdleSeconds?: number;
     };
     allowed: Array<string>;
-};
+}

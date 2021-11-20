@@ -14,8 +14,8 @@ class FlagHelpError extends Error {
 
 class Inactivity {
     private config: {
-        waitRejoinSeconds: number,
-        botIdleSeconds: number
+        waitRejoinSeconds: number;
+        botIdleSeconds: number;
     };
     private aloneTimer: NodeJS.Timeout;
     private inactivityTimer: NodeJS.Timeout;
@@ -106,7 +106,7 @@ export default {
      * @param {object} loaded
      * @return {string} ASCII table
      */
-    showTable: (loaded: { commands: Array<string>, events: Array<string> }) => {
+    showTable: (loaded: { commands: Array<string>; events: Array<string> }) => {
         let table = new AsciiTable('Loading content...');
         table.setHeading('Commands', 'Events');
         for (let i = 0; i <= Math.max(loaded.commands.length, loaded.events.length) - 1; i++)
