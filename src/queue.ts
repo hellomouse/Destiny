@@ -24,7 +24,7 @@ export class ServerQueue {
     public shuffleWaiting: Array<string>;
     public volume: number;
     public _paused: boolean;
-    public loop: 'song' | 'none' | 'off' | 'queue';
+    public loop: LOOP_MODES;
     public skipped: boolean;
     public shuffle: boolean;
     public shuffled: boolean;
@@ -85,7 +85,7 @@ export class ServerQueue {
         return this.index;
     }
 
-    setLoopMode(loop: 'song' | 'none' | 'off' | 'queue') {
+    setLoopMode(loop: LOOP_MODES) {
         this.loop = loop;
     }
 
