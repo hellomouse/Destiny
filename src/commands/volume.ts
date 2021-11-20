@@ -32,7 +32,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         .setDescription(`Volume set to **${floatVolume.toFixed(2)}%**`)] });
 
     serverQueue!.volume = floatVolume;
-    return serverQueue!.connection!.dispatcher.setVolumeLogarithmic(floatVolume / utils.VOLUME_BASE_UNIT);
+    return serverQueue!.audioResource!.volume!.setVolumeLogarithmic(floatVolume / utils.VOLUME_BASE_UNIT);
 };
 
 export const names = ['volume', 'v', 'vol'];

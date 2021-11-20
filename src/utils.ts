@@ -38,7 +38,7 @@ class Inactivity {
         clearTimeout(this.aloneTimer);
         if (this.config.waitRejoinSeconds < 0) return;
         setTimeout(() => {
-            serverQueue.voiceChannel.leave();
+            serverQueue.connection!.disconnect();
             serverQueue.textChannel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
         }, this.config.waitRejoinSeconds);
     }
@@ -51,7 +51,7 @@ class Inactivity {
         clearTimeout(this.inactivityTimer);
         if (this.config.botIdleSeconds < 0) return;
         setTimeout(() => {
-            serverQueue.voiceChannel.leave();
+            serverQueue.connection!.disconnect();
             serverQueue.textChannel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
         }, this.config.botIdleSeconds);
     }

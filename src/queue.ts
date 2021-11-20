@@ -3,7 +3,7 @@ import utils from './utils.js';
 import embeds from './embeds.js';
 
 import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel } from 'discord.js';
-import { VoiceConnection } from '@discordjs/voice';
+import { AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, getVoiceConnection, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
 import type { FileSong, Song, YouTubeSong } from './song';
 
 const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
@@ -36,6 +36,7 @@ export class ServerQueue {
     static consts = {
         DEFAULT_VOLUME: 70
     };
+    audioResource?: AudioResource;
 
     /**
      * Construct a server queue
@@ -117,16 +118,18 @@ export class ServerQueue {
         seekTime = Math.min(song.duration, seekTime);
 
         this.ignoreNextSongEnd = true;
-        this.connection?.dispatcher.end();
-        let dispatcher = this.connection?.play(await song.getStream(seekTime))!;
+        let connection = getVoiceConnection(this.serverID);
+        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
+        let audio = this.audioResource = createAudioResource(await song.getStream(seekTime), { inlineVolume: true });
+        audioPlayer.play(audio);
 
-        dispatcher.on('finish', this.onSongFinish.bind(this));
-        dispatcher.on('error', async (error: string) => {
+        audioPlayer.on(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
+        audioPlayer.on('error', async error => {
             console.log('seek dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
             await this.seekTo(seekTime, errorCounter + 1);
         });
-        dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
+        audio.volume!.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
 
         return seekTime;
     }
@@ -201,17 +204,19 @@ export class ServerQueue {
 
         utils.log(`Started playing the music : ${song.title} ${this.index}`);
 
-        let dispatcher = this.connection?.play(await song.getStream())!;
+        let player = createAudioPlayer();
+        let audio = this.audioResource = createAudioResource(await song.getStream(), { inlineVolume: true });
+        player.play(audio);
 
-        dispatcher.on('finish', this.onSongFinish.bind(this));
-        dispatcher.on('error', async (error: string) => {
+        this.connection!.subscribe(player);
+        player.on(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
+        player.on('error', async error => {
             console.log('dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
             await this.play(errorCounter + 1);
         });
-        dispatcher.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
-
-        return dispatcher;
+        audio.volume!.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
+        return player;
     }
 
     /**
@@ -220,8 +225,10 @@ export class ServerQueue {
      */
     skip() {
         this.skipped = true;
-        if (this.connection?.dispatcher)
-            this.connection.dispatcher.end();
+        let connection = getVoiceConnection(this.serverID);
+        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
+        audioPlayer.stop();
+        this.audioResource = undefined; // Remove reference to audio resource, to prevent memory leak
     }
 
     /**
@@ -248,7 +255,9 @@ export class ServerQueue {
     pause() {
         if (this._paused) return;
         this._paused = true;
-        this.connection?.dispatcher.pause();
+        let connection = getVoiceConnection(this.serverID);
+        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
+        audioPlayer.pause();
         utils.inactivity.onNotPlaying(this);
     }
 
@@ -272,12 +281,9 @@ export class ServerQueue {
         if (!this._paused) return;
         this._paused = false;
 
-        // Hacky fix for a bug that was never fixed
-        // This resume-pause-resume must be followed if running
-        // node > v14.15.5
-        this.connection?.dispatcher.resume();
-        this.connection?.dispatcher.pause();
-        this.connection?.dispatcher.resume();
+        let connection = getVoiceConnection(this.serverID);
+        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
+        audioPlayer.unpause();
     }
 
     /**

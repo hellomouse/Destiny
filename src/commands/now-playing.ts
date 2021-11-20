@@ -17,7 +17,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     if (!song) return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
 
-    const time = utils.formatDuration(serverQueue.connection!.dispatcher.streamTime / 1000);
+    const time = utils.formatDuration(serverQueue.audioResource!.playbackDuration / 1000);
     const embed = song.getEmbed(
         embeds.songEmbed(song, 'Now Playing', false)
             .addField('Duration', `${time} / ${song.formattedDuration}`, true)
