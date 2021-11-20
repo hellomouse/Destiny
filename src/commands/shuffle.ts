@@ -15,10 +15,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     if (serverQueue.shuffle) {
         serverQueue.shuffleOff();
-        message.channel.send(embeds.defaultEmbed().setDescription('Shuffle mode is now disabled'));
+        message.channel.send({ embeds: [embeds.defaultEmbed().setDescription('Shuffle mode is now disabled')] });
     } else {
         serverQueue.shuffleOn();
-        message.channel.send(embeds.defaultEmbed().setDescription('Shuffle mode is now enabled'));
+        message.channel.send({ embeds: [embeds.defaultEmbed().setDescription('Shuffle mode is now enabled')] });
     }
 };
 

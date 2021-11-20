@@ -20,16 +20,16 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         throw new utils.FlagHelpError();
 
     if (args.length === 0)
-        return message.channel.send(embeds.defaultEmbed()
-            .setDescription(`The current volume is **${serverQueue!.volume}%**`));
+        return message.channel.send({ embeds: [embeds.defaultEmbed()
+            .setDescription(`The current volume is **${serverQueue!.volume}%**`)] });
 
     let floatVolume = +args;
     if (Number.isNaN(floatVolume) || floatVolume < 0 || floatVolume > MAX_VOLUME)
-        return message.channel.send(embeds.errorEmbed()
-            .setTitle(`Volume must be a percentage from 0 to ${MAX_VOLUME}%`));
+        return message.channel.send({ embeds: [embeds.errorEmbed()
+            .setTitle(`Volume must be a percentage from 0 to ${MAX_VOLUME}%`)] });
 
-    message.channel.send(embeds.defaultEmbed()
-        .setDescription(`Volume set to **${floatVolume.toFixed(2)}%**`));
+    message.channel.send({ embeds: [embeds.defaultEmbed()
+        .setDescription(`Volume set to **${floatVolume.toFixed(2)}%**`)] });
 
     serverQueue!.volume = floatVolume;
     return serverQueue!.connection!.dispatcher.setVolumeLogarithmic(floatVolume / utils.VOLUME_BASE_UNIT);
