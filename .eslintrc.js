@@ -12,7 +12,7 @@ module.exports = {
             experimentalObjectRestSpread: true
         }
     },
-    extends: ['eslint:recommended', '@hellomouse/typescript'],
+    extends: ['@hellomouse/typescript'],
     ignorePatterns: ['build/**'],
     rules: {
         '@typescript-eslint/indent': ['error', 4, { SwitchCase: 2 }],
