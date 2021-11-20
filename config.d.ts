@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-export default class config {
+export default interface Config {
     token: string;
     prefix: string;
     inactivity: {
@@ -14,5 +14,9 @@ export default class config {
             YouTubeSong?: number;
         }
     };
+    inactivity?: {
+        waitRejoinSeconds?: number;
+        botIdleSeconds?: number;
+    };
     allowed: Array<string>;
-}
+};
