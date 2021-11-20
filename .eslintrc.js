@@ -32,17 +32,33 @@ module.exports = {
                 nonwords: false
             }
         ],
-        'padding-line-between-statements': [
+        'padding-line-between-statements': 'off',
+        '@typescript-eslint/padding-line-between-statements': [
             'error',
             { blankLine: 'any', prev: '*', next: 'return' },
             { blankLine: 'any', prev: ['const', 'let'], next: '*' },
-            { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] }
+            { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] },
+            { blankLine: 'any', prev: '*', next: ['interface', 'type'] }
         ],
         'no-shadow': 'off',
         '@typescript-eslint/no-shadow': 'error',
         'no-useless-return': 'error',
         'block-scoped-var': 'error',
         'no-else-return': 'error',
-        'no-undef-init': 'error'
+        'no-undef-init': 'error',
+        '@typescript-eslint/naming-convention': [
+            'error',
+            { selector: 'default', format: ['camelCase'], leadingUnderscore: 'allow' },
+            { selector: 'variable', format: ['camelCase', 'UPPER_CASE', 'PascalCase'], leadingUnderscore: 'allow' },
+            { selector: 'parameter', format: ['camelCase'], leadingUnderscore: 'allow' },
+            { selector: 'memberLike', format: ['camelCase'], leadingUnderscore: 'allow' },
+            { selector: 'typeLike', format: ['PascalCase'] },
+            { selector: 'enum', format: ['PascalCase', 'UPPER_CASE'] },
+            { selector: 'enumMember', format: ['PascalCase', 'UPPER_CASE'] },
+            { selector: 'variable', modifiers: ['const'], format: ['camelCase', 'UPPER_CASE'] },
+            { selector: 'typeProperty', format: ['PascalCase', 'camelCase'], leadingUnderscore: 'allow' },
+            { selector: 'typeAlias', format: ['PascalCase', 'UPPER_CASE'] },
+            { selector: 'objectLiteralProperty', format: ['camelCase', 'UPPER_CASE'] }
+        ]
     }
 };
