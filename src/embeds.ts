@@ -60,7 +60,7 @@ export default {
      * @param {string} description embed description
      * @return {MessageEmbed}
      */
-    playlistEmbed: (playlist: { title: string; url: string; thumbnail: { url: string } },
+    playlistEmbed: (playlist: { title: string, url: string, thumbnail: { url: string } },
         title: string | undefined, description: string) => {
         let embed = defaultEmbed()
             .setTitle(playlist.title)

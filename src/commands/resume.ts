@@ -16,7 +16,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     serverQueue.resume();
 
     utils.log(`Resumed music playback`);
-    return message.channel.send(embeds.defaultEmbed().setDescription(`:play_pause: Playback resumed`));
+    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`:play_pause: Playback resumed`)] });
 };
 
 export const names = ['resume', 'unpause'];

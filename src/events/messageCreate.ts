@@ -57,7 +57,7 @@ export default async (client: Client, message: Message) => {
         } catch (e) {
             // Show help text because arguments were invalid
             if (e instanceof utils.FlagHelpError)
-                message.channel.send(embeds.helpEmbed(cmd));
+                message.channel.send({ embeds: [embeds.helpEmbed(cmd)] });
             // Real error occured
             else
                 console.log(e);

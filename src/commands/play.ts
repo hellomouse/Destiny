@@ -3,7 +3,7 @@ import { queueManager } from '../queue';
 import embeds from '../embeds';
 
 import COMMAMD_REQUIREMENTS from '../commands';
-import { Song, getSong } from '../song';
+import { Song, getSong, YouTubeSong } from '../song';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -21,12 +21,12 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     let [songs, onlyPlaylistSongs] = await Song.getSongURLs(args.join(' ').split(' | '), message, true);
     let playlists = await Promise.all(
-        Song.getYouTubePlaylistURLs(args)
-            .map(x => Song.getPlaylistData(x)))
-        .then(list => list.filter(async x => x.videos.length > 0 ));
+        YouTubeSong.getYouTubePlaylistURLs(args)
+            .map(x => YouTubeSong.getPlaylistData(x)))
+        .then(list => list.filter(async x => x.items.length > 0));
 
-    let actualVideoNum = playlists.reduce((prev, current) => prev += current.videos.length, 0);
-    let expectedVideoNum = playlists.reduce((prev, current) => prev += current.videoCount, 0);
+    let actualVideoNum = playlists.reduce((prev, current) => prev += current.items.length, 0);
+    let expectedVideoNum = playlists.reduce((prev, current) => prev += current.estimatedItemCount, 0);
 
     let enqueuedEmbed;
     if (playlists.length === 0)
@@ -35,13 +35,13 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             .setDescription(`Added ${songs.length} songs`);
     else if (onlyPlaylistSongs)
         if (playlists.length === 1)
-            enqueuedEmbed = embeds.playlistEmbed(playlists[0], undefined, `Added ${playlists[0].videos.length}/${playlists[0].videoCount} songs`);
+            enqueuedEmbed = embeds.playlistEmbed(playlists[0], undefined, `Added ${playlists[0].items.length}/${playlists[0].estimatedItemCount} songs`);
         else
             enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${actualVideoNum}/${expectedVideoNum} songs`);
     else
         enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
 
-    message.channel.send(enqueuedEmbed);
+    message.channel.send({ embeds: [enqueuedEmbed] });
 
     let voiceChannel = message.member!.voice.channel!;
     let serverQueue = queueManager.getOrCreate(message, voiceChannel);

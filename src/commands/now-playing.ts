@@ -15,7 +15,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const serverQueue = queueManager.get(message.guild!.id)!;
     const song = serverQueue.currentSong();
 
-    if (!song) return message.channel.send(embeds.queueNotPlaying());
+    if (!song) return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
 
     const time = utils.formatDuration(serverQueue.connection!.dispatcher.streamTime / 1000);
     const embed = song.getEmbed(
@@ -24,7 +24,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             .addField('Action', serverQueue.isPaused() ? 'Paused' : 'Playing', true)
     );
 
-    return message.channel.send(embed);
+    return message.channel.send({ embeds: [embed] });
 };
 
 export const names = ['nowplaying', 'now_playing', 'np', 'playing', 'song', 'current'];

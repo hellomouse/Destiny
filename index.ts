@@ -40,7 +40,7 @@ async function load(client: Client) {
 
     /* ----------------------------------------------- */
 
-    let loaded: { events: string[]; commands: string[] } = { events: [], commands: [] };
+    let loaded: { events: string[], commands: string[] } = { events: [], commands: [] };
 
     try {
         let files = [

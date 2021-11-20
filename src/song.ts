@@ -23,6 +23,8 @@ export default class Song {
     public formattedDuration: string;
     public duration: number;
     public artist?: string;
+    requestedBy: any;
+    public requestedChannel: TextChannel;
 
     /**
      * Construct a new song
@@ -41,6 +43,7 @@ export default class Song {
         this.formattedDuration = 'XX:XX';
         this.duration = Infinity;
         this.artist = undefined;
+        this.requestedChannel = channel;
     }
 
     /**
@@ -83,8 +86,8 @@ export default class Song {
     }
 
     static async getSongURLs(args: Array<string>, message: Message,
-        unpackPlaylists = false): Promise<[(Song | Promise<Song> | undefined)[], boolean]> {
-        let songs: Array<Song | undefined> = [];
+        unpackPlaylists = false): Promise<[(Song | string | Promise<Song> | undefined)[], boolean]> {
+        let songs: Array<Song | string | undefined> = [];
         let playlistSongs: Array<Promise<Song>> = [];
 
         if (message.attachments.size > 0)
@@ -282,15 +285,15 @@ export class SongManager {
 
     static async getSong(id: string) {
         let song = SongManager.songs.get(id);
-        if (song === undefined) return undefined;
+        if (typeof song === 'undefined') return undefined;
 
         if (Date.now() > song.metadataTTL) return SongManager.songs.get(id)?.finalize();
         return SongManager.songs.get(id);
     }
 
-    static getSongReference(id: string, requestedBy: User, requestedChannel: TextChannel) {
-        let song = SongManager.getSong(id);
-        if (song === undefined) return SongManagerErrors.SongDoesNotExist;
+    static async getSongReference(id: string, requestedBy: User, requestedChannel: TextChannel) {
+        let song = await SongManager.getSong(id);
+        if (typeof song === 'undefined') return SongManagerErrors.SongDoesNotExist;
 
         return new SongReferemce(song.id, requestedBy, requestedChannel);
     }

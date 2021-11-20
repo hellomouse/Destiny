@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-enum COMMAMD_REQUIREMENTS {
+const enum COMMAMD_REQUIREMENTS {
     // Enums for command requirements
     // Multiple requirements can be ORed together
     REQUIRE_QUEUE_NON_EMPTY = 1,

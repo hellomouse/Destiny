@@ -19,7 +19,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     serverQueue.clear(true);
     serverQueue.voiceChannel.leave();
 
-    return message.channel.send(embeds.defaultEmbed().setDescription(':wave:'));
+    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave:')] });
 };
 
 export const names = ['dc', 'disconnect', 'leave', 'die', 'fuckoff'];

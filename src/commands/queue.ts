@@ -14,7 +14,7 @@ import { Client, Message } from 'discord.js';
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
     if (!serverQueue || serverQueue.size() === 0)
-        return message.channel.send(embeds.songQueueEmpty());
+        return message.channel.send({ embeds: [embeds.songQueueEmpty()] });
 
     let queuetxt = '';
 

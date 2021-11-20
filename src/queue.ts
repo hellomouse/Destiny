@@ -2,7 +2,8 @@ import config from '../config.js';
 import utils from './utils.js';
 import embeds from './embeds.js';
 
-import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel, VoiceConnection } from 'discord.js';
+import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel } from 'discord.js';
+import { VoiceConnection } from '@discordjs/voice';
 import type { FileSong, Song, YouTubeSong } from './song';
 
 const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
@@ -100,7 +101,7 @@ export class ServerQueue {
             this.lastNowPlayingMessage.delete()
                 .catch(err => console.log(err));
 
-        this.lastNowPlayingMessage = await song.requestedChannel.send(embeds.songEmbed(song, 'Now Playing'));
+        this.lastNowPlayingMessage = await song.requestedChannel.send({ embeds: [embeds.songEmbed(song, 'Now Playing')] });
     }
 
     /**
@@ -180,8 +181,8 @@ export class ServerQueue {
         if (this.isEmpty() || this.index < 0 || this.index >= this.size() ||
             this.loop !== 'queue' && ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length && this.shuffle && !this.shuffled) {
             this._isPlaying = false;
-            this.textChannel.send(embeds.defaultEmbed()
-                .setDescription('Finished playing!'));
+            this.textChannel.send({ embeds: [embeds.defaultEmbed()
+                .setDescription('Finished playing!')] });
             utils.inactivity.onNotPlaying(this);
             return;
         }

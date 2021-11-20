@@ -1,22 +1,28 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-export default interface Config {
+export interface Config {
+    playlists: {
+        maximum: number,
+        maximumItemsPerPlaylist: number
+    };
     token: string;
     prefix: string;
     inactivity: {
-        waitRejoinSeconds: number;
-        botIdleSeconds: number;
+        waitRejoinSeconds: number,
+        botIdleSeconds: number
     };
     songManager: {
-        softNumLimit: number;
-        hardNumLimit: number;
-        cacheCleanTimeoutDuration: number;
+        softNumLimit: number,
+        hardNumLimit: number,
+        cacheCleanTimeoutDuration: number,
         metadataRefreshInterval: {
-            YouTubeSong?: number;
-        };
+            YouTubeSong?: number
+        }
     };
     inactivity?: {
-        waitRejoinSeconds?: number;
-        botIdleSeconds?: number;
+        waitRejoinSeconds?: number,
+        botIdleSeconds?: number
     };
     allowed: Array<string>;
+    onlyOneVoiceChannel?: boolean;
 }
+declare const config: Config = {};
+export default config;

@@ -14,8 +14,8 @@ class FlagHelpError extends Error {
 
 class Inactivity {
     private config: {
-        waitRejoinSeconds: number;
-        botIdleSeconds: number;
+        waitRejoinSeconds: number,
+        botIdleSeconds: number
     };
     private aloneTimer: NodeJS.Timeout;
     private inactivityTimer: NodeJS.Timeout;
@@ -39,7 +39,7 @@ class Inactivity {
         if (this.config.waitRejoinSeconds < 0) return;
         setTimeout(() => {
             serverQueue.voiceChannel.leave();
-            serverQueue.textChannel.send(embeds.defaultEmbed().setDescription(':wave: Leaving as no one is in VC'));
+            serverQueue.textChannel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
         }, this.config.waitRejoinSeconds);
     }
 
@@ -52,7 +52,7 @@ class Inactivity {
         if (this.config.botIdleSeconds < 0) return;
         setTimeout(() => {
             serverQueue.voiceChannel.leave();
-            serverQueue.textChannel.send(embeds.defaultEmbed().setDescription(':wave: Leaving due to inactivity'));
+            serverQueue.textChannel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
         }, this.config.botIdleSeconds);
     }
 
@@ -106,7 +106,7 @@ export default {
      * @param {object} loaded
      * @return {string} ASCII table
      */
-    showTable: (loaded: { commands: Array<string>; events: Array<string> }) => {
+    showTable: (loaded: { commands: Array<string>, events: Array<string> }) => {
         let table = new AsciiTable('Loading content...');
         table.setHeading('Commands', 'Events');
         for (let i = 0; i <= Math.max(loaded.commands.length, loaded.events.length) - 1; i++)

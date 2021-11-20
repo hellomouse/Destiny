@@ -23,8 +23,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     serverQueue.connection = connection;
     utils.log(`Joined the channel : ${voiceChannel.name}`);
 
-    return message.channel.send(embeds.defaultEmbed()
-        .setDescription(`Joining ${voiceChannel.toString()}`));
+    return message.channel.send({ embeds: [embeds.defaultEmbed()
+        .setDescription(`Joining ${voiceChannel.toString()}`)] });
 };
 
 export const names = ['summon', 'join', 'j'];
