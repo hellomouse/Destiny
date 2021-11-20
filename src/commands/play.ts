@@ -49,7 +49,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let song;
 
     for (let s of songs) {
-        song = s instanceof Song ? s : await getSong(s, message.author, message.channel);
+        song = typeof s === 'string' ? await getSong(s, message.author, message.channel) : s;
         if (song) serverQueue.add(song);
     }
 
