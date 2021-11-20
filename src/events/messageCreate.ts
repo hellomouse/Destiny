@@ -5,7 +5,7 @@ import config from '../../config';
 import COMMAMD_REQUIREMENTS from '../commands';
 import { queueManager } from '../queue';
 
-import prefix = config.prefix;
+const prefix = config.prefix;
 import { DMChannel, Message, NewsChannel, ThreadChannel } from 'discord.js';
 import { Client } from '../types';
 
