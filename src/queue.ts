@@ -319,10 +319,12 @@ export class QueueManager {
      */
     getOrCreate(message: Message, voiceChannel: VoiceChannel): ServerQueue {
         const serverID = message.guild?.id;
-        if (typeof serverID !== 'undefined')
-            if (typeof this._queues[serverID] !== 'undefined')
-                return this._queues[serverID]!;
+        if (typeof serverID !== 'undefined') {
+            let queue = this._queues[serverID];
 
+            if (typeof queue !== 'undefined')
+                return queue;
+        }
         return this.add(new ServerQueue(message, voiceChannel))!;
     }
 
