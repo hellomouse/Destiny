@@ -17,7 +17,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     utils.log('Stopped playing music');
     serverQueue.clear(true);
-    serverQueue.voiceChannel.leave();
+    serverQueue.connection!.disconnect();
 
     return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave:')] });
 };

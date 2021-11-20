@@ -5,6 +5,7 @@ import embeds from '../embeds';
 import COMMAMD_REQUIREMENTS from '../commands';
 import { Song, getSong, YouTubeSong } from '../song';
 import { Client, Message } from 'discord.js';
+import { joinVoiceChannel } from '@discordjs/voice';
 
 /**
  * @description Play a song with the provided link
@@ -55,7 +56,11 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     utils.log('Got music details, preparing the music to be played...');
 
     if (!serverQueue.isPlaying()) {
-        let connection = await voiceChannel!.join();
+        let connection = joinVoiceChannel({
+            channelId: voiceChannel.id,
+            guildId: voiceChannel.guild.id,
+            adapterCreator: voiceChannel.guild.voiceAdapterCreator
+        });
         serverQueue.connection = connection;
         await serverQueue.play();
         serverQueue.resume();
