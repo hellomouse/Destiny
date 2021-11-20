@@ -2,7 +2,7 @@ import config from '../config.js';
 import utils from './utils.js';
 import embeds from './embeds.js';
 
-import type { Channel, Message, NewsChannel, StreamDispatcher, TextChannel, VoiceChannel, DMChannel } from 'discord.js';
+import type { Message, StageChannel, VoiceChannel } from 'discord.js';
 import { AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, getVoiceConnection, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
 import type { FileSong, Song, YouTubeSong } from './song';
 
@@ -17,8 +17,8 @@ type LOOP_MODES = typeof LOOP_MODES[number];
 export class ServerQueue {
 
     public serverID: string | undefined;
-    public textChannel: TextChannel | DMChannel | NewsChannel;
     public voiceChannel: VoiceChannel;
+    public textChannel: Message['channel'];
     public connection?: VoiceConnection;
     public songs: Array<YouTubeSong | FileSong>;
     public shuffleWaiting: Array<string>;

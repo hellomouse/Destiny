@@ -5,7 +5,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import playlist from 'ytpl';
 import Stream from 'stream';
 import { v4 as uuidv4 } from 'uuid';
-import type { Message, MessageEmbed, TextChannel, User } from 'discord.js';
+import type { Message, MessageEmbed, User } from 'discord.js';
 
 /**
  * Base Song class, do not use directly!
@@ -24,7 +24,7 @@ export default class Song {
     public duration: number;
     public artist?: string;
     requestedBy: any;
-    public requestedChannel: TextChannel;
+    public requestedChannel: Message['channel'];
 
     /**
      * Construct a new song
@@ -32,7 +32,7 @@ export default class Song {
      * @param {MessageAuthor} author Author of the request
      * @param {TextChannel} channel Channel command was run
      */
-    constructor(url: string, author: User, channel: TextChannel) {
+    constructor(url: string, author: User, channel: Message['channel']) {
         this.id = uuidv4();
         this.references = 0;
         this.metadataTTL = Infinity;
@@ -116,7 +116,7 @@ class YouTubeSong extends Song {
     public youtubeId?: string;
     public viewCount?: number;
 
-    constructor(url: string, author: User, channel: TextChannel) {
+    constructor(url: string, author: User, channel: Message['channel']) {
         super(url, author, channel);
     }
 
@@ -215,7 +215,7 @@ class YouTubeSong extends Song {
 class FileSong extends Song {
     public album?: string;
 
-    constructor(url: string, author: User, channel: TextChannel) {
+    constructor(url: string, author: User, channel: Message['channel']) {
         super(url, author, channel);
     }
 
@@ -292,7 +292,7 @@ export class SongManager {
         return SongManager.songs.get(id);
     }
 
-    static async getSongReference(id: string, requestedBy: User, requestedChannel: TextChannel) {
+    static async getSongReference(id: string, requestedBy: User, requestedChannel: Message['channel']) {
         let song = await SongManager.getSong(id);
         if (typeof song === 'undefined') return SongManagerErrors.SongDoesNotExist;
 
@@ -320,9 +320,9 @@ new SongManager();
 class SongReference {
     public readonly id: string;
     public readonly requestedBy: User;
-    public requestedChannel: TextChannel;
+    public requestedChannel: Message['channel'];
 
-    constructor(id: string, requestedBy: User, requestedChannel: TextChannel) {
+    constructor(id: string, requestedBy: User, requestedChannel: Message['channel']) {
         this.id = id;
         this.requestedBy = requestedBy;
         this.requestedChannel = requestedChannel;
@@ -340,7 +340,7 @@ class SongReference {
  * @param {Discord.Message.channel} channel
  * @return {Song} song
  */
-async function getSong(url: string, author: User, channel: TextChannel) {
+async function getSong(url: string, author: User, channel: Message['channel']) {
     if (!url) return undefined;
 
     if (url.startsWith('https://www.youtube.com') || url.startsWith('https://youtu.be'))
