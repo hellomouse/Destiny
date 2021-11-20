@@ -89,7 +89,7 @@ export class ServerQueue {
         this.loop = loop;
     }
 
-    currentSong() {
+    currentSong(): YouTubeSong | FileSong | undefined {
         return this.songs[this.index];
     }
 
@@ -112,7 +112,7 @@ export class ServerQueue {
      * @return {number} Validated seek time
      */
     async seekTo(seekTime: number, errorCounter = 0) {
-        const song = this.currentSong();
+        const song = this.currentSong()!;
 
         seekTime = Math.max(0, seekTime);
         seekTime = Math.min(song.duration, seekTime);
@@ -154,14 +154,14 @@ export class ServerQueue {
         if (this.loop !== 'song' || this.skipped)
             if (this.shuffle) {
                 if (this.shuffleWaiting.length === 0 && this.loop === 'queue')
-                    this.shuffleWaiting = this.songs.map(x => x.uuid);
+                    this.shuffleWaiting = this.songs.map(x => x.id);
 
                 let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
                 let uuidFind = this.shuffleWaiting[uuidIndex];
 
                 // Check there are more songs to shuffle
                 if (uuidFind) {
-                    this.index = this.songs.findIndex(x => x.uuid === uuidFind);
+                    this.index = this.songs.findIndex(x => x.id === uuidFind);
                     this.shuffled = true;
                 }
 
@@ -195,7 +195,7 @@ export class ServerQueue {
 
         this.shuffled = false;
 
-        const song = this.currentSong();
+        const song = this.currentSong()!;
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
@@ -262,8 +262,8 @@ export class ServerQueue {
     }
 
     shuffleOn() {
-        let uuidFind = this.currentSong() ? this.currentSong().uuid : '';
-        this.shuffleWaiting = this.songs.filter(x => x.uuid !== uuidFind).map(x => x.uuid);
+        let uuidFind = typeof this.currentSong() !== 'undefined' ? this.currentSong()!.id : '';
+        this.shuffleWaiting = this.songs.filter(x => x.id !== uuidFind).map(x => x.id);
         this.shuffle = true;
     }
 
@@ -294,7 +294,7 @@ export class ServerQueue {
         this.songs.push(song);
 
         if (this.shuffle && this.songs.length > 1)
-            this.shuffleWaiting.push(song.uuid);
+            this.shuffleWaiting.push(song.id);
     }
 }
 
