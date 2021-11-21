@@ -23,7 +23,7 @@ export default class Song {
     public formattedDuration: string;
     public duration: number;
     public artist?: string;
-    requestedBy: any;
+    requestedBy: User;
     public requestedChannel: Message['channel'];
 
     /**
@@ -44,6 +44,7 @@ export default class Song {
         this.duration = Infinity;
         this.artist = undefined;
         this.requestedChannel = channel;
+        this.requestedBy = author;
     }
 
     /**
