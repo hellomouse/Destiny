@@ -94,7 +94,9 @@ async function load(client: Client) {
 }
 
 import { Client as DiscordClient, Intents, Message } from 'discord.js';
-const client = new DiscordClient({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] }) as Client;
+const client = new DiscordClient({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]
+}) as Client;
 
 client.lastToken = null;
 
