@@ -16,7 +16,11 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     utils.log(`Skipped music : ${serverQueue!.songs[0].title}`);
     serverQueue!.skip();
 
-    return message.channel.send({ embeds: [embeds.songEmbed(serverQueue!.currentSong(), 'Skipping', false)] });
+    const currentSong = serverQueue!.currentSong();
+    if (currentSong)
+        return message.channel.send({ embeds: [embeds.songEmbed(currentSong, 'Skipping', false)] });
+
+    return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
 };
 
 export const names = ['skip', 's'];
