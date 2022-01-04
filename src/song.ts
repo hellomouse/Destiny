@@ -102,7 +102,7 @@ export default class Song {
             } else if (utils.isURL(arg))
                 songs.push((await getSong(arg, message.author, message.channel))!);
             else
-                await utils.getUrl(arg).then(result => songs.push(result.items[0].url)).catch(err => { });
+                await utils.getUrl(arg).then(result => songs.push(result)).catch(err => { });
         }
 
         return [[...songs, ...playlistSongs], songs.length === 0];

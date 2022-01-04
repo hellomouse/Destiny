@@ -115,12 +115,12 @@ export default {
         return table.render();
     },
 
-    getUrl: async (words: string | Array<string>): Promise<ytsr.Result & { items: ytsr.Video[] }> => {
+    getUrl: async (words: string | Array<string>): Promise<string> => {
         let stringOfWords = Array.isArray(words) ? words.join(' ') : words;
         let filter = (await ytsr.getFilters(stringOfWords)).get('Type')!.get('Video')!;
         let lookingOnYtb = await ytsr(filter.url!, { limit: 1 });
 
-        return lookingOnYtb as ytsr.Result & { items: ytsr.Video[] };
+        return (lookingOnYtb.items[0] as ytsr.Video).url;
     },
 
     formatDuration: (sec: number) => {
