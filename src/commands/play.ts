@@ -3,9 +3,9 @@ import { queueManager } from '../queue';
 import embeds from '../embeds';
 
 import COMMAMD_REQUIREMENTS from '../commands';
-import { Song, getSong, YouTubeSong } from '../song';
+import { Song, getSong, YouTubeSong, SongManager } from '../song';
 import { Client, Message } from 'discord.js';
-import { joinVoiceChannel } from '@discordjs/voice';
+import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
 
 /**
  * @description Play a song with the provided link
@@ -48,10 +48,16 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let serverQueue = queueManager.getOrCreate(message, voiceChannel);
     let song;
 
-    for (let s of songs) {
-        song = typeof s === 'string' ? await getSong(s, message.author, message.channel) : s;
-        if (song) serverQueue.add(song);
-    }
+    utils.log('Requested by: ' + message.author.toString());
+    for (let s of songs)
+        try {
+            song = typeof s === 'string' ? await SongManager.getCreateSong(s, message.author, message.channel) : s;
+            utils.log(`Adding ${song?.title} to queue`);
+            if (song) serverQueue.add(song);
+        } catch (e) {
+            utils.log(e);
+        }
+
 
     utils.log('Got music details, preparing the music to be played...');
 
@@ -59,7 +65,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         let connection = joinVoiceChannel({
             channelId: voiceChannel.id,
             guildId: voiceChannel.guild.id,
-            adapterCreator: voiceChannel.guild.voiceAdapterCreator
+            adapterCreator: voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator
         });
         serverQueue.connection = connection;
         await serverQueue.play();
