@@ -32,7 +32,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         .setDescription(`Volume set to **${floatVolume.toFixed(2)}%**`)] });
 
     serverQueue!.volume = floatVolume;
-    return serverQueue!.audioResource!.volume!.setVolumeLogarithmic(floatVolume / utils.VOLUME_BASE_UNIT);
+    // TypeError: Cannot read properties of undefined (reading 'volume')
+    return serverQueue!.setVolume(floatVolume);
 };
 
 export const names = ['volume', 'v', 'vol'];
