@@ -3,7 +3,6 @@ import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands';
 import { Client, Message } from 'discord.js';
-import { joinVoiceChannel } from '@discordjs/voice';
 
 /**
  * @description Make the bot join the current voice channel the user is in
@@ -13,20 +12,16 @@ import { joinVoiceChannel } from '@discordjs/voice';
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
+    utils.log(message);
     if (!message || !message.member) return;
 
     const voiceChannel = message.member.voice.channel;
+    utils.log(`voiceChannel: ${voiceChannel}`);
     if (!voiceChannel) return; // You need to be in a voice channel
 
-    const serverQueue = queueManager.getOrCreate(message, voiceChannel);
-    const connection = joinVoiceChannel({
-        channelId: voiceChannel.id,
-        guildId: voiceChannel.guild.id,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator
-    });
-
-    serverQueue.connection = connection;
-    utils.log(`Joined the channel : ${voiceChannel.name}`);
+    utils.log(`Joining ${voiceChannel.name}`);
+    const queue = queueManager.getOrCreate(message, voiceChannel);
+    queue.join();
 
     return message.channel.send({ embeds: [embeds.defaultEmbed()
         .setDescription(`Joining ${voiceChannel.toString()}`)] });

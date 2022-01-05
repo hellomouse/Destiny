@@ -2,8 +2,8 @@ import config from '../config.js';
 import utils from './utils.js';
 import embeds from './embeds.js';
 
-import type { Message, StageChannel, VoiceChannel } from 'discord.js';
-import { AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, getVoiceConnection, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
+import type { Message, VoiceBasedChannel } from 'discord.js';
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
 import type { FileSong, Song, YouTubeSong } from './song';
 
 const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
@@ -16,10 +16,11 @@ type LOOP_MODES = typeof LOOP_MODES[number];
  */
 export class ServerQueue {
 
-    public serverID: string | undefined;
-    public voiceChannel: VoiceChannel | StageChannel;
+    public serverID: string;
+    public voiceChannel: VoiceBasedChannel;
     public textChannel: Message['channel'];
     public connection?: VoiceConnection;
+    private audioPlayer: AudioPlayer;
     public songs: Array<YouTubeSong | FileSong>;
     public shuffleWaiting: Array<string>;
     public volume: number;
@@ -43,8 +44,8 @@ export class ServerQueue {
      * @param {Message} message Message for the play command
      * @param {VoiceChannel} voiceChannel Voice channel to play in
      */
-    constructor(message: Message, voiceChannel: VoiceChannel | StageChannel) {
-        this.serverID = message.guild?.id;
+    constructor(message: Message, voiceChannel: VoiceBasedChannel) {
+        this.serverID = message.guild!.id!;
         this.textChannel = message.channel;
         this.voiceChannel = voiceChannel;
 
@@ -65,8 +66,6 @@ export class ServerQueue {
         this.lastNowPlayingMessage;
 
         this.ignoreNextSongEnd = false; // Don't run anything after dispatcher ends for next end, for seeking
-
-        utils.inactivity.onNotPlaying(this);
     }
 
     isEmpty() {
@@ -181,17 +180,13 @@ export class ServerQueue {
      * @return {*} The dispatcher
      */
     async play(errorCounter = 0) {
-        if (this.isEmpty() || this.index < 0 || this.index >= this.size() ||
-            this.loop !== 'queue' && ['none', 'off'].includes(this.loop) && !this.shuffleWaiting.length && this.shuffle && !this.shuffled) {
-            this._isPlaying = false;
-            this.textChannel.send({ embeds: [embeds.defaultEmbed()
-                .setDescription('Finished playing!')] });
-            utils.inactivity.onNotPlaying(this);
-            return;
-        }
+        this.audioPlayer = createAudioPlayer({
+            behaviors: {
+                noSubscriber: NoSubscriberBehavior.Pause
+            }
+        });
 
         this._isPlaying = true;
-        utils.inactivity.onPlaying();
 
         this.shuffled = false;
 
@@ -206,9 +201,10 @@ export class ServerQueue {
 
         let player = createAudioPlayer();
         let audio = this.audioResource = createAudioResource(await song.getStream(), { inlineVolume: true });
-        player.play(audio);
 
         this.connection!.subscribe(player);
+        player.play(audio);
+
         player.on(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
         player.on('error', async error => {
             console.log('dispatcher errored: ' + error);
@@ -226,8 +222,8 @@ export class ServerQueue {
     skip() {
         this.skipped = true;
         let connection = getVoiceConnection(this.serverID);
-        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
-        audioPlayer.stop();
+        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription?.player;
+        audioPlayer?.stop();
         this.audioResource = undefined; // Remove reference to audio resource, to prevent memory leak
     }
 
@@ -274,6 +270,8 @@ export class ServerQueue {
 
     setVolume(volume: number) {
         this.volume = volume;
+        if (this.isPlaying())
+            this.audioResource?.volume?.setVolumeLogarithmic(volume / utils.VOLUME_BASE_UNIT);
     }
 
     /** Resume currently playing song */
@@ -296,6 +294,19 @@ export class ServerQueue {
         if (this.shuffle && this.songs.length > 1)
             this.shuffleWaiting.push(song.id);
     }
+
+    /**
+     * Connects to the queue's linked voice channel
+     */
+    join() {
+        this.connection = joinVoiceChannel({
+            channelId: this.voiceChannel.id,
+            guildId: this.voiceChannel.guild.id,
+            adapterCreator: this.voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
+            selfDeaf: true
+        });
+        utils.log(`Joined the channel : ${this.voiceChannel.name}`);
+    }
 }
 
 /**
@@ -317,7 +328,7 @@ export class QueueManager {
      * @param {VoiceChannel} voiceChannel voice channel
      * @return {ServerQueue} Server queue instance for server
      */
-    getOrCreate(message: Message, voiceChannel: VoiceChannel | StageChannel): ServerQueue {
+    getOrCreate(message: Message, voiceChannel: VoiceBasedChannel): ServerQueue {
         const serverID = message.guild?.id;
         if (typeof serverID !== 'undefined') {
             let queue = this._queues[serverID];
