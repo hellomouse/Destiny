@@ -1,4 +1,4 @@
-import { inactivity, log, VOLUME_BASE_UNIT } from '../utils.js';
+import { InactivityHelper, log, VOLUME_BASE_UNIT } from '../utils.js';
 import { songEmbed } from '../embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
@@ -33,6 +33,7 @@ export class ServerQueue {
     };
     audioResource?: AudioResource;
     messages: MessageCollection;
+    inactivityHelper: InactivityHelper;
 
     /**
      * Construct a server queue
@@ -57,6 +58,8 @@ export class ServerQueue {
             this.ignoreNextSongEnd = true;
             await this.play();
         });
+
+        this.inactivityHelper = new InactivityHelper(this);
 
         this.songs = [];
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
@@ -147,6 +150,7 @@ export class ServerQueue {
         const previousIndex = this.index - 1 < 0 ? 0 : this.index - 1;
         if (this.songs[this.index]) {
             log(`Finished playing the music : ${(this.songs[previousIndex].song).title}`);
+            this.inactivityHelper.onNotPlaying();
             await this.play();
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
@@ -182,6 +186,7 @@ export class ServerQueue {
 
         this.connection!.subscribe(player);
         player.play(audio);
+        this.inactivityHelper.onPlaying();
 
         audio.volume!.setVolumeLogarithmic(this.volume / VOLUME_BASE_UNIT);
         return player;
@@ -253,6 +258,7 @@ export class ServerQueue {
     pause() {
         if (!this.isPlaying()) return;
         this.audioPlayer.pause();
+        this.inactivityHelper.onNotPlaying();
     }
 
     shuffleOn() {
@@ -281,6 +287,7 @@ export class ServerQueue {
         }
 
         this.audioPlayer.unpause();
+        this.inactivityHelper.onPlaying();
     }
 
     /**

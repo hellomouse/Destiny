@@ -13,37 +13,42 @@ export class FlagHelpError extends Error {
     }
 }
 
-class Inactivity {
-    private config: {
-        waitRejoinSeconds: number,
-        botIdleSeconds: number
-    };
-    private aloneTimer: NodeJS.Timeout;
-    private inactivityTimer: NodeJS.Timeout;
+export class InactivityHelper {
+    static config = InactivityHelper.generateConfig();
 
-    constructor() {
-        this.config = Object.assign({
+    static generateConfig() {
+        let generatedConfig = Object.assign({
             waitRejoinSeconds: 60,
             botIdleSeconds: 600
         }, config.inactivity); // Writes default values with ones from written configuration file
 
         // Convert to milliseconds for timers
-        this.config.waitRejoinSeconds *= 1000;
-        this.config.botIdleSeconds *= 1000;
+        generatedConfig.waitRejoinSeconds *= 1000;
+        generatedConfig.botIdleSeconds *= 1000;
+
+        return generatedConfig;
+    }
+
+    private aloneTimer: NodeJS.Timeout;
+    private inactivityTimer: NodeJS.Timeout;
+    private serverQueue: ServerQueue;
+
+    constructor(serverQueue: ServerQueue) {
+        this.serverQueue = serverQueue;
 
         this.aloneTimer = setTimeout(() => { }, 0);
         this.inactivityTimer = setTimeout(() => { }, 0);
     }
 
-    onAlone(serverQueue: ServerQueue) {
+    onAlone() {
         clearTimeout(this.aloneTimer);
-        if (this.config.waitRejoinSeconds < 0) return;
+        if (InactivityHelper.config.waitRejoinSeconds < 0) return;
         setTimeout(() => {
-            if (serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
-                queueManager.remove(serverQueue.serverID);
-                serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
+            if (this.serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
+                queueManager.remove(this.serverQueue.serverID);
+                this.serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
             }
-        }, this.config.waitRejoinSeconds);
+        }, InactivityHelper.config.waitRejoinSeconds);
     }
 
     onPersonJoin() {
@@ -58,23 +63,21 @@ class Inactivity {
         clearTimeout(this.inactivityTimer);
     }
 
-    onNotPlaying(serverQueue: ServerQueue) {
+    onNotPlaying() {
         clearTimeout(this.inactivityTimer);
-        if (this.config.botIdleSeconds < 0) return;
+        if (InactivityHelper.config.botIdleSeconds < 0) return;
         setTimeout(() => {
-            if (serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
-                queueManager.remove(serverQueue.serverID);
-                serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
+            if (this.serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
+                queueManager.remove(this.serverQueue.serverID);
+                this.serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
             }
-        }, this.config.botIdleSeconds);
+        }, InactivityHelper.config.botIdleSeconds);
     }
 
     onPlaying() {
         clearTimeout(this.inactivityTimer);
     }
 }
-
-export const inactivity = new Inactivity();
 
 /**
      * @description Sends logs to console and adds the date/time
