@@ -11,27 +11,27 @@ import { Client, Message } from 'discord.js';
  * @param {Array<string>} args Optional loop mode
  * @return {Promise<Message>} sent message
  */
-export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message> => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
-    let loopMode = LOOP_MODES[(LOOP_MODES.indexOf(serverQueue.loop) + 1) % LOOP_MODES.length];
+    let loopMode = serverQueue.loop;
     if (args[0])
-        if (!LOOP_MODES.includes(args[0].toLowerCase() as LOOP_MODES)) {
-            loopMode = args[0].toLowerCase() as LOOP_MODES;
+        loopMode = LOOP_MODES[args[0].toLowerCase() as keyof typeof LOOP_MODES];
+        if (!loopMode) {
             return message.channel.send({ embeds: [embeds.errorEmbed()
                 .setTitle(`Invalid loop mode \`${args[0].toLowerCase()}\``)
-                .setDescription(`Loop mode should be one of \`${LOOP_MODES.join(', ')}\``)] });
+                .setDescription(`Loop mode should be one of \`${Object.keys(LOOP_MODES).join(', ')}\``)] });
         }
 
 
-    serverQueue.setLoopMode(loopMode as LOOP_MODES);
-    utils.log(`Loop mode set to ${loopMode}`);
+    serverQueue.setLoopMode(loopMode);
+    utils.log(`Loop mode set to ${LOOP_MODES[loopMode]}`);
     return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Loop mode now set to \`${loopMode}\``)] });
 };
 
 export const names = ['loop', 'l'];
 export const help = {
     desc: 'Change looping settings',
-    syntax: '[loop | none | queue]'
+    syntax: '[loop | none/off | queue]'
 };
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

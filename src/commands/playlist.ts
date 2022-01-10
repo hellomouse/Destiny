@@ -25,7 +25,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let playlistsLength = Object.keys(playlists).length;
     let hasPlaylist = localData.hasPlaylist(userId, playlistName);
     let playlist = playlists[playlistName] || [];
-    let [songs] = await Song.getSongURLs(args.slice(2), message);
+    let [songs] = await Song.getSongReferences(args.slice(2), message);
 
     switch (args[0] === 'list' ? args[0] : args[1]) {
             case 'create': {
@@ -67,7 +67,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
                 if (playlist.length === config.playlists.maximumItemsPerPlaylist)
                     return message.channel.send({ embeds: [embeds.errorEmbed().setDescription(`Playlist has reached maximum number of items`)] });
 
-                songs.forEach(x => localData.addSong(userId, playlistName, (x instanceof Song ? x.url : x)));
+                songs.forEach(async x => localData.addSong(userId, playlistName, (await x.song).url));
                 message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Added ${songs.length} song(s) to playlist`)] });
                 break;
             }
@@ -75,12 +75,12 @@ export const run = async (client: Client, message: Message, args: Array<string>)
                 if (!hasPlaylist) return message.channel.send({ embeds: [embeds.errorEmbed().setDescription(`No such playlist exists`)] });
                 if (!songs.length) return message.channel.send({ embeds: [embeds.errorEmbed().setDescription(`Not a valid song(s)`)] });
 
-                let occurences = [...new Set(songs)]
-                    .map(x => localData.hasSong(userId, playlistName, (x instanceof Song ? x.url : x)) ? 1 : 0)
-                    .reduce((prev, current) => prev + current);
+                let occurences = await [...new Set(songs)]
+                    .map(async x => localData.hasSong(userId, playlistName, (await x.song).url) ? 1 : 0)
+                    .reduce(async (prev, current) => (await prev) + (await current));
                 if (occurences === 0) return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription('Song(s) not found in playlist')] });
 
-                songs.forEach(x => localData.removeSong(userId, playlistName, (x instanceof Song ? x.url : x)));
+                songs.forEach(async x => localData.removeSong(userId, playlistName, (await x.song).url));
                 message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Removed ${occurences} song(s) from playlist`)] });
 
                 break;

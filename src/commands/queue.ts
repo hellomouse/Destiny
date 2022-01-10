@@ -1,29 +1,32 @@
 import strings from '../strings.json';
 import utils from '../utils';
 import embeds from '../embeds.js';
-import { queueManager, ServerQueue } from '../queue.js';
+import { LOOP_MODES, queueManager, ServerQueue } from '../queue.js';
 import { Client, Message, MessageActionRow, MessageButton } from 'discord.js';
 
 const PAGE_SIZE = 10;
 const MAX_LINE_LENGTH = 80;
 
-// Prev, next, first, last
-const ROW_BTN_LABELS = ['上页', '下页', '初页', '末页'];
+// first, prev, next, last
+const ROW_BTN_EMOJI = ['929913795726418001', '929913795491561615', '929913795726442567', '929913795747405924'];
 const ROW_BTN_FUNC = [
-    (page: number, maxPages: number) => page + 1,
-    (page: number, maxPages: number) => page - 1,
     (page: number, maxPages: number) => 0,
+    (page: number, maxPages: number) => page - 1,
+    (page: number, maxPages: number) => page + 1,
     (page: number, maxPages: number) => maxPages - 1
 ];
 
-function getQueueContent(page:number, serverQueue: ServerQueue, maxPages: number) {
+async function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: number) {
+    page = Math.max(0, Math.min(page, maxPages - 1));
+
     let queuetxt = '```swift';
     queuetxt += `\nQueue Page: ${page + 1} / ${maxPages}`;
-    queuetxt += `    Loop Mode: ${serverQueue.loop}\n\n`;
+    queuetxt += `    Loop Mode: ${LOOP_MODES[serverQueue.loop]}\n\n`;
 
     let endIndex = Math.min((page + 1) * PAGE_SIZE, serverQueue.songs.length);
     for (let i = page * PAGE_SIZE; i < endIndex; i++) {
-        let song = serverQueue.songs[i];
+        let songReference = serverQueue.songs[i];
+        let song = await songReference.song;
         let indexStr = (i + 1)
             .toString()
             .padStart(Math.floor(Math.log10(endIndex)) + 1, ' ');
@@ -63,23 +66,23 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     }
     page = Math.max(0, Math.min(page, maxPages - 1));
 
-    let queuetxt = getQueueContent(page, serverQueue, maxPages);
+    let queuetxt = await getQueueContent(page, serverQueue, maxPages);
 
     const row = new MessageActionRow();
-    row.addComponents(...ROW_BTN_LABELS.map(label => new MessageButton()
-        .setCustomId(label)
-        .setLabel(label)
-        .setStyle('SECONDARY')));
+    row.addComponents(...ROW_BTN_EMOJI.map(emoji => new MessageButton()
+        .setEmoji(emoji)
+        .setCustomId(emoji)
+        .setStyle('PRIMARY')));
 
     client.on('interactionCreate', async interaction => {
         if (!interaction.isButton()) return;
         console.log(interaction);
-        for (let i = 0; i < ROW_BTN_LABELS.length; i++)
-            if (interaction.customId === ROW_BTN_LABELS[i]) {
+        for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
+            if (interaction.customId === ROW_BTN_EMOJI[i]) {
                 page = ROW_BTN_FUNC[i](page, maxPages);
-                let content = getQueueContent(page, serverQueue, maxPages);
-                await interaction.message.edit({ content });
-                interaction.reply(ROW_BTN_LABELS[i]);
+                let content = await getQueueContent(page, serverQueue, maxPages);
+                await interaction.update({ content });
+                //interaction.reply(ROW_BTN_LABELS[i]);
                 return;
             }
     });
@@ -89,6 +92,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         content: queuetxt,
         components: [row]
     });
+    // return message.channel.send({
+    //     content: queuetxt,
+    //     components: [row]
+    // }, hidden = true);
 };
 
 

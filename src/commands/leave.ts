@@ -2,6 +2,7 @@ import utils from '../utils';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import { Client, Message } from 'discord.js';
+import { getVoiceConnection } from '@discordjs/voice';
 
 /**
  * @description Stops the music and make the bot leave the channel
@@ -17,7 +18,12 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     utils.log('Stopped playing music');
     serverQueue.clear(true);
-    serverQueue.connection!.disconnect();
+    let connection = getVoiceConnection(message.guildId!);
+    const voiceChannel = message.member!.voice.channel;
+    if (!connection)
+        connection = queueManager.getOrCreate(message, voiceChannel!).connection!; // Join VC to disconnect
+
+    connection.destroy();
 
     return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave:')] });
 };

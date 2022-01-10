@@ -13,7 +13,7 @@ import { Client, Message } from 'discord.js';
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
-    const song = serverQueue.currentSong();
+    const song = await serverQueue.currentSong();
 
     if (!song) return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
 

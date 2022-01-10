@@ -2,10 +2,9 @@ import utils from '../utils';
 import { queueManager } from '../queue';
 import embeds from '../embeds';
 
-import COMMAMD_REQUIREMENTS from '../commands';
-import { Song, getSong, YouTubeSong, SongManager } from '../song';
+import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands';
+import { Song, YouTubeSong } from '../song';
 import { Client, Message } from 'discord.js';
-import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
 
 /**
  * @description Play a song with the provided link
@@ -15,12 +14,11 @@ import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
-    if (!args[0] && message.attachments.size === 0)
-        throw new utils.FlagHelpError();
+    hasEnoughArgs(args, message);
 
     utils.log('Looking for music details...');
-
-    let [songs, onlyPlaylistSongs] = await Song.getSongURLs(args.join(' ').split(' | '), message, true);
+    // !!play youtube_link | your favorite song query here | spotify link | direct video link
+    let [songs, onlyPlaylistSongs] = await Song.getSongReferences(args.join(' ').split(' | '), message, true);
     let playlists = await Promise.all(
         YouTubeSong.getYouTubePlaylistURLs(args)
             .map(x => YouTubeSong.getPlaylistData(x)))
@@ -29,6 +27,13 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let actualVideoNum = playlists.reduce((prev, current) => prev += current.items.length, 0);
     let expectedVideoNum = playlists.reduce((prev, current) => prev += current.estimatedItemCount, 0);
 
+    // Have no embed at all, user has no idea what's happening
+    // Have two embeds, like we currently do.
+    // "Adding songs..." embed then edit to say "Added 3/4 songs".
+    // * how to do this then, new module called messages.ts, info.ts? or move to queue.ts?
+    // message/info.ts could handle user callback/delegate it
+    // bad idea, we give function conditions and messages
+    // like sendResponse(messagestuff, [playlists.length === 0, ddd], callback or `Added ${songs.length} songs`...)
     let enqueuedEmbed;
     if (playlists.length === 0)
         enqueuedEmbed = embeds.defaultEmbed()
@@ -44,35 +49,29 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     message.channel.send({ embeds: [enqueuedEmbed] });
 
-    let voiceChannel = message.member!.voice.channel!;
-    let serverQueue = queueManager.getOrCreate(message, voiceChannel);
-    let song;
+    let serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
-    utils.log('Requested by: ' + message.author.toString());
-    for (let s of songs)
-        try {
-            song = typeof s === 'string' ? await SongManager.getCreateSong(s, message.author, message.channel) : s;
-            utils.log(`Adding ${song?.title} to queue`);
-            if (song) serverQueue.add(song);
-        } catch (e) {
-            utils.log(e);
-        }
+    utils.log('Requested by: ' + message.author.toString()); // maybe bundle into a json-like console message, !!play from <user>, arguments: truncated, server: foo
+    // for (let s of songs)
+    //     try {
+    //         song = typeof s === 'string' ? await SongManager.getCreateSong(s, message.author, message.channel) : s;
+    //         utils.log(`Adding ${song?.title} to queue`);
+    //         if (song) serverQueue.add(song);
+    //     } catch (e) {
+    //         utils.log(e);
+    //     }
 
+    // we have an array of songreferences, which *should* all be valid songs
+    // just pass them to serverQueue.play(songsreferences: [SongReference])
+    // play function should resume if paused... well... just play regardless
+    serverQueue.join();
+    serverQueue.add(songs);
+    serverQueue.play();
 
-    utils.log('Got music details, preparing the music to be played...');
-
-    if (!serverQueue.isPlaying()) {
-        let connection = joinVoiceChannel({
-            channelId: voiceChannel.id,
-            guildId: voiceChannel.guild.id,
-            adapterCreator: voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator
-        });
-        serverQueue.connection = connection;
-        await serverQueue.play();
-        serverQueue.resume();
-    }
+    utils.log('Got music details, preparing the music to be played...'); // don't really like this, not a lot of information
 };
 
+// perhaps we can improve how commands work?
 export const names = ['play', 'p'];
 export const help = {
     desc: 'Add a song to the queue',
