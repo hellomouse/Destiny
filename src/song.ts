@@ -9,6 +9,7 @@ import type { Message, MessageEmbed, User } from 'discord.js';
 
 class SongAlreadyExistsError extends Error {}
 class SongQueueFullError extends Error {}
+class SongNotFoundError extends Error {}
 
 /**
  * Get a Song object given its url
@@ -105,10 +106,10 @@ export default class Song {
         return embed;
     }
 
-    static async getSongURLs(args: Array<string>, message: Message,
-        unpackPlaylists = false): Promise<[(YouTubeSong | FileSong | string)[], boolean]> {
-        let songs: Array<YouTubeSong | FileSong | string> = [];
-        let playlistSongs: Array<YouTubeSong | string> = [];
+    static async getSongReferences(args: Array<string>, message: Message,
+        unpackPlaylists = false): Promise<[SongReference[], boolean]> {
+        let songs: Array<SongReference> = [];
+        let playlistSongs: Array<SongReference> = [];
 
         if (message.attachments.size > 0)
             args = [...args, ...message.attachments.map(x => x.url)];
@@ -117,11 +118,24 @@ export default class Song {
             let isPlaylist = YouTubeSong.getYoutubePlaylistID(arg);
             if (isPlaylist && unpackPlaylists) {
                 let unpackedPlaylist = await YouTubeSong.unpackPlaylist(arg, message);
-                playlistSongs = [...playlistSongs, ...await Promise.all(unpackedPlaylist)];
-            } else if (utils.isURL(arg))
-                songs.push((getSongTypeFromURL(arg, message.author, message.channel))!);
+                playlistSongs = [...playlistSongs, ...unpackedPlaylist];
+            } else if (utils.isURL(arg)) {
+                try {
+                    let songReference = await SongManager.getCreateSong(arg, message.author, message.channel);
+                    songs.push(songReference);
+                    // get song type, new SongType, check if exists in global song manager queue,
+                    // get reference, if not, add, get reference
+                    // push reference to songs
+                } catch (e) {
+                    // do nothing i guess?
+                }
+            }
             else
-                await utils.getUrl(arg).then(result => songs.push(result)).catch(err => { });
+                await utils.getUrl(arg).then(result => {
+                    let id = YouTubeSong.generateIdFromUrl(result);
+                    // tod
+                }).catch(err => { });
+                // can't find any youtube/other links, so perform youtube search and add first song
         }
 
         return [[...songs, ...playlistSongs], songs.length === 0];
@@ -217,36 +231,38 @@ class YouTubeSong extends Song {
     }
 
     static async unpackPlaylist(url: string, message: Message) {
-        let songs: Array<Promise<SongReference>> = [];
+        let songs: Array<SongReference> = [];
 
         const playlistData = await YouTubeSong.getPlaylistData(url);
         if (!playlistData)
             return [];
 
-        playlistData.items.forEach(async (song: playlist.Item) => {
+        for (let song of playlistData.items) {
             let id = YouTubeSong.generateId(song.id);
 
-            try {
-                let songReference: SongReference;
-                if (!SongManager.hasId(id)) {
-                    const ytSong = new YouTubeSong(
-                        `https://www.youtube.com/watch?v=${song.id}`,
-                        message.author,
-                        message.channel
-                    );
-                    songReference = await SongManager.addSong(
-                        await ytSong.finalize(song.youtubeId, song.title, song.duration, song.artist, song.viewCount),
-                        message.author,
-                        message.channel
-                    );
-                } else
-                    songReference = await SongManager.getSongReference(id, message.author, message.channel);
+            let songReference: SongReference;
+            if (!SongManager.hasId(id)) {
+                const ytSong = new YouTubeSong(
+                    `https://www.youtube.com/watch?v=${song.id}`,
+                    message.author,
+                    message.channel
+                );
+                songReference = await SongManager.addSong(
+                    await ytSong.finalize(
+                        song.id,
+                        song.title,
+                        song.durationSec!,
+                        song.author.name,
+                        undefined
+                    ),
+                    message.author,
+                    message.channel
+                );
+            } else
+                songReference = await SongManager.getSongReference(id, message.author, message.channel);
 
-                songs.push(songReference);
-            } catch (error) {
-                // do nothing i guess, but it failed for a reason? so pass up?
-            }
-        });
+            songs.push(songReference);
+        }
 
         return songs;
     }
@@ -311,13 +327,8 @@ class FileSong extends Song {
     }
 }
 
-enum SongManagerErrors {
-    CacheFull,
-    SongAlreadyExists,
-    SongDoesNotExist
-}
 export class SongManager {
-    private static songs: Map<string, Song>;
+    private static songs: Map<string, YouTubeSong | FileSong>;
     private static cacheCleanTimeout: NodeJS.Timeout;
     private static cacheCleanTimeoutDestroyed: boolean;
     private static cacheCleanTimeoutDuration: number;
@@ -329,20 +340,23 @@ export class SongManager {
         SongManager.cacheCleanTimeoutDestroyed = true;
     }
 
-    static async getCreateSong(url: string, requestedBy: User, requestedChannel: Message['channel']) {
+    /**
+     * Creates a new song in the songs hashmap, if it already exists then return it
+     */
+    static async getCreateSong(url: string, requestedBy: User, requestedChannel: Message['channel']): Promise<SongReference> {
         // Stupid eslint... We throw an error if the song is not a known song type
         // eslint-disable-next-line no-useless-catch
         try {
             let songType = getSongTypeFromURL(url);
             let id = songType.generateIdFromUrl(url);
 
-            if (SongManager.songs.has(id)) return SongManager.getSong(id);
+            if (SongManager.songs.has(id)) return SongManager.getSongReference(id, requestedBy, requestedChannel);
 
             // eslint-disable-next-line new-cap
-            let song = new songType(url, requestedBy, requestedChannel);
-            SongManager.addSong(song);
+            let song = await new songType(url, requestedBy, requestedChannel).finalize();
+            let songReference = SongManager.addSong(song, requestedBy, requestedChannel);
 
-            return id;
+            return songReference;
         } catch (error) {
             throw error;
         }
@@ -355,32 +369,33 @@ export class SongManager {
         return SongManager.hasId(id);
     }
 
-    static async hasId(id: string) {
+    static hasId(id: string) {
         return SongManager.songs.has(id);
     }
 
-    static async addSong(song: Song, requestedBy: User, requestedChannel: Message['channel']) {
+    static async addSong(song: YouTubeSong | FileSong, requestedBy: User, requestedChannel: Message['channel']) {
         if (SongManager.songs.size >= config.songManager.hardNumLimit) throw new SongQueueFullError('Song cache full');
-        if (await SongManager.getSong(song.id)) throw new SongAlreadyExistsError('Song already exists');
+        if (SongManager.hasId(song.id)) throw new SongAlreadyExistsError('Song already exists'); // !!!!
 
         SongManager.songs.set(song.id, song);
 
         SongManager.checkCleanup();
 
-        return this.getSongReference(song.id, requestedBy, requestedChannel);
+        return await this.getSongReference(song.id, requestedBy, requestedChannel);
     }
 
-    static async getSong(id: string) {
+    static async getSong(id: string): Promise<YouTubeSong | FileSong> {
         let song = SongManager.songs.get(id);
-        if (typeof song === 'undefined') return undefined;
+        if (typeof song === 'undefined') throw new SongNotFoundError();
 
-        if (Date.now() > song.metadataTTL) return SongManager.songs.get(id)?.finalize();
-        return SongManager.songs.get(id);
+        // If the song metadata is old then update it
+        if (Date.now() > song.metadataTTL) return await song.finalize();
+        return song;
     }
 
     static async getSongReference(id: string, requestedBy: User, requestedChannel: Message['channel']) {
         let song = await SongManager.getSong(id);
-        if (typeof song === 'undefined') return SongManagerErrors.SongDoesNotExist;
+        if (typeof song === 'undefined') throw new SongNotFoundError(); // need to change to throw error
 
         return new SongReference(song.id, requestedBy, requestedChannel);
     }
@@ -403,7 +418,7 @@ export class SongManager {
 
 export const songManager = new SongManager(); // need to export this so queue.ts can use it
 
-class SongReference {
+export class SongReference {
     public readonly id: string;
     public readonly requestedBy: User;
     public requestedChannel: Message['channel'];
@@ -424,5 +439,5 @@ class SongReference {
     }
 }
 
-export { Song, YouTubeSong, FileSong, SongManagerErrors };
+export { Song, YouTubeSong, FileSong };
 

@@ -4,10 +4,16 @@ import embeds from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
-import type { FileSong, Song, YouTubeSong } from './song';
+import { FileSong, Song, YouTubeSong, SongReference, SongManager } from './song';
 
-const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
-type LOOP_MODES = typeof LOOP_MODES[number];
+// const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
+// type LOOP_MODES = typeof LOOP_MODES[number];
+enum LOOP_MODES {
+    'none' = 0,
+    'off' = 0,
+    'song' = 1,
+    'queue' = 2
+}
 
 /**
  * A queue for a specified server
@@ -20,12 +26,12 @@ export class ServerQueue {
     public voiceChannel: VoiceBasedChannel;
     public textChannel: Message['channel'];
     public connection?: VoiceConnection;
-    private audioPlayer: AudioPlayer;
-    public songs: Array<YouTubeSong | FileSong>;
+    private audioPlayer!: AudioPlayer;
+    public songs: Array<SongReference>;
     public shuffleWaiting: Array<string>;
     public volume: number;
     public _paused: boolean;
-    public loop: LOOP_MODES;
+    public loop: number;
     public skipped: boolean;
     public shuffle: boolean;
     public shuffled: boolean;
@@ -55,7 +61,7 @@ export class ServerQueue {
         this.shuffleWaiting = []; // Songs to be played in shuffle mode
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this._paused = false;
-        this.loop = 'none'; // in LOOP_MODES
+        this.loop = LOOP_MODES['none']; // in LOOP_MODES
         this.skipped = false;
 
         this.shuffle = false;
@@ -88,8 +94,8 @@ export class ServerQueue {
         this.loop = loop;
     }
 
-    currentSong(): YouTubeSong | FileSong | undefined {
-        return this.songs[this.index];
+    currentSong() {
+        return this.songs[this.index].song;
     }
 
     isPlaying() {
@@ -111,14 +117,14 @@ export class ServerQueue {
      * @return {number} Validated seek time
      */
     async seekTo(seekTime: number, errorCounter = 0) {
-        const song = this.currentSong()!;
+        const song = await this.currentSong()!;
 
         seekTime = Math.max(0, seekTime);
         seekTime = Math.min(song.duration, seekTime);
 
         this.ignoreNextSongEnd = true;
         let connection = getVoiceConnection(this.serverID);
-        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
+        let audioPlayer = this.audioPlayer;
         let audio = this.audioResource = createAudioResource(await song.getStream(seekTime), { inlineVolume: true });
         audioPlayer.play(audio);
 
@@ -143,16 +149,16 @@ export class ServerQueue {
         }
 
         if (this.songs[this.index + 1])
-            utils.log(`Finished playing the music : ${this.songs[this.index].title}`);
+            utils.log(`Finished playing the music : ${(await this.songs[this.index].song).title}`);
         else
             utils.log(`Finished playing all musics, no more musics in the queue`);
 
         this.skipped = false;
         if (this.songs.length === 0) return;
 
-        if (this.loop !== 'song' || this.skipped)
+        if (this.loop !== LOOP_MODES['song'] || this.skipped)
             if (this.shuffle) {
-                if (this.shuffleWaiting.length === 0 && this.loop === 'queue')
+                if (this.shuffleWaiting.length === 0 && this.loop === LOOP_MODES['queue'])
                     this.shuffleWaiting = this.songs.map(x => x.id);
 
                 let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
@@ -168,7 +174,7 @@ export class ServerQueue {
             } else
                 this.index++;
 
-        if (this.loop === 'queue')
+        if (this.loop === LOOP_MODES['queue'])
             this.index %= this.size();
 
         await this.play();
@@ -190,7 +196,7 @@ export class ServerQueue {
 
         this.shuffled = false;
 
-        const song = this.currentSong()!;
+        const song = await this.currentSong()!;
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
@@ -241,7 +247,7 @@ export class ServerQueue {
         this.index = 0;
 
         if (restoreDefaults) {
-            this.setLoopMode('off');
+            this.setLoopMode(LOOP_MODES['off']);
             this.shuffleOff();
             this.setVolume(ServerQueue.consts.DEFAULT_VOLUME);
         }
@@ -285,14 +291,12 @@ export class ServerQueue {
     }
 
     /**
-     * Add a song to the queue
+     * Adds SongReferences' to the queue
      * @param {Song} song Song to add
      */
-    add(song: YouTubeSong | FileSong) {
-        this.songs.push(song);
-
-        if (this.shuffle && this.songs.length > 1)
-            this.shuffleWaiting.push(song.id);
+    add(songReferences: Array<SongReference>) {
+        for (let songReference of songReferences)
+            this.songs.push(songReference);
     }
 
     /**
