@@ -74,23 +74,26 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         .setCustomId(emoji)
         .setStyle('PRIMARY')));
 
-    client.on('interactionCreate', async interaction => {
-        if (!interaction.isButton()) return;
-        console.log(interaction);
-        for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
-            if (interaction.customId === ROW_BTN_EMOJI[i]) {
-                page = ROW_BTN_FUNC[i](page, maxPages);
-                let content = await getQueueContent(page, serverQueue, maxPages);
-                await interaction.update({ content });
-                return;
-            }
-    });
-
     utils.log('Showed music queue');
-    return serverQueue.messages.get('queue')?.send(message.channel, {
+    let sentMessage = await serverQueue.messages.get('queue')?.send(message.channel, {
         content: queuetxt,
         components: [row]
     });
+
+    sentMessage?.createMessageComponentCollector({ componentType: 'BUTTON' })
+        .on('collect', async interaction => {
+            if (!interaction.isButton()) return;
+            for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
+                if (interaction.customId === ROW_BTN_EMOJI[i]) {
+                    page = ROW_BTN_FUNC[i](page, maxPages);
+                    let content = await getQueueContent(page, serverQueue, maxPages);
+                    await interaction.update({ content })
+                        .catch(console.error);
+                    return;
+                }
+        });
+
+    return sentMessage;
     // return message.channel.send({
     //     content: queuetxt,
     //     components: [row]

@@ -32,25 +32,27 @@ export class SingletonMessage extends CustomMessage {
 }
 
 export class SongQueueMessage extends CustomMessage {
+    private previousMessage: Message<boolean> | undefined;
     constructor() {
         super();
     }
 
     // Disable buttons for the previous song queue message
     async disableButtons() {
-        if (!this.message) return;
+        if (!this.previousMessage) return;
 
-        this.message.components[0].components.forEach(
+        this.previousMessage.components[0].components.forEach(
             button => button.setDisabled(true)
         );
 
-        this.message.edit({ components: this.message.components }).catch(console.error);
+        this.previousMessage.edit({ components: this.previousMessage.components }).catch(console.error);
     }
 
     async send(channel: Message['channel'], options: string | MessagePayload | MessageOptions) {
         // TODO: Figure out why DiscordAPIError is thrown.
         // We send a new message, and disable the buttons on the previous message
-        let message = this._send(channel, options);
+        this.previousMessage = this.message;
+        let message = await this._send(channel, options);
         await this.disableButtons();
         return message;
     }
