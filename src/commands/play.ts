@@ -66,7 +66,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     // play function should resume if paused... well... just play regardless
     serverQueue.join();
     serverQueue.add(songs);
-    serverQueue.play();
+    serverQueue.playIfNewInstance();
 
     utils.log('Got music details, preparing the music to be played...'); // don't really like this, not a lot of information
 };
