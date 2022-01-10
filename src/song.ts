@@ -129,7 +129,6 @@ export default class Song {
                 } catch (e) {
                     // do nothing i guess?
                 }
-
             else
                 await utils.getUrl(arg).then(result => {
                     let id = YouTubeSong.generateIdFromUrl(result);
@@ -173,7 +172,8 @@ class YouTubeSong extends Song {
 
         this.youtubeId = id || songMetadata.videoDetails.videoId;
         this.id = YouTubeSong.generateId(this.youtubeId);
-        this.metadataTTL = Date.now() + (config.songManager.metadataRefreshInterval.YouTubeSong || this.metadataTTL);
+        this.metadataTTL = Date.now() +
+            (config.songManager.metadataRefreshInterval.YouTubeSong * 1000 || this.metadataTTL);
         this.thumbnail = `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
         this.title = title || songMetadata.videoDetails.title;
         this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
@@ -388,8 +388,6 @@ export class SongManager {
         let song = SongManager.songs.get(id);
         if (typeof song === 'undefined') throw new SongNotFoundError();
 
-        // If the song metadata is old then update it
-        if (Date.now() > song.metadataTTL) return await song.finalize();
         return song;
     }
 
@@ -414,9 +412,19 @@ export class SongManager {
                 SongManager.cacheCleanTimeout = setTimeout(SongManager.clean, SongManager.cacheCleanTimeoutDuration);
             }
     }
+
+    static refreshMetadata() {
+        let date = Date.now();
+        SongManager.songs.forEach(async song => {
+            // If the song metadata is old then update it
+            if (date > song.metadataTTL)
+                await song.finalize();
+        });
+    }
 }
 
 export const songManager = new SongManager(); // need to export this so queue.ts can use it
+setInterval(SongManager.refreshMetadata, 600000); // Check for song available metadata refreshes every 10 minutes
 
 export class SongReference {
     public readonly id: string;
