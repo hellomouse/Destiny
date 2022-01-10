@@ -82,13 +82,12 @@ export const run = async (client: Client, message: Message, args: Array<string>)
                 page = ROW_BTN_FUNC[i](page, maxPages);
                 let content = await getQueueContent(page, serverQueue, maxPages);
                 await interaction.update({ content });
-                // interaction.reply(ROW_BTN_LABELS[i]);
                 return;
             }
     });
 
     utils.log('Showed music queue');
-    return message.channel.send({
+    return serverQueue.messages.get('queue')?.send(message.channel, {
         content: queuetxt,
         components: [row]
     });
