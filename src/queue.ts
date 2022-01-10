@@ -5,14 +5,15 @@ import embeds from './embeds.js';
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
 import { FileSong, Song, YouTubeSong, SongReference, SongManager } from './song';
+import MessageCollection, { SongQueueMessage, SingletonMessage } from './messages';
 
 // const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
 // type LOOP_MODES = typeof LOOP_MODES[number];
 enum LOOP_MODES {
-    'none' = 0,
-    'off' = 0,
-    'song' = 1,
-    'queue' = 2
+    'NONE' = 0,
+    'OFF' = 0,
+    'SONG' = 1,
+    'QUEUE' = 2
 }
 
 /**
@@ -44,6 +45,7 @@ export class ServerQueue {
         DEFAULT_VOLUME: 70
     };
     audioResource?: AudioResource;
+    messages: MessageCollection;
 
     /**
      * Construct a server queue
@@ -61,7 +63,7 @@ export class ServerQueue {
         this.shuffleWaiting = []; // Songs to be played in shuffle mode
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this._paused = false;
-        this.loop = LOOP_MODES['none']; // in LOOP_MODES
+        this.loop = LOOP_MODES['NONE']; // in LOOP_MODES
         this.skipped = false;
 
         this.shuffle = false;
@@ -69,7 +71,9 @@ export class ServerQueue {
         this.index = 0;
         this._isPlaying = false;
 
-        this.lastNowPlayingMessage;
+        this.messages = new MessageCollection();
+        this.messages.set('nowPlaying', new SingletonMessage());
+        this.messages.set('queue', new SongQueueMessage());
 
         this.ignoreNextSongEnd = false; // Don't run anything after dispatcher ends for next end, for seeking
     }
@@ -103,11 +107,7 @@ export class ServerQueue {
     }
 
     async sendNowPlayingEmbed(song: Song) {
-        if (this.lastNowPlayingMessage)
-            this.lastNowPlayingMessage.delete()
-                .catch(err => console.log(err));
-
-        this.lastNowPlayingMessage = await song.requestedChannel.send({ embeds: [embeds.songEmbed(song, 'Now Playing')] });
+        this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [embeds.songEmbed(song, 'Now Playing')] })
     }
 
     /**
@@ -156,9 +156,9 @@ export class ServerQueue {
         this.skipped = false;
         if (this.songs.length === 0) return;
 
-        if (this.loop !== LOOP_MODES['song'] || this.skipped)
+        if (this.loop !== LOOP_MODES['SONG'] || this.skipped)
             if (this.shuffle) {
-                if (this.shuffleWaiting.length === 0 && this.loop === LOOP_MODES['queue'])
+                if (this.shuffleWaiting.length === 0 && this.loop === LOOP_MODES['QUEUE'])
                     this.shuffleWaiting = this.songs.map(x => x.id);
 
                 let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
@@ -174,7 +174,7 @@ export class ServerQueue {
             } else
                 this.index++;
 
-        if (this.loop === LOOP_MODES['queue'])
+        if (this.loop === LOOP_MODES['QUEUE'])
             this.index %= this.size();
 
         await this.play();
@@ -247,7 +247,7 @@ export class ServerQueue {
         this.index = 0;
 
         if (restoreDefaults) {
-            this.setLoopMode(LOOP_MODES['off']);
+            this.setLoopMode(LOOP_MODES['OFF']);
             this.shuffleOff();
             this.setVolume(ServerQueue.consts.DEFAULT_VOLUME);
         }

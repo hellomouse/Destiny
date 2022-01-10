@@ -3,6 +3,11 @@ import { Client, Command } from './src/types.js';
 import Enmap from 'enmap';
 import './src/local-data.js';
 
+// Remove this
+process.on('unhandledRejection', error => {
+    console.error('Unhandled promise rejection:', error);
+});
+
 async function load(client: Client) {
     let utils = (await import('./src/utils')).default;
     let config = (await import('./config')).default;
