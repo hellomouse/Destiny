@@ -17,13 +17,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         return;
 
     utils.log('Stopped playing music');
-    serverQueue.clear(true);
-    let connection = getVoiceConnection(message.guildId!);
-    const voiceChannel = message.member!.voice.channel;
-    if (!connection)
-        connection = queueManager.getOrCreate(message, voiceChannel!).connection!; // Join VC to disconnect
-
-    connection.destroy();
+    serverQueue.leave();
 
     return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave:')] });
 };

@@ -323,6 +323,11 @@ export class ServerQueue {
         });
         utils.log(`Joined the channel : ${this.voiceChannel.name}`);
     }
+
+    leave() {
+        this.connection?.destroy();
+        this.clear(true);
+    }
 }
 
 /**
