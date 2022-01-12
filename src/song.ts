@@ -107,7 +107,7 @@ export default class Song {
     }
 
     static async getSongReferences(args: Array<string>, message: Message,
-        unpackPlaylists = false): Promise<[SongReference[], boolean]> {
+        unpackPlaylists = false): Promise<[Array<SongReference>, boolean]> {
         let songs: Array<SongReference> = [];
         let playlistSongs: Array<SongReference> = [];
 
@@ -119,7 +119,7 @@ export default class Song {
             if (isPlaylist && unpackPlaylists) {
                 let unpackedPlaylist = await YouTubeSong.unpackPlaylist(arg, message);
                 playlistSongs = [...playlistSongs, ...unpackedPlaylist];
-            } else if (utils.isURL(arg)) {
+            } else if (utils.isURL(arg))
                 try {
                     let songReference = await SongManager.getCreateSong(arg, message.author, message.channel);
                     songs.push(songReference);
@@ -129,7 +129,7 @@ export default class Song {
                 } catch (e) {
                     // do nothing i guess?
                 }
-            }
+
             else
                 await utils.getUrl(arg).then(result => {
                     let id = YouTubeSong.generateIdFromUrl(result);

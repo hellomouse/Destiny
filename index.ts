@@ -40,7 +40,7 @@ async function load(client: Client) {
 
     /* ----------------------------------------------- */
 
-    let loaded: { events: string[], commands: string[] } = { events: [], commands: [] };
+    let loaded: { events: Array<string>, commands: Array<string> } = { events: [], commands: [] };
 
     try {
         let files = [
@@ -78,7 +78,7 @@ async function load(client: Client) {
     utils.log(`Table of commands and events :\n${utils.showTable(loaded)}`);
 
     client.commands.set('reload', {
-        run: function reload(cl: Client, message: Message, args: string[]) {
+        run: function reload(cl: Client, message: Message, args: Array<string>) {
             client._events = {};
 
             load(cl);

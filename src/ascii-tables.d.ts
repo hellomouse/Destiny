@@ -19,18 +19,18 @@ declare module 'ascii-table' {
         alignRight: (str: string, len: number, pad: number) => string;
         alignAuto: (str: string, len: number, pad: number) => string;
         arrayFill: <T = any>(len: number, fill: T) => Array<T>;
-        clear(title: string): AsciiTable
-        setBorder(edge: string, fill: string, top: string, bottom: string): AsciiTable
-        removeBorder(): AsciiTable
-        setAlign(idx: number, dir: number): AsciiTable
-        title(title: string): AsciiTable
-        getTitle(): string
-        setTitleAlign(dir: number): AsciiTable
-        sort(): AsciiTable
-        sortColumn(idx: number, method: Function): AsciiTable
-        setHeading(...args: string[]): AsciiTable
-        getHeading(): Array<string>
-        setHeadingAlign(dir: number): AsciiTable
+        clear(title: string): AsciiTable;
+        setBorder(edge: string, fill: string, top: string, bottom: string): AsciiTable;
+        removeBorder(): AsciiTable;
+        setAlign(idx: number, dir: number): AsciiTable;
+        title(title: string): AsciiTable;
+        getTitle(): string;
+        setTitleAlign(dir: number): AsciiTable;
+        sort(): AsciiTable;
+        sortColumn(idx: number, method: Function): AsciiTable;
+        setHeading(...args: Array<string>): AsciiTable;
+        getHeading(): Array<string>;
+        setHeadingAlign(dir: number): AsciiTable;
 
     }
 }

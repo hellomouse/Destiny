@@ -8,7 +8,7 @@ export interface Command {
         desc: string,
         syntax: string
     };
-    names: string | string[];
+    names: string | Array<string>;
 }
 
 export interface Client extends DiscordClient {

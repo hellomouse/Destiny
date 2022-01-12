@@ -1,7 +1,7 @@
 import Enmap from 'enmap';
 
 class LocalData extends Enmap {
-    constructor(...args: any[]) {
+    constructor(...args: Array<any>) {
         super(...args);
     }
 

@@ -9,7 +9,7 @@ const enum COMMAMD_REQUIREMENTS {
     REQUIRE_USER_IN_VC = 4
 }
 
-export function hasEnoughArgs(args: string[], message: Message) {
+export function hasEnoughArgs(args: Array<string>, message: Message) {
     if (!args[0] && message.attachments.size === 0)
         throw new utils.FlagHelpError();
 }
