@@ -59,6 +59,7 @@ module.exports = {
             { selector: 'typeProperty', format: ['PascalCase', 'camelCase'], leadingUnderscore: 'allow' },
             { selector: 'typeAlias', format: ['PascalCase', 'UPPER_CASE'] },
             { selector: 'objectLiteralProperty', format: ['camelCase', 'UPPER_CASE'] }
-        ]
+        ],
+        '@typescript-eslint/array-type': ['error', { default: 'generic' }]
     }
 };
