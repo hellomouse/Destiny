@@ -1,4 +1,4 @@
-import embeds from '../embeds.js';
+import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { log } from '../utils';
 import { queueManager, LOOP_MODES } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
@@ -18,7 +18,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     if (args[0]) {
         loopMode = LOOP_MODES[args[0].toLowerCase() as keyof typeof LOOP_MODES];
         if (!loopMode)
-            return message.channel.send({ embeds: [embeds.errorEmbed()
+            return message.channel.send({ embeds: [errorEmbed()
                 .setTitle(`Invalid loop mode \`${args[0].toLowerCase()}\``)
                 .setDescription(`Loop mode should be one of \`${Object.keys(LOOP_MODES).join(', ')}\``)] });
     }
@@ -26,7 +26,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     serverQueue.setLoopMode(loopMode);
     log(`Loop mode set to ${LOOP_MODES[loopMode]}`);
-    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Loop mode now set to \`${loopMode}\``)] });
+    return message.channel.send({ embeds: [defaultEmbed().setDescription(`Loop mode now set to \`${loopMode}\``)] });
 };
 
 export const names = ['loop', 'l'];

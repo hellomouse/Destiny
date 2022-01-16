@@ -1,6 +1,6 @@
 import strings from '../strings.json';
 import { FlagHelpError, log } from '../utils.js';
-import embeds from '../embeds';
+import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } from '../embeds';
 import config from '../../config';
 import COMMAMD_REQUIREMENTS from '../commands';
 import { queueManager } from '../queue';
@@ -37,15 +37,15 @@ export default async (client: Client, message: Message) => {
             if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY) {
                 const serverQueue = queueManager.get(message.guild!.id);
                 if (!serverQueue)
-                    return message.reply({ embeds: [embeds.songQueueEmpty()] });
+                    return message.reply({ embeds: [songQueueEmpty()] });
             }
             if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_IS_PLAYING) {
                 const serverQueue = queueManager.get(message.guild!.id)!;
                 if (!serverQueue.isPlaying())
-                    return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
+                    return message.channel.send({ embeds: [queueNotPlaying()] });
             }
             if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC && !message.member!.voice.channel)
-                return message.channel.send({ embeds: [embeds.notInVoiceChannelEmbed()] } );
+                return message.channel.send({ embeds: [notInVoiceChannelEmbed()] } );
         }
 
         if (message.channel instanceof NewsChannel || message.channel instanceof DMChannel ||
@@ -57,7 +57,7 @@ export default async (client: Client, message: Message) => {
         } catch (e) {
             // Show help text because arguments were invalid
             if (e instanceof FlagHelpError)
-                message.channel.send({ embeds: [embeds.helpEmbed(cmd)] });
+                message.channel.send({ embeds: [helpEmbed(cmd)] });
             // Real error occured
             else
                 console.log(e);

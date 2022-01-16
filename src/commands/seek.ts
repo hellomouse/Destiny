@@ -1,4 +1,4 @@
-import embeds from '../embeds.js';
+import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { FlagHelpError, formatDuration, log } from '../utils.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
@@ -33,14 +33,14 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         }
         if (!m)
             return message.channel.send({
-                embeds: [embeds.errorEmbed()
+                embeds: [errorEmbed()
                     .setTitle(`Invalid seek parameter \`${args[0]}\``)]
             });
     }
 
     seekTime = await serverQueue.seekTo(seekTime);
     log(`Seeking to ${seekTime}`);
-    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Seeking to \`${formatDuration(seekTime)}\``)] });
+    return message.channel.send({ embeds: [defaultEmbed().setDescription(`Seeking to \`${formatDuration(seekTime)}\``)] });
 };
 
 export const names = ['seek'];

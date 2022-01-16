@@ -1,6 +1,6 @@
 import config from '../config.js';
 import { getRandomInt, inactivity, log, VOLUME_BASE_UNIT } from './utils.js';
-import embeds from './embeds.js';
+import { songEmbed } from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
@@ -107,7 +107,7 @@ export class ServerQueue {
     }
 
     async sendNowPlayingEmbed(song: Song) {
-        this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [embeds.songEmbed(song, 'Now Playing')] });
+        this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [songEmbed(song, 'Now Playing')] });
     }
 
     /**

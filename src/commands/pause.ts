@@ -1,4 +1,4 @@
-import embeds from '../embeds.js';
+import { defaultEmbed } from '../embeds.js';
 import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
 import { Client, Message } from 'discord.js';
@@ -16,7 +16,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     serverQueue.pause();
 
     log(`Paused music playback`);
-    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`:pause_button: Playback paused`)] });
+    return message.channel.send({ embeds: [defaultEmbed().setDescription(`:pause_button: Playback paused`)] });
 };
 
 export const names = ['pause', 'unresume'];

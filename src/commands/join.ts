@@ -1,5 +1,5 @@
 import { log } from '../utils.js';
-import embeds from '../embeds.js';
+import { defaultEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
@@ -23,7 +23,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const queue = queueManager.getOrCreate(message, voiceChannel);
     queue.join();
 
-    return message.channel.send({ embeds: [embeds.defaultEmbed()
+    return message.channel.send({ embeds: [defaultEmbed()
         .setDescription(`Joining ${voiceChannel.toString()}`)] });
 };
 

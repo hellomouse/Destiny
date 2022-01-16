@@ -1,5 +1,5 @@
 import { log } from '../utils';
-import embeds from '../embeds.js';
+import { songEmbed, queueNotPlaying } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
@@ -18,9 +18,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     const currentSong = serverQueue.currentSong();
     if (currentSong)
-        return message.channel.send({ embeds: [embeds.songEmbed(currentSong, 'Skipping', false)] });
+        return message.channel.send({ embeds: [songEmbed(currentSong, 'Skipping', false)] });
 
-    return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
+    return message.channel.send({ embeds: [queueNotPlaying()] });
 };
 
 export const names = ['skip', 's'];

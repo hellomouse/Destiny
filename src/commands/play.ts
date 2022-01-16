@@ -1,6 +1,6 @@
 import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
-import embeds from '../embeds.js';
+import { defaultEmbed, playlistEmbed } from '../embeds.js';
 
 import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands.js';
 import { Song, YouTubeSong } from '../song.js';
@@ -36,16 +36,16 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     // like sendResponse(messagestuff, [playlists.length === 0, ddd], callback or `Added ${songs.length} songs`...)
     let enqueuedEmbed;
     if (playlists.length === 0)
-        enqueuedEmbed = embeds.defaultEmbed()
+        enqueuedEmbed = defaultEmbed()
             .setTitle('Added to Queue')
             .setDescription(`Added ${songs.length} songs`);
     else if (onlyPlaylistSongs)
         if (playlists.length === 1)
-            enqueuedEmbed = embeds.playlistEmbed(playlists[0], undefined, `Added ${playlists[0].items.length}/${playlists[0].estimatedItemCount} songs`);
+            enqueuedEmbed = playlistEmbed(playlists[0], undefined, `Added ${playlists[0].items.length}/${playlists[0].estimatedItemCount} songs`);
         else
-            enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${actualVideoNum}/${expectedVideoNum} songs`);
+            enqueuedEmbed = playlistEmbed(playlists[0], 'Added to Queue', `Added ${actualVideoNum}/${expectedVideoNum} songs`);
     else
-        enqueuedEmbed = embeds.playlistEmbed(playlists[0], 'Added to Queue', `Added ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
+        enqueuedEmbed = playlistEmbed(playlists[0], 'Added to Queue', `Added ${songs.length} songs with ${actualVideoNum}/${expectedVideoNum} songs from ${playlists.length} playlists`);
 
     message.channel.send({ embeds: [enqueuedEmbed] });
 

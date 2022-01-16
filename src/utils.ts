@@ -1,6 +1,6 @@
 import AsciiTable from 'ascii-table';
 
-import embeds from './embeds';
+import { defaultEmbed } from './embeds';
 import config from '../config';
 import type { ServerQueue } from './queue';
 import ytsr from 'ytsr';
@@ -39,7 +39,7 @@ class Inactivity {
         if (this.config.waitRejoinSeconds < 0) return;
         setTimeout(() => {
             serverQueue.leave();
-            serverQueue.textChannel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
+            serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
         }, this.config.waitRejoinSeconds);
     }
 
@@ -52,7 +52,7 @@ class Inactivity {
         if (this.config.botIdleSeconds < 0) return;
         setTimeout(() => {
             serverQueue.leave();
-            serverQueue.textChannel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
+            serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
         }, this.config.botIdleSeconds);
     }
 

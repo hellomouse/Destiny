@@ -1,4 +1,4 @@
-import embeds from '../embeds.js';
+import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import { FlagHelpError, MAX_VOLUME } from '../utils.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
@@ -18,15 +18,15 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         throw new FlagHelpError();
 
     if (args.length === 0)
-        return message.channel.send({ embeds: [embeds.defaultEmbed()
+        return message.channel.send({ embeds: [defaultEmbed()
             .setDescription(`The current volume is **${serverQueue!.volume}%**`)] });
 
     let floatVolume = +args;
     if (Number.isNaN(floatVolume) || floatVolume < 0 || floatVolume > MAX_VOLUME)
-        return message.channel.send({ embeds: [embeds.errorEmbed()
+        return message.channel.send({ embeds: [errorEmbed()
             .setTitle(`Volume must be a percentage from 0 to ${MAX_VOLUME}%`)] });
 
-    message.channel.send({ embeds: [embeds.defaultEmbed()
+    message.channel.send({ embeds: [defaultEmbed()
         .setDescription(`Volume set to **${floatVolume.toFixed(2)}%**`)] });
 
     serverQueue!.volume = floatVolume;

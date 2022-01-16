@@ -1,4 +1,4 @@
-import embeds from '../embeds.js';
+import { defaultEmbed } from '../embeds.js';
 import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands';
@@ -16,7 +16,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     serverQueue.resume();
 
     log(`Resumed music playback`);
-    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`:play_pause: Playback resumed`)] });
+    return message.channel.send({ embeds: [defaultEmbed().setDescription(`:play_pause: Playback resumed`)] });
 };
 
 export const names = ['resume', 'unpause'];
