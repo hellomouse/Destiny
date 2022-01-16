@@ -1,4 +1,5 @@
 import { readdir } from 'fs/promises';
+import { configHandler } from './src/configHandler.js';
 import { Client, Command } from './src/types.js';
 import Enmap from 'enmap';
 import './src/local-data.js';
@@ -10,27 +11,7 @@ process.on('unhandledRejection', error => {
 
 async function load(client: Client) {
     let utils = await import('./src/utils.js');
-    let config = (await import('./config')).default;
-
-    if (!process.env.TOKEN)
-        try {
-            require('./config.js');
-        } catch (e) {
-            console.error('No config file found, create it or use environnement variables.');
-            process.exit(1);
-        }
-    else {
-        if (!process.env.PREFIX) process.env.PREFIX = '$';
-        config = { 'token': process.env.TOKEN, 'prefix': process.env.PREFIX };
-    }
-    if (!process.env.ALLOWED)
-        try {
-            config.allowed = (await import('./allowed.json')).allowed;
-        } catch (e) {
-            config.allowed = [];
-        }
-    else
-        config.allowed = process.env.ALLOWED;
+    let config = await configHandler();
 
     if (config.token !== client.lastToken) {
         client.lastToken = config.token;
