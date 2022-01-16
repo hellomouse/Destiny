@@ -1,5 +1,5 @@
 import ytdl from 'ytdl-core';
-import utils from './utils.js';
+import { formatDuration, getYouTubeURL, isURL } from './utils.js';
 import config from '../config';
 import ffmpeg from 'fluent-ffmpeg';
 import playlist from 'ytpl';
@@ -119,7 +119,7 @@ export default class Song {
             if (isPlaylist && unpackPlaylists) {
                 let unpackedPlaylist = await YouTubeSong.unpackPlaylist(arg, message);
                 playlistSongs = [...playlistSongs, ...unpackedPlaylist];
-            } else if (utils.isURL(arg))
+            } else if (isURL(arg))
                 try {
                     let songReference = await SongManager.getCreateSong(arg, message.author, message.channel);
                     songs.push(songReference);
@@ -130,7 +130,7 @@ export default class Song {
                     // do nothing i guess?
                 }
             else
-                await utils.getUrl(arg).then(result => {
+                await getYouTubeURL(arg).then(result => {
                     let id = YouTubeSong.generateIdFromUrl(result);
                     // tod
                 }).catch(err => { });
@@ -177,7 +177,7 @@ class YouTubeSong extends Song {
         this.thumbnail = `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
         this.title = title || songMetadata.videoDetails.title;
         this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
-        this.formattedDuration = utils.formatDuration(this.duration);
+        this.formattedDuration = formatDuration(this.duration);
         this.artist = artist || songMetadata.videoDetails.author.name;
         this.viewCount = viewCount || +songMetadata.videoDetails.viewCount;
 
@@ -305,7 +305,7 @@ class FileSong extends Song {
 
         this.duration = format.duration || this.duration;
         this.duration = Math.round(this.duration);
-        this.formattedDuration = utils.formatDuration(this.duration);
+        this.formattedDuration = formatDuration(this.duration);
 
         return this;
     }

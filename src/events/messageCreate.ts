@@ -1,5 +1,5 @@
 import strings from '../strings.json';
-import utils from '../utils';
+import { FlagHelpError, log } from '../utils.js';
 import embeds from '../embeds';
 import config from '../../config';
 import COMMAMD_REQUIREMENTS from '../commands';
@@ -25,11 +25,11 @@ export default async (client: Client, message: Message) => {
 
         if (!cmd) return;
 
-        utils.log(`[${message.author.tag} / ${message.author.id}] ${message.content.slice(0, MAX_LEN)}`);
+        log(`[${message.author.tag} / ${message.author.id}] ${message.content.slice(0, MAX_LEN)}`);
 
         if (!config.allowed.includes(message.author.id) && config.allowed.length > 0) {
             message.channel.send(strings.permissionDenied);
-            utils.log(`${message.author.tag} tried to run the command '${message.content.slice(0, MAX_LEN)}' but permission was not accepted`);
+            log(`${message.author.tag} tried to run the command '${message.content.slice(0, MAX_LEN)}' but permission was not accepted`);
             return;
         }
 
@@ -56,7 +56,7 @@ export default async (client: Client, message: Message) => {
             await cmd.run(client, message, args);
         } catch (e) {
             // Show help text because arguments were invalid
-            if (e instanceof utils.FlagHelpError)
+            if (e instanceof FlagHelpError)
                 message.channel.send({ embeds: [embeds.helpEmbed(cmd)] });
             // Real error occured
             else

@@ -5,7 +5,7 @@ import config from '../config';
 import type { ServerQueue } from './queue';
 import ytsr from 'ytsr';
 
-class FlagHelpError extends Error {
+export class FlagHelpError extends Error {
     constructor(message?: string) {
         super(message);
         this.name = 'FlagHelpError';
@@ -61,93 +61,87 @@ class Inactivity {
     }
 }
 
-export default {
-    /**
+export const inactivity = new Inactivity();
+
+/**
      * @description Sends logs to console and adds the date/time
      * @param {*} content
      */
-    log: (content: any) => {
-        let dateObj = new Date();
+export function log(content: any) {
+    let dateObj = new Date();
 
-        let date = dateObj.getDate().toString();
-        let month = dateObj.getMonth().toString();
-        let year = dateObj.getFullYear().toString();
+    let date = dateObj.getDate().toString();
+    let month = dateObj.getMonth().toString();
+    let year = dateObj.getFullYear().toString();
 
-        if (date.length === 1) date = '0' + date;
-        if (month.length === 1) month = '0' + month;
+    if (date.length === 1) date = '0' + date;
+    if (month.length === 1) month = '0' + month;
 
-        let dmy = date + '/' + month + '/' + year;
+    let dmy = date + '/' + month + '/' + year;
 
-        /* Gets hours, minutes and seconds */
-        let hms = dateObj.toLocaleTimeString();
+    /* Gets hours, minutes and seconds */
+    let hms = dateObj.toLocaleTimeString();
 
-        console.log(`[ ${dmy} | ${hms} ] ${content}`);
-    },
+    console.log(`[ ${dmy} | ${hms} ] ${content}`);
+}
 
-    /**
-     * @description Checks if the provided string is an url
-     * @param {string} url
-     * @return {boolean} Is url?
-     */
-    isURL: (url: string): boolean => {
-        if (!url) return false;
-        let pattern = new RegExp('^(https?:\\/\\/)?' +
-            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
-            '((\\d{1,3}\\.){3}\\d{1,3}))|' +
-            'localhost' +
-            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
-            '(\\?[;&a-z\\d%_.~+=-]*)?' +
-            '(\\#[-a-z\\d_]*)?$', 'i');
-        return pattern.test(url);
-    },
+/**
+ * @description Checks if the provided string is an url
+ * @param {string} url
+ * @return {boolean} Is url?
+ */
+export function isURL(url: string): boolean {
+    if (!url) return false;
+    let pattern = new RegExp('^(https?:\\/\\/)?' +
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+        '((\\d{1,3}\\.){3}\\d{1,3}))|' +
+        'localhost' +
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+        '(\\?[;&a-z\\d%_.~+=-]*)?' +
+        '(\\#[-a-z\\d_]*)?$', 'i');
+    return pattern.test(url);
+}
 
-    /**
-     * @description Create an ascii-table shown in the console on startup with the loaded events & commands
-     * @param {object} loaded
-     * @return {string} ASCII table
-     */
-    showTable: (loaded: { commands: Array<string>, events: Array<string> }) => {
-        let table = new AsciiTable('Loading content...');
-        table.setHeading('Commands', 'Events');
-        for (let i = 0; i <= Math.max(loaded.commands.length, loaded.events.length) - 1; i++)
-            table.addRow(loaded.commands[i], loaded.events[i]);
+/**
+ * @description Create an ascii-table shown in the console on startup with the loaded events & commands
+ * @param {object} loaded
+ * @return {string} ASCII table
+ */
+export function showTable(loaded: { commands: Array<string>, events: Array<string> }) {
+    let table = new AsciiTable('Loading content...');
+    table.setHeading('Commands', 'Events');
+    for (let i = 0; i <= Math.max(loaded.commands.length, loaded.events.length) - 1; i++)
+        table.addRow(loaded.commands[i], loaded.events[i]);
 
-        return table.render();
-    },
+    return table.render();
+}
 
-    getUrl: async (words: string | Array<string>): Promise<string> => {
-        let stringOfWords = Array.isArray(words) ? words.join(' ') : words;
-        let filter = (await ytsr.getFilters(stringOfWords)).get('Type')!.get('Video')!;
-        let lookingOnYtb = await ytsr(filter.url!, { limit: 1 });
+export async function getYouTubeURL(words: string | Array<string>): Promise<string> {
+    let stringOfWords = Array.isArray(words) ? words.join(' ') : words;
+    let filter = (await ytsr.getFilters(stringOfWords)).get('Type')!.get('Video')!;
+    let lookingOnYtb = await ytsr(filter.url!, { limit: 1 });
 
-        return (lookingOnYtb.items[0] as ytsr.Video).url;
-    },
+    return (lookingOnYtb.items[0] as ytsr.Video).url;
+}
 
-    formatDuration: (sec: number) => {
-        sec = Math.round(sec);
-        let min = Math.floor(sec / 60);
-        let hours = Math.floor(min / 60);
-        min %= 60;
-        sec %= 60;
+export function formatDuration(sec: number) {
+    sec = Math.round(sec);
+    let min = Math.floor(sec / 60);
+    let hours = Math.floor(min / 60);
+    min %= 60;
+    sec %= 60;
 
-        let result = hours > 0 ? `${hours}h ` : '';
-        result += min < 10 ? '0' + min : min;
-        result += ':';
-        result += sec < 10 ? '0' + sec : sec;
-        return result;
-    },
+    let result = hours > 0 ? `${hours}h ` : '';
+    result += min < 10 ? '0' + min : min;
+    result += ':';
+    result += sec < 10 ? '0' + sec : sec;
+    return result;
+}
 
-    getRandomInt(max:number): number {
-        return Math.floor(Math.random() * max);
-    },
+export function getRandomInt(max:number): number {
+    return Math.floor(Math.random() * max);
+}
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    FlagHelpError,
-
-    inactivity: new Inactivity(),
-
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    VOLUME_BASE_UNIT: 100, // what is = 100% volume, note volume command assumes this is 100 (it uses a % sign)
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    MAX_VOLUME: 200
-};
+// what is = 100% volume, note volume command assumes this is 100 (it uses a % sign)
+export const VOLUME_BASE_UNIT = 100;
+export const MAX_VOLUME = 200;

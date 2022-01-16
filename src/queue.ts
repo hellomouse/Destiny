@@ -1,5 +1,5 @@
 import config from '../config.js';
-import utils from './utils.js';
+import { getRandomInt, inactivity, log, VOLUME_BASE_UNIT } from './utils.js';
 import embeds from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
@@ -134,7 +134,7 @@ export class ServerQueue {
             this.ignoreNextSongEnd = true;
             await this.seekTo(seekTime, errorCounter + 1);
         });
-        audio.volume!.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
+        audio.volume!.setVolumeLogarithmic(this.volume / VOLUME_BASE_UNIT);
 
         return seekTime;
     }
@@ -149,9 +149,9 @@ export class ServerQueue {
         }
 
         if (this.songs[this.index + 1])
-            utils.log(`Finished playing the music : ${(this.songs[this.index].song).title}`);
+            log(`Finished playing the music : ${(this.songs[this.index].song).title}`);
         else
-            utils.log(`Finished playing all musics, no more musics in the queue`);
+            log(`Finished playing all musics, no more musics in the queue`);
 
         this.skipped = false;
         if (this.songs.length === 0) return;
@@ -161,7 +161,7 @@ export class ServerQueue {
                 if (this.shuffleWaiting.length === 0 && this.loop === LOOP_MODES['QUEUE'])
                     this.shuffleWaiting = this.songs.map(x => x.id);
 
-                let uuidIndex = utils.getRandomInt(this.shuffleWaiting.length);
+                let uuidIndex = getRandomInt(this.shuffleWaiting.length);
                 let uuidFind = this.shuffleWaiting[uuidIndex];
 
                 // Check there are more songs to shuffle
@@ -203,7 +203,7 @@ export class ServerQueue {
         if (errorCounter < 1)
             await this.sendNowPlayingEmbed(song);
 
-        utils.log(`Started playing the music : ${song.title} ${this.index}`);
+        log(`Started playing the music : ${song.title} ${this.index}`);
 
         let player = createAudioPlayer();
         let audio = this.audioResource = createAudioResource(await song.getStream(), { inlineVolume: true });
@@ -217,7 +217,7 @@ export class ServerQueue {
             this.ignoreNextSongEnd = true;
             await this.play(errorCounter + 1);
         });
-        audio.volume!.setVolumeLogarithmic(this.volume / utils.VOLUME_BASE_UNIT);
+        audio.volume!.setVolumeLogarithmic(this.volume / VOLUME_BASE_UNIT);
         return player;
     }
 
@@ -272,7 +272,7 @@ export class ServerQueue {
         let connection = getVoiceConnection(this.serverID);
         let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
         audioPlayer.pause();
-        utils.inactivity.onNotPlaying(this);
+        inactivity.onNotPlaying(this);
     }
 
     shuffleOn() {
@@ -289,7 +289,7 @@ export class ServerQueue {
     setVolume(volume: number) {
         this.volume = volume;
         if (this.isPlaying())
-            this.audioResource?.volume?.setVolumeLogarithmic(volume / utils.VOLUME_BASE_UNIT);
+            this.audioResource?.volume?.setVolumeLogarithmic(volume / VOLUME_BASE_UNIT);
     }
 
     /** Resume currently playing song */
@@ -321,7 +321,7 @@ export class ServerQueue {
             adapterCreator: this.voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
             selfDeaf: true
         });
-        utils.log(`Joined the channel : ${this.voiceChannel.name}`);
+        log(`Joined the channel : ${this.voiceChannel.name}`);
     }
 
     leave() {

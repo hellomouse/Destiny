@@ -1,7 +1,7 @@
-import utils from '../utils';
 import { queueManager } from '../queue';
 import embeds from '../embeds';
 import COMMAMD_REQUIREMENTS from '../commands';
+import { formatDuration } from '../utils.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -17,7 +17,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     if (!song) return message.channel.send({ embeds: [embeds.queueNotPlaying()] });
 
-    const time = utils.formatDuration(serverQueue.audioResource!.playbackDuration / 1000);
+    const time = formatDuration(serverQueue.audioResource!.playbackDuration / 1000);
     const embed = song.getEmbed(
         embeds.songEmbed(song, 'Now Playing', false)
             .addField('Duration', `${time} / ${song.formattedDuration}`, true)

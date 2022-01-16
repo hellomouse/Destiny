@@ -1,8 +1,7 @@
-import utils from '../utils';
+import { log } from '../utils.js';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import { Client, Message } from 'discord.js';
-import { getVoiceConnection } from '@discordjs/voice';
 
 /**
  * @description Stops the music and make the bot leave the channel
@@ -16,7 +15,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     if (!serverQueue) // Not in VC, ignore
         return;
 
-    utils.log('Stopped playing music');
+    log('Stopped playing music');
     serverQueue.leave();
 
     return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(':wave:')] });

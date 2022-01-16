@@ -1,5 +1,5 @@
 import embeds from '../embeds.js';
-import utils from '../utils';
+import { log } from '../utils';
 import { queueManager, LOOP_MODES } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
@@ -25,7 +25,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
 
     serverQueue.setLoopMode(loopMode);
-    utils.log(`Loop mode set to ${LOOP_MODES[loopMode]}`);
+    log(`Loop mode set to ${LOOP_MODES[loopMode]}`);
     return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Loop mode now set to \`${loopMode}\``)] });
 };
 

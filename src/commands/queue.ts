@@ -1,5 +1,5 @@
 import strings from '../strings.json';
-import utils from '../utils';
+import { FlagHelpError, log } from '../utils.js';
 import embeds from '../embeds.js';
 import { LOOP_MODES, queueManager, ServerQueue } from '../queue.js';
 import { Client, Message, MessageActionRow, MessageButton } from 'discord.js';
@@ -62,7 +62,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     if (args.length) {
         page = +args[0] - 1;
         if (Number.isNaN(page))
-            throw new utils.FlagHelpError();
+            throw new FlagHelpError();
     }
     page = Math.max(0, Math.min(page, maxPages - 1));
 
@@ -74,7 +74,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         .setCustomId(emoji)
         .setStyle('PRIMARY')));
 
-    utils.log('Showed music queue');
+    log('Showed music queue');
     let sentMessage = await serverQueue.messages.get('queue')?.send(message.channel, {
         content: queuetxt,
         components: [row]

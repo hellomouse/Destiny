@@ -1,10 +1,8 @@
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
-import utils from '../utils.js';
+import { FlagHelpError, MAX_VOLUME } from '../utils.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
-
-const MAX_VOLUME = utils.MAX_VOLUME;
 
 /**
  * @description Adjust the playback volume
@@ -17,7 +15,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
     if (args.length > 1)
-        throw new utils.FlagHelpError();
+        throw new FlagHelpError();
 
     if (args.length === 0)
         return message.channel.send({ embeds: [embeds.defaultEmbed()

@@ -1,5 +1,5 @@
 import embeds from '../embeds.js';
-import utils from '../utils';
+import { FlagHelpError, formatDuration, log } from '../utils.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
@@ -13,7 +13,7 @@ import { Client, Message } from 'discord.js';
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     if (!args[0])
-        throw new utils.FlagHelpError();
+        throw new FlagHelpError();
 
     const serverQueue = queueManager.get(message.guild!.id)!;
 
@@ -39,8 +39,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     }
 
     seekTime = await serverQueue.seekTo(seekTime);
-    utils.log(`Seeking to ${seekTime}`);
-    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Seeking to \`${utils.formatDuration(seekTime)}\``)] });
+    log(`Seeking to ${seekTime}`);
+    return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Seeking to \`${formatDuration(seekTime)}\``)] });
 };
 
 export const names = ['seek'];

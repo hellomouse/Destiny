@@ -9,7 +9,7 @@ process.on('unhandledRejection', error => {
 });
 
 async function load(client: Client) {
-    let utils = (await import('./src/utils')).default;
+    let utils = await import('./src/utils.js');
     let config = (await import('./config')).default;
 
     if (!process.env.TOKEN)

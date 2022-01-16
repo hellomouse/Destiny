@@ -1,4 +1,4 @@
-import utils from '../utils';
+import { inactivity } from '../utils.js';
 import { queueManager } from '../queue.js';
 import { VoiceState } from 'discord.js';
 
@@ -9,7 +9,7 @@ export default async (oldVoiceState: VoiceState, newVoiceState: VoiceState) => {
     let voiceChannel = serverQueue.voiceChannel;
 
     if (voiceChannel.members.size === 1)
-        utils.inactivity.onAlone(serverQueue);
+        inactivity.onAlone(serverQueue);
     else
-        utils.inactivity.onPersonJoin();
+        inactivity.onPersonJoin();
 };

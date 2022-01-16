@@ -1,6 +1,6 @@
-import utils from '../utils';
 import { queueManager } from '../queue';
 import embeds from '../embeds';
+import { log } from '../utils.js';
 
 import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands';
 import { Song, YouTubeSong } from '../song';
@@ -16,7 +16,7 @@ import { Client, Message } from 'discord.js';
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     hasEnoughArgs(args, message);
 
-    utils.log('Looking for music details...');
+    log('Looking for music details...');
     // !!play youtube_link | your favorite song query here | spotify link | direct video link
     let [songs, onlyPlaylistSongs] = await Song.getSongReferences(args.join(' ').split(' | '), message, true);
     let playlists = await Promise.all(
@@ -51,14 +51,14 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     let serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
-    utils.log('Requested by: ' + message.author.toString()); // maybe bundle into a json-like console message, !!play from <user>, arguments: truncated, server: foo
+    log('Requested by: ' + message.author.toString()); // maybe bundle into a json-like console message, !!play from <user>, arguments: truncated, server: foo
     // for (let s of songs)
     //     try {
     //         song = typeof s === 'string' ? await SongManager.getCreateSong(s, message.author, message.channel) : s;
-    //         utils.log(`Adding ${song?.title} to queue`);
+    //         log(`Adding ${song?.title} to queue`);
     //         if (song) serverQueue.add(song);
     //     } catch (e) {
-    //         utils.log(e);
+    //         log(e);
     //     }
 
     // we have an array of songreferences, which *should* all be valid songs
@@ -68,7 +68,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     serverQueue.add(songs);
     serverQueue.playIfNewInstance();
 
-    utils.log('Got music details, preparing the music to be played...'); // don't really like this, not a lot of information
+    log('Got music details, preparing the music to be played...'); // don't really like this, not a lot of information
 };
 
 // perhaps we can improve how commands work?

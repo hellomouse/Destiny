@@ -1,4 +1,4 @@
-import utils from '../utils';
+import { log } from '../utils';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
@@ -13,7 +13,7 @@ import { Client, Message } from 'discord.js';
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
-    utils.log(`Skipped music : ${serverQueue!.songs[0].song.title}`);
+    log(`Skipped music : ${serverQueue!.songs[0].song.title}`);
     serverQueue!.skip();
 
     const currentSong = serverQueue.currentSong();

@@ -1,4 +1,4 @@
-import utils from '../utils';
+import { log } from '../utils.js';
 import embeds from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands';
@@ -12,14 +12,14 @@ import { Client, Message } from 'discord.js';
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
-    utils.log(message);
+    log(message);
     if (!message || !message.member) return;
 
     const voiceChannel = message.member.voice.channel;
-    utils.log(`voiceChannel: ${voiceChannel}`);
+    log(`voiceChannel: ${voiceChannel}`);
     if (!voiceChannel) return; // You need to be in a voice channel
 
-    utils.log(`Joining ${voiceChannel.name}`);
+    log(`Joining ${voiceChannel.name}`);
     const queue = queueManager.getOrCreate(message, voiceChannel);
     queue.join();
 

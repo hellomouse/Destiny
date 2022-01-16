@@ -1,4 +1,4 @@
-import utils from './utils';
+import { FlagHelpError } from './utils';
 import { Message } from 'discord.js';
 
 const enum COMMAMD_REQUIREMENTS {
@@ -11,7 +11,7 @@ const enum COMMAMD_REQUIREMENTS {
 
 export function hasEnoughArgs(args: Array<string>, message: Message) {
     if (!args[0] && message.attachments.size === 0)
-        throw new utils.FlagHelpError();
+        throw new FlagHelpError();
 }
 
 export default COMMAMD_REQUIREMENTS;

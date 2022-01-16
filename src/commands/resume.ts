@@ -1,5 +1,5 @@
 import embeds from '../embeds.js';
-import utils from '../utils';
+import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands';
 import { Client, Message } from 'discord.js';
@@ -15,7 +15,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const serverQueue = queueManager.get(message.guild!.id)!;
     serverQueue.resume();
 
-    utils.log(`Resumed music playback`);
+    log(`Resumed music playback`);
     return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`:play_pause: Playback resumed`)] });
 };
 
