@@ -13,10 +13,10 @@ import { Client, Message } from 'discord.js';
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
-    utils.log(`Skipped music : ${(await serverQueue!.songs[0].song).title}`);
+    utils.log(`Skipped music : ${serverQueue!.songs[0].song.title}`);
     serverQueue!.skip();
 
-    const currentSong = await serverQueue.currentSong();
+    const currentSong = serverQueue.currentSong();
     if (currentSong)
         return message.channel.send({ embeds: [embeds.songEmbed(currentSong, 'Skipping', false)] });
 

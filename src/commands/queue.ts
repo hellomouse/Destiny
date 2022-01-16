@@ -16,7 +16,7 @@ const ROW_BTN_FUNC = [
     (page: number, maxPages: number) => maxPages - 1
 ];
 
-async function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: number) {
+function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: number) {
     page = Math.max(0, Math.min(page, maxPages - 1));
 
     let queuetxt = '```swift';
@@ -26,7 +26,7 @@ async function getQueueContent(page: number, serverQueue: ServerQueue, maxPages:
     let endIndex = Math.min((page + 1) * PAGE_SIZE, serverQueue.songs.length);
     for (let i = page * PAGE_SIZE; i < endIndex; i++) {
         let songReference = serverQueue.songs[i];
-        let song = await songReference.song;
+        let song = songReference.song;
         let indexStr = (i + 1)
             .toString()
             .padStart(Math.floor(Math.log10(endIndex)) + 1, ' ');
@@ -66,7 +66,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     }
     page = Math.max(0, Math.min(page, maxPages - 1));
 
-    let queuetxt = await getQueueContent(page, serverQueue, maxPages);
+    let queuetxt = getQueueContent(page, serverQueue, maxPages);
 
     const row = new MessageActionRow();
     row.addComponents(...ROW_BTN_EMOJI.map(emoji => new MessageButton()
@@ -86,7 +86,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
                 if (interaction.customId === ROW_BTN_EMOJI[i]) {
                     page = ROW_BTN_FUNC[i](page, maxPages);
-                    let content = await getQueueContent(page, serverQueue, maxPages);
+                    let content = getQueueContent(page, serverQueue, maxPages);
                     await interaction.update({ content })
                         .catch(console.error);
                     return;
