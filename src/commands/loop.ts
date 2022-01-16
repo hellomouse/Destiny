@@ -15,13 +15,13 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
     let loopMode = serverQueue.loop;
-    if (args[0])
+    if (args[0]) {
         loopMode = LOOP_MODES[args[0].toLowerCase() as keyof typeof LOOP_MODES];
-        if (!loopMode) {
+        if (!loopMode)
             return message.channel.send({ embeds: [embeds.errorEmbed()
                 .setTitle(`Invalid loop mode \`${args[0].toLowerCase()}\``)
                 .setDescription(`Loop mode should be one of \`${Object.keys(LOOP_MODES).join(', ')}\``)] });
-        }
+    }
 
 
     serverQueue.setLoopMode(loopMode);
