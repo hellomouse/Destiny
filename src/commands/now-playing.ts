@@ -1,7 +1,7 @@
-import { queueManager } from '../queue';
-import embeds from '../embeds';
-import COMMAMD_REQUIREMENTS from '../commands';
 import { formatDuration } from '../utils.js';
+import { queueManager } from '../queue.js';
+import embeds from '../embeds.js';
+import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**

@@ -1,8 +1,8 @@
-import embeds from '../embeds';
-import Song from '../song';
-import localData from '../local-data';
-import config from '../../config';
-import { queueManager } from '../queue';
+import embeds from '../embeds.js';
+import Song from '../song.js';
+import localData from '../local-data.js';
+import config from '../../config.js';
+import { queueManager } from '../queue.js';
 import { run as playRun } from './play.js'; // This is a hack for now
 import { Client, Message } from 'discord.js';
 

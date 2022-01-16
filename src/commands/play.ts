@@ -1,9 +1,9 @@
-import { queueManager } from '../queue';
-import embeds from '../embeds';
 import { log } from '../utils.js';
+import { queueManager } from '../queue.js';
+import embeds from '../embeds.js';
 
-import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands';
-import { Song, YouTubeSong } from '../song';
+import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands.js';
+import { Song, YouTubeSong } from '../song.js';
 import { Client, Message } from 'discord.js';
 
 /**
