@@ -358,7 +358,7 @@ export class SongManager {
 
             // eslint-disable-next-line new-cap
             let song = await new songType(url, requestedBy, requestedChannel).finalize();
-            let songReference = SongManager.addSong(song, requestedBy, requestedChannel);
+            let songReference = await SongManager.addSong(song, requestedBy, requestedChannel);
 
             return songReference;
         } catch (error) {
