@@ -130,11 +130,15 @@ export default class Song {
                     // do nothing i guess?
                 }
             else
-                await getYouTubeURL(arg).then(result => {
-                    let id = YouTubeSong.generateIdFromUrl(result);
-                    // tod
-                }).catch(err => { });
-                // can't find any youtube/other links, so perform youtube search and add first song
+                try {// can't find any youtube/other links, so perform youtube search and add first song
+                    let url = await getYouTubeURL(arg);
+                    let songReference = await SongManager.getCreateSong(url, message.author, message.channel);
+                    songs.push(songReference);
+                } catch (e) {
+                    // do nothing, can't add song because search query returned nothing.
+                    // maybe be could have song references that are like Promise<Rejected>
+                    // so we can pass that up????
+                }
         }
 
         return [[...songs, ...playlistSongs], songs.length === 0];
