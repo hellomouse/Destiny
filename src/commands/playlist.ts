@@ -67,7 +67,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
                 if (playlist.length === config.playlists.maximumItemsPerPlaylist)
                     return message.channel.send({ embeds: [embeds.errorEmbed().setDescription(`Playlist has reached maximum number of items`)] });
 
-                songs.forEach(async x => localData.addSong(userId, playlistName, (await x.song).url));
+                songs.forEach(async x => localData.addSong(userId, playlistName, x.song.url));
                 message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Added ${songs.length} song(s) to playlist`)] });
                 break;
             }
@@ -75,12 +75,12 @@ export const run = async (client: Client, message: Message, args: Array<string>)
                 if (!hasPlaylist) return message.channel.send({ embeds: [embeds.errorEmbed().setDescription(`No such playlist exists`)] });
                 if (!songs.length) return message.channel.send({ embeds: [embeds.errorEmbed().setDescription(`Not a valid song(s)`)] });
 
-                let occurences = await [...new Set(songs)]
-                    .map(async x => localData.hasSong(userId, playlistName, (await x.song).url) ? 1 : 0)
-                    .reduce(async (prev, current) => (await prev) + (await current));
+                let occurences = [...new Set(songs)]
+                    .map(x => localData.hasSong(userId, playlistName, x.song.url) ? 1 : 0)
+                    .reduce((prev, current) => prev + current);
                 if (occurences === 0) return message.channel.send({ embeds: [embeds.defaultEmbed().setDescription('Song(s) not found in playlist')] });
 
-                songs.forEach(async x => localData.removeSong(userId, playlistName, (await x.song).url));
+                songs.forEach(async x => localData.removeSong(userId, playlistName, x.song.url));
                 message.channel.send({ embeds: [embeds.defaultEmbed().setDescription(`Removed ${occurences} song(s) from playlist`)] });
 
                 break;

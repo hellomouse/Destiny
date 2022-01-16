@@ -107,7 +107,7 @@ export class ServerQueue {
     }
 
     async sendNowPlayingEmbed(song: Song) {
-        this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [embeds.songEmbed(song, 'Now Playing')] })
+        this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [embeds.songEmbed(song, 'Now Playing')] });
     }
 
     /**
@@ -117,7 +117,7 @@ export class ServerQueue {
      * @return {number} Validated seek time
      */
     async seekTo(seekTime: number, errorCounter = 0) {
-        const song = await this.currentSong()!;
+        const song = this.currentSong()!;
 
         seekTime = Math.max(0, seekTime);
         seekTime = Math.min(song.duration, seekTime);
@@ -149,7 +149,7 @@ export class ServerQueue {
         }
 
         if (this.songs[this.index + 1])
-            utils.log(`Finished playing the music : ${(await this.songs[this.index].song).title}`);
+            utils.log(`Finished playing the music : ${(this.songs[this.index].song).title}`);
         else
             utils.log(`Finished playing all musics, no more musics in the queue`);
 
@@ -196,7 +196,7 @@ export class ServerQueue {
 
         this.shuffled = false;
 
-        const song = await this.currentSong()!;
+        const song = this.currentSong()!;
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 

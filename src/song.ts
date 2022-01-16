@@ -259,7 +259,7 @@ class YouTubeSong extends Song {
                     message.channel
                 );
             } else
-                songReference = await SongManager.getSongReference(id, message.author, message.channel);
+                songReference = SongManager.getSongReference(id, message.author, message.channel);
 
             songs.push(songReference);
         }
@@ -381,18 +381,18 @@ export class SongManager {
 
         SongManager.checkCleanup();
 
-        return await this.getSongReference(song.id, requestedBy, requestedChannel);
+        return this.getSongReference(song.id, requestedBy, requestedChannel);
     }
 
-    static async getSong(id: string): Promise<YouTubeSong | FileSong> {
+    static getSong(id: string): YouTubeSong | FileSong {
         let song = SongManager.songs.get(id);
         if (typeof song === 'undefined') throw new SongNotFoundError();
 
         return song;
     }
 
-    static async getSongReference(id: string, requestedBy: User, requestedChannel: Message['channel']) {
-        let song = await SongManager.getSong(id);
+    static getSongReference(id: string, requestedBy: User, requestedChannel: Message['channel']) {
+        let song = SongManager.getSong(id);
         if (typeof song === 'undefined') throw new SongNotFoundError(); // need to change to throw error
 
         return new SongReference(song.id, requestedBy, requestedChannel);
