@@ -1,6 +1,7 @@
 import { readdir } from 'fs/promises';
 import { configHandler } from './src/configHandler.js';
 import { Client, Command } from './src/types.js';
+import { resolve as pathResolve } from 'path';
 import Enmap from 'enmap';
 import './src/local-data.js';
 
@@ -10,7 +11,7 @@ process.on('unhandledRejection', error => {
 });
 
 async function load(client: Client) {
-    let utils = await import('./src/utils.js');
+    let utils = await import(`./src/utils.js?ts=${Date.now()}`);
     let config = await configHandler();
 
     if (config.token !== client.lastToken) {
@@ -35,19 +36,18 @@ async function load(client: Client) {
         ];
         for (let file of files) {
             if (!file.name.endsWith('.js')) continue;
-            let path = require.resolve(`./src/${file.type}/${file.name}`);
-            delete require.cache[path];
+            let path = pathResolve(`./src/${file.type}/${file.name}`);
 
             let name = file.name.split('.')[0];
             switch (file.type) {
                     case 'events': {
-                        let evt = (await import(path)).default;
+                        let evt = (await import(`${path}?ts=${Date.now()}`)).default;
                         loaded.events.push(name);
                         client.on(name, evt.bind(null, client));
                         break;
                     }
                     case 'commands': {
-                        let props: Command = await import(path);
+                        let props: Command = await import(`${path}?ts=${Date.now()}`);
                         if (Array.isArray(props.names))
                             props.names.forEach(propName => {
                                 client.commands.set(propName, props);
