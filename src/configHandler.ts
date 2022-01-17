@@ -3,7 +3,7 @@ export async function configHandler() {
 
     if (!process.env.TOKEN)
         try {
-            require('../config.cjs');
+            // require('../config.cjs');
         } catch (e) {
             console.error('No config file found, create it or use environnement variables.');
             process.exit(1);
