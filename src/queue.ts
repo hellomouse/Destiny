@@ -219,6 +219,10 @@ export class ServerQueue {
         this.skip();
         this.skipped = false;
         this._isPlaying = false;
+
+        for (let songReference of this.songs)
+            songReference.song.references--;
+
         this.songs = [];
         this.index = 0;
 
@@ -279,8 +283,10 @@ export class ServerQueue {
      * @param {Song} song Song to add
      */
     add(songReferences: Array<SongReference>) {
-        for (let songReference of songReferences)
+        for (let songReference of songReferences) {
             this.songs.push(songReference);
+            songReference.song.references++;
+        }
     }
 
     /**
