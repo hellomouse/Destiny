@@ -1,7 +1,7 @@
 import AsciiTable from 'ascii-table';
 
 import { defaultEmbed } from './embeds.js';
-import config from '../config.js';
+import config from '../config.cjs';
 import type { ServerQueue } from './queue.js';
 import ytsr from 'ytsr';
 

@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import ytpl from 'ytpl';
-import config from '../config.js';
+import config from '../config.cjs';
 import Song from './song.js';
 import { Command } from './types';
 
