@@ -29,13 +29,10 @@ export class ServerQueue {
     public connection?: VoiceConnection;
     private audioPlayer!: AudioPlayer;
     public songs: Array<SongReference>;
-    public shuffleWaiting: Array<string>;
     public volume: number;
     public _paused: boolean;
     public loop: number;
     public skipped: boolean;
-    public shuffle: boolean;
-    public shuffled: boolean;
     public index: number;
     public _isPlaying: boolean;
     public lastNowPlayingMessage?: Message;
@@ -60,14 +57,11 @@ export class ServerQueue {
         this.connection = undefined;
 
         this.songs = [];
-        this.shuffleWaiting = []; // Songs to be played in shuffle mode
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this._paused = false;
         this.loop = LOOP_MODES['NONE']; // in LOOP_MODES
         this.skipped = false;
 
-        this.shuffle = false;
-        this.shuffled = false;
         this.index = 0;
         this._isPlaying = false;
 
@@ -157,22 +151,7 @@ export class ServerQueue {
         if (this.songs.length === 0) return;
 
         if (this.loop !== LOOP_MODES['SONG'] || this.skipped)
-            if (this.shuffle) {
-                if (this.shuffleWaiting.length === 0 && this.loop === LOOP_MODES['QUEUE'])
-                    this.shuffleWaiting = this.songs.map(x => x.id);
-
-                let uuidIndex = getRandomInt(this.shuffleWaiting.length);
-                let uuidFind = this.shuffleWaiting[uuidIndex];
-
-                // Check there are more songs to shuffle
-                if (uuidFind) {
-                    this.index = this.songs.findIndex(x => x.id === uuidFind);
-                    this.shuffled = true;
-                }
-
-                this.shuffleWaiting.splice(uuidIndex, 1);
-            } else
-                this.index++;
+            this.index++;
 
         if (this.loop === LOOP_MODES['QUEUE'])
             this.index %= this.size();
@@ -194,9 +173,7 @@ export class ServerQueue {
 
         this._isPlaying = true;
 
-        this.shuffled = false;
-
-        const song = this.currentSong()!;
+        const song = await this.currentSong()!;
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
@@ -243,7 +220,6 @@ export class ServerQueue {
         this.skipped = false;
         this._isPlaying = false;
         this.songs = [];
-        this.shuffleWaiting = [];
         this.index = 0;
 
         if (restoreDefaults) {
@@ -272,18 +248,14 @@ export class ServerQueue {
         let connection = getVoiceConnection(this.serverID);
         let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
         audioPlayer.pause();
-        inactivity.onNotPlaying(this);
     }
 
     shuffleOn() {
-        let uuidFind = typeof this.currentSong() !== 'undefined' ? this.currentSong()!.id : '';
-        this.shuffleWaiting = this.songs.filter(x => x.id !== uuidFind).map(x => x.id);
-        this.shuffle = true;
+
     }
 
     shuffleOff() {
-        this.shuffleWaiting = [];
-        this.shuffle = false;
+
     }
 
     setVolume(volume: number) {

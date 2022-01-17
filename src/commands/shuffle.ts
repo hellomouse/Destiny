@@ -11,7 +11,7 @@ import { Client, Message } from 'discord.js';
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
-    const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
+    //const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
     if (serverQueue.shuffle) {
         serverQueue.shuffleOff();
