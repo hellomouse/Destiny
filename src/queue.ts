@@ -173,7 +173,7 @@ export class ServerQueue {
 
         this._isPlaying = true;
 
-        const song = await this.currentSong()!;
+        const song = this.currentSong()!;
         this.textChannel = song.requestedChannel; // Update text channel
         this._isPlaying = true;
 
