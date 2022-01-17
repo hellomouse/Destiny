@@ -1,6 +1,6 @@
 import ytdl from 'ytdl-core';
 import { formatDuration, getYouTubeURL, isURL } from './utils.js';
-import config from '../config';
+import config from '../config.cjs';
 import ffmpeg from 'fluent-ffmpeg';
 import playlist from 'ytpl';
 import Stream from 'stream';

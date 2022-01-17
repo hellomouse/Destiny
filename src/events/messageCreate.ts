@@ -1,9 +1,9 @@
 import strings from '../strings.json';
 import { FlagHelpError, log } from '../utils.js';
-import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } from '../embeds';
-import config from '../../config';
-import COMMAMD_REQUIREMENTS from '../commands';
-import { queueManager } from '../queue';
+import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } from '../embeds.js';
+import config from '../../config.cjs';
+import COMMAMD_REQUIREMENTS from '../commands.js';
+import { queueManager } from '../queue.js';
 
 const prefix = config.prefix;
 import { DMChannel, Message, NewsChannel, ThreadChannel } from 'discord.js';

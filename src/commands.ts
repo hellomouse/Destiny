@@ -1,4 +1,4 @@
-import { FlagHelpError } from './utils';
+import { FlagHelpError } from './utils.js';
 import { Message } from 'discord.js';
 
 const enum COMMAMD_REQUIREMENTS {

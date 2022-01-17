@@ -1,9 +1,9 @@
 export async function configHandler() {
-    let config = (await import(`../config?ts=${Date.now()}`)).default;
+    let config = (await import(`../config.cjs?ts=${Date.now()}`)).default;
 
     if (!process.env.TOKEN)
         try {
-            require('../config.js');
+            require('../config.cjs');
         } catch (e) {
             console.error('No config file found, create it or use environnement variables.');
             process.exit(1);

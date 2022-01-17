@@ -1,5 +1,5 @@
 import { defaultEmbed, errorEmbed } from '../embeds.js';
-import { log } from '../utils';
+import { log } from '../utils.js';
 import { queueManager, LOOP_MODES } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';

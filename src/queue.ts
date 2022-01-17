@@ -1,4 +1,4 @@
-import config from '../config.js';
+import config from '../config.cjs';
 import { getRandomInt, inactivity, log, VOLUME_BASE_UNIT } from './utils.js';
 import { songEmbed } from './embeds.js';
 
