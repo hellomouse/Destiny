@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "A music bot",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "build": "rm -rf ./build/* && tsc -p tsconfig.json",
     "start": "cd build && node index.js",

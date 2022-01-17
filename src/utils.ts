@@ -1,8 +1,8 @@
 import AsciiTable from 'ascii-table';
 
-import { defaultEmbed } from './embeds';
-import config from '../config';
-import type { ServerQueue } from './queue';
+import { defaultEmbed } from './embeds.js';
+import config from '../config.js';
+import type { ServerQueue } from './queue.js';
 import ytsr from 'ytsr';
 
 export class FlagHelpError extends Error {

@@ -1,6 +1,7 @@
 # Token
 config.js
 config.ts
+config.cjs
 
 # Logs
 logs
