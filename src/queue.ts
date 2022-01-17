@@ -4,8 +4,8 @@ import { songEmbed } from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionReadyState } from '@discordjs/voice';
-import { Song, SongReference } from './song';
-import MessageCollection, { SongQueueMessage, SingletonMessage } from './messages';
+import { Song, SongReference } from './song.js';
+import MessageCollection, { SongQueueMessage, SingletonMessage } from './messages.js';
 
 // const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
 // type LOOP_MODES = typeof LOOP_MODES[number];
