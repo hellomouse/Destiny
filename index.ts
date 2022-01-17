@@ -47,7 +47,7 @@ async function load(client: Client) {
                         break;
                     }
                     case 'commands': {
-                        let props: Command = await import(`${path}?ts=${Date.now()}`);
+                        let props: Command = { ...await import(`${path}?ts=${Date.now()}`) };
                         if (Array.isArray(props.names))
                             props.names.forEach(propName => {
                                 client.commands.set(propName, props);
