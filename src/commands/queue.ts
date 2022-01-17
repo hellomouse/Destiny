@@ -1,4 +1,3 @@
-import strings from '../strings.json';
 import { FlagHelpError, log } from '../utils.js';
 import { songQueueEmpty } from '../embeds.js';
 import { LOOP_MODES, queueManager, ServerQueue } from '../queue.js';
