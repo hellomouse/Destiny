@@ -1,24 +1,29 @@
 export async function configHandler() {
     let config = (await import(`../config.cjs?ts=${Date.now()}`)).default;
+    config = Object.assign(
+        {
+            token: process.env.TOKEN,
+            prefix: process.env.PREFIX || '!!',
+            inactivity: {
+                waitRejoinSeconds: 60,
+                botIdleSeconds: 600
+            },
+            songManager: {
+                softNumLimit: 1000000,
+                hardNumLimit: 10000000,
+                cacheCleanTimeoutDuration: 300,
+                metadataRefreshInterval: {
+                    // eslint-disable-next-line @typescript-eslint/naming-convention
+                    YouTubeSong: 3600
+                }
+            },
+            allowed: process.env.ALLOWED ? [process.env.ALLOWED] : [] // TODO: rework permissions
+        },
+        config
+    );
 
-    if (!process.env.TOKEN)
-        try {
-            // require('../config.cjs');
-        } catch (e) {
-            console.error('No config file found, create it or use environnement variables.');
-            process.exit(1);
-        }
-    else {
-        if (!process.env.PREFIX) process.env.PREFIX = '$';
-        config = { 'token': process.env.TOKEN, 'prefix': process.env.PREFIX };
-    }
-    if (!process.env.ALLOWED)
-        try {
-            config.allowed = (await import(`../allowed.json?ts=${Date.now()}`)).allowed;
-        } catch (e) {
-            config.allowed = [];
-        }
-    else
-        config.allowed = [process.env.ALLOWED];
+    if (!config.token)
+        throw new Error('Bot token not defined in config or environment');
+
     return config;
 }
