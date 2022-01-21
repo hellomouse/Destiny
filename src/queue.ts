@@ -175,6 +175,20 @@ export class ServerQueue {
     }
 
     /**
+     * Stop the current song from playing
+     * and jump to a specific position in the queue
+     */
+    jump(position: number) {
+        if (position > this.songs.length)
+            throw new Error('Position is out of bounds');
+
+        this.index = position - 1;
+        this.skipped = true;
+        this.audioPlayer.stop();
+        this.audioResource = undefined; // Remove reference to audio resource, to prevent memory leak
+    }
+
+    /**
      * Stop current song from playing and
      * clear the queue
      * @param {boolean} restoreDefaults Restore ServerQueue defaults
