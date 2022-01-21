@@ -35,9 +35,10 @@
     "ffmpeg-static": "^4.4.0",
     "fluent-ffmpeg": "^2.1.2",
     "node-ipc": "^10.1.0",
+    "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.7",
     "uuid": "^8.3.2",
-    "ytdl-core": "^4.9.1",
+    "ytdl-core": "^4.10.0",
     "ytpl": "^2.2.3",
     "ytsr": "^3.5.3",
     "zlib-sync": "^0.1.7"
