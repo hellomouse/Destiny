@@ -27,14 +27,12 @@ export class ServerQueue {
     public voiceChannel: VoiceBasedChannel;
     public textChannel: Message['channel'];
     public connection?: VoiceConnection;
-    private audioPlayer!: AudioPlayer;
+    private audioPlayer: AudioPlayer;
     public songs: Array<SongReference>;
     public volume: number;
-    public _paused: boolean;
     public loop: number;
     public skipped: boolean;
     public index: number;
-    public _isPlaying: boolean;
     public lastNowPlayingMessage?: Message;
     public ignoreNextSongEnd: boolean;
 
@@ -55,15 +53,18 @@ export class ServerQueue {
         this.voiceChannel = voiceChannel;
 
         this.connection = undefined;
+        this.audioPlayer = createAudioPlayer({
+            behaviors: {
+                noSubscriber: NoSubscriberBehavior.Pause
+            }
+        });
 
         this.songs = [];
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
-        this._paused = false;
         this.loop = LOOP_MODES['NONE']; // in LOOP_MODES
         this.skipped = false;
 
         this.index = 0;
-        this._isPlaying = false;
 
         this.messages = new MessageCollection();
         this.messages.set('nowPlaying', new SingletonMessage());
@@ -77,7 +78,8 @@ export class ServerQueue {
     }
 
     isPaused() {
-        return this._paused;
+        return this.audioPlayer.state.status === AudioPlayerStatus.Paused ||
+            this.audioPlayer.state.status === AudioPlayerStatus.AutoPaused;
     }
 
     size() {
@@ -97,7 +99,7 @@ export class ServerQueue {
     }
 
     isPlaying() {
-        return this._isPlaying;
+        return this.audioPlayer.state.status === AudioPlayerStatus.Playing;
     }
 
     async sendNowPlayingEmbed(song: Song) {
@@ -117,7 +119,6 @@ export class ServerQueue {
         seekTime = Math.min(song.duration, seekTime);
 
         this.ignoreNextSongEnd = true;
-        let connection = getVoiceConnection(this.serverID);
         let audioPlayer = this.audioPlayer;
         let audio = this.audioResource = createAudioResource(await song.getStream(seekTime), { inlineVolume: true });
         audioPlayer.play(audio);
@@ -165,24 +166,16 @@ export class ServerQueue {
      * @return {*} The dispatcher
      */
     async play(errorCounter = 0) {
-        this.audioPlayer = createAudioPlayer({
-            behaviors: {
-                noSubscriber: NoSubscriberBehavior.Pause
-            }
-        });
-
-        this._isPlaying = true;
+        let player = this.audioPlayer;
 
         const song = this.currentSong()!;
         this.textChannel = song.requestedChannel; // Update text channel
-        this._isPlaying = true;
 
         if (errorCounter < 1)
             await this.sendNowPlayingEmbed(song);
 
         log(`Started playing the music : ${song.title} ${this.index}`);
 
-        let player = createAudioPlayer();
         let audio = this.audioResource = createAudioResource(await song.getStream(), { inlineVolume: true });
 
         this.connection!.subscribe(player);
@@ -218,7 +211,6 @@ export class ServerQueue {
     clear(restoreDefaults = false) {
         this.skip();
         this.skipped = false;
-        this._isPlaying = false;
 
         for (let songReference of this.songs)
             songReference.song.references--;
@@ -247,11 +239,8 @@ export class ServerQueue {
 
     /** Pause currently playing song */
     pause() {
-        if (this._paused) return;
-        this._paused = true;
-        let connection = getVoiceConnection(this.serverID);
-        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
-        audioPlayer.pause();
+        if (this.isPlaying()) return;
+        this.audioPlayer.pause();
     }
 
     shuffleOn() {
@@ -270,12 +259,9 @@ export class ServerQueue {
 
     /** Resume currently playing song */
     resume() {
-        if (!this._paused) return;
-        this._paused = false;
+        if (!this.isPaused()) return;
 
-        let connection = getVoiceConnection(this.serverID);
-        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription!.player;
-        audioPlayer.unpause();
+        this.audioPlayer.unpause();
     }
 
     /**
