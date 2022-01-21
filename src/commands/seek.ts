@@ -38,7 +38,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             });
     }
 
-    seekTime = await serverQueue.seekTo(seekTime);
+    seekTime = Math.max(0, seekTime);
+    seekTime = Math.min(serverQueue.currentSong().duration, seekTime);
+    await serverQueue.play(seekTime);
     log(`Seeking to ${seekTime}`);
     return message.channel.send({ embeds: [defaultEmbed().setDescription(`Seeking to \`${formatDuration(seekTime)}\``)] });
 };
