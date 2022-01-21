@@ -170,9 +170,7 @@ export class ServerQueue {
      */
     skip() {
         this.skipped = true;
-        let connection = getVoiceConnection(this.serverID);
-        let audioPlayer = (connection?.state as VoiceConnectionReadyState)?.subscription?.player;
-        audioPlayer?.stop();
+        this.audioPlayer.stop();
         this.audioResource = undefined; // Remove reference to audio resource, to prevent memory leak
     }
 
