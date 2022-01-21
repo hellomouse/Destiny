@@ -1,7 +1,7 @@
 import { defaultEmbed } from '../embeds.js';
 import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
-import COMMAMD_REQUIREMENTS from '../commands';
+import COMMAMD_REQUIREMENTS from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
