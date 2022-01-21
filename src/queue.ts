@@ -107,34 +107,6 @@ export class ServerQueue {
     }
 
     /**
-     * Seek current song to seekTime (validated)
-     * @param {number} seekTime Seek time in seconds
-     * @param {number} errorCounter Errors occured
-     * @return {number} Validated seek time
-     */
-    async seekTo(seekTime: number, errorCounter = 0) {
-        const song = this.currentSong()!;
-
-        seekTime = Math.max(0, seekTime);
-        seekTime = Math.min(song.duration, seekTime);
-
-        this.ignoreNextSongEnd = true;
-        let audioPlayer = this.audioPlayer;
-        let audio = this.audioResource = createAudioResource(await song.getStream(seekTime), { inlineVolume: true });
-        audioPlayer.play(audio);
-
-        audioPlayer.on(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
-        audioPlayer.on('error', async error => {
-            console.log('seek dispatcher errored: ' + error);
-            this.ignoreNextSongEnd = true;
-            await this.seekTo(seekTime, errorCounter + 1);
-        });
-        audio.volume!.setVolumeLogarithmic(this.volume / VOLUME_BASE_UNIT);
-
-        return seekTime;
-    }
-
-    /**
      * Executes on song finish
      */
     async onSongFinish() {
@@ -165,10 +137,11 @@ export class ServerQueue {
      * @param {number} errorCounter Number of retries when error occurs
      * @return {*} The dispatcher
      */
-    async play(errorCounter = 0) {
+    async play(seekTime = 0, errorCounter = 0) {
         let player = this.audioPlayer;
 
         const song = this.currentSong()!;
+
         this.textChannel = song.requestedChannel; // Update text channel
 
         if (errorCounter < 1)
@@ -176,7 +149,7 @@ export class ServerQueue {
 
         log(`Started playing the music : ${song.title} ${this.index}`);
 
-        let audio = this.audioResource = createAudioResource(await song.getStream(), { inlineVolume: true });
+        let audio = this.audioResource = createAudioResource(await song.getStream(seekTime), { inlineVolume: true });
 
         this.connection!.subscribe(player);
         player.play(audio);
@@ -185,7 +158,7 @@ export class ServerQueue {
         player.on('error', async error => {
             console.log('dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
-            await this.play(errorCounter + 1);
+            await this.play(0, errorCounter + 1);
         });
         audio.volume!.setVolumeLogarithmic(this.volume / VOLUME_BASE_UNIT);
         return player;
