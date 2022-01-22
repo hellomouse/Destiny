@@ -186,10 +186,12 @@ export class ServerQueue {
         if (position > this.songs.length)
             throw new Error('Position is out of bounds');
 
-        this.index = position - 1;
+        this.index = position - 1; // Convert to 0-based index
         this.skipped = true;
+        this.ignoreNextSongEnd = true;
         this.audioPlayer.stop();
         this.audioResource = undefined; // Remove reference to audio resource, to prevent memory leak
+        this.play();
     }
 
     /**
