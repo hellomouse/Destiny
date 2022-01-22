@@ -12,8 +12,14 @@ class CustomMessage {
     }
 
     async send(channel: Message['channel'], options: string | MessagePayload | MessageOptions) {
-        this._send(channel, options);
+        await this._send(channel, options);
         return this.message;
+    }
+}
+
+export class NormalMessage extends CustomMessage {
+    constructor() {
+        super();
     }
 }
 
@@ -58,7 +64,7 @@ export class SongQueueMessage extends CustomMessage {
     }
 }
 
-class MessageCollection extends Collection<string, SingletonMessage | SongQueueMessage> {
+class MessageCollection extends Collection<string, SingletonMessage | SongQueueMessage | NormalMessage> {
     constructor() {
         super();
     }
