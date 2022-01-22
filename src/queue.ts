@@ -158,8 +158,8 @@ export class ServerQueue {
         this.connection!.subscribe(player);
         player.play(audio);
 
-        player.on(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
-        player.on('error', async error => {
+        player.once(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
+        player.once('error', async error => {
             console.log('dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
             await this.play(0, errorCounter + 1);
