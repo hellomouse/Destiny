@@ -82,6 +82,10 @@ export class ServerQueue {
             this.audioPlayer.state.status === AudioPlayerStatus.AutoPaused;
     }
 
+    /**
+     * Get the queues size
+     * @returns {number} The size of the queue
+     */
     size() {
         return this.songs.length;
     }
