@@ -108,7 +108,7 @@ export class ServerQueue {
     }
 
     async sendNowPlayingEmbed(song: Song) {
-        this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [songEmbed(song, 'Now Playing')] });
+        await this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [songEmbed(song, 'Now Playing')] });
     }
 
     /**
