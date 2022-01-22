@@ -1,3 +1,4 @@
+import { AudioPlayerError } from '@discordjs/voice';
 import { MessageEmbed } from 'discord.js';
 import ytpl from 'ytpl';
 import config from '../config.cjs';
@@ -47,6 +48,13 @@ export const songEmbed = (song: Song, title: string, showDuration = true) => {
 
     if (song.thumbnail)
         embed.setThumbnail(song.thumbnail);
+    return embed;
+};
+
+export const songErrorEmbed = (song: Song, errorCount: number, error: AudioPlayerError) => {
+    let embed = errorEmbed()
+        .setTitle('Error: Trying to replay song')
+        .setDescription(`Retry count: ${errorCount}`);
     return embed;
 };
 
