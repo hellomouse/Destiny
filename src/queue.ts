@@ -1,11 +1,11 @@
 import config from '../config.cjs';
-import { getRandomInt, inactivity, log, VOLUME_BASE_UNIT } from './utils.js';
+import { log, VOLUME_BASE_UNIT } from './utils.js';
 import { songEmbed } from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from '@discordjs/voice';
 import { Song, SongReference } from './song.js';
-import MessageCollection, { SongQueueMessage, SingletonMessage } from './messages.js';
+import MessageCollection, { SongQueueMessage, SingletonMessage, NormalMessage } from './messages.js';
 
 // const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
 // type LOOP_MODES = typeof LOOP_MODES[number];
@@ -68,6 +68,7 @@ export class ServerQueue {
 
         this.messages = new MessageCollection();
         this.messages.set('nowPlaying', new SingletonMessage());
+        this.messages.set('finishedPlaying', new NormalMessage());
         this.messages.set('queue', new SongQueueMessage());
 
         this.ignoreNextSongEnd = false; // Don't run anything after dispatcher ends for next end, for seeking
@@ -119,21 +120,23 @@ export class ServerQueue {
             return;
         }
 
-        if (this.songs[this.index + 1])
-            log(`Finished playing the music : ${(this.songs[this.index].song).title}`);
-        else
-            log(`Finished playing all musics, no more musics in the queue`);
-
-        this.skipped = false;
         if (this.songs.length === 0) return;
 
-        if (this.loop !== LOOP_MODES['SONG'] || this.skipped)
+        if (this.loop !== LOOP_MODES['NONE'] || this.skipped)
             this.index++;
+
+        this.skipped = false;
 
         if (this.loop === LOOP_MODES['QUEUE'])
             this.index %= this.size();
 
-        await this.play();
+        if (this.songs[this.index]) {
+            log(`Finished playing the music : ${(this.songs[this.index].song).title}`);
+            await this.play();
+        } else {
+            log(`Finished playing all musics, no more musics in the queue`);
+            await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.songs[this.index - 1].song, 'Finished Playing')] });
+        }
     }
 
     /**
