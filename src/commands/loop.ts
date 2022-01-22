@@ -20,7 +20,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         loopMode = LOOP_MODES[args[0].toUpperCase() as keyof typeof LOOP_MODES];
 
         if (typeof loopMode === 'undefined')
-            return message.channel.send({ embeds: [errorEmbed()
+            return message.reply({ embeds: [errorEmbed()
                 .setTitle(`Invalid loop mode: \`${args[0].toLowerCase()}\``)
                 // List loop modes (lowercase) after filtering out the number keys
                 .setDescription(`Loop mode should be one of \`${Object.keys(LOOP_MODES).map(e => e.toLowerCase()).filter(e => isNaN(+e)).join(', ')}\``)] });

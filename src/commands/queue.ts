@@ -54,7 +54,7 @@ function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: numbe
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
     if (!serverQueue || serverQueue.size() === 0)
-        return message.channel.send({ embeds: [songQueueEmpty()] });
+        return message.reply({ embeds: [songQueueEmpty()] });
 
     let page = 0;
     let maxPages = Math.ceil(serverQueue.songs.length / PAGE_SIZE);

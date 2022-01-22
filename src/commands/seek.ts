@@ -32,7 +32,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             if (m) seekTime = getN(m, 1) * 60 * 60 + getN(m, 2) * 60 + getN(m, 3);
         }
         if (!m)
-            return message.channel.send({
+            return message.reply({
                 embeds: [errorEmbed()
                     .setTitle(`Invalid seek parameter \`${args[0]}\``)]
             });

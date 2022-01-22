@@ -30,7 +30,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     //    return message.channel.send({ embeds: [songEmbed(currentSong, 'Jumping to...', false)] });
 
 
-    return message.channel.send({ embeds: [queueNotPlaying()] });
+    return message.reply({ embeds: [queueNotPlaying()] });
 };
 
 export const names = ['jump'];

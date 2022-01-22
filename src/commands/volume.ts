@@ -23,7 +23,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     let floatVolume = +args;
     if (Number.isNaN(floatVolume) || floatVolume < 0 || floatVolume > MAX_VOLUME)
-        return message.channel.send({ embeds: [errorEmbed()
+        return message.reply({ embeds: [errorEmbed()
             .setTitle(`Volume must be a percentage from 0 to ${MAX_VOLUME}%`)] });
 
     message.channel.send({ embeds: [defaultEmbed()
