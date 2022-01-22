@@ -95,6 +95,10 @@ export class ServerQueue {
         return this.index;
     }
 
+    getSongAtIndex(index: number) {
+        return this.songs[index];
+    }
+
     setLoopMode(loop: LOOP_MODES) {
         this.loop = loop;
     }
@@ -218,6 +222,12 @@ export class ServerQueue {
             this.shuffleOff();
             this.setVolume(ServerQueue.consts.DEFAULT_VOLUME);
         }
+    }
+
+    removeSong(index: number) {
+        let songReference = this.songs.splice(index, 1)[0];
+        songReference!.song.references--;
+        return songReference;
     }
 
     /**
