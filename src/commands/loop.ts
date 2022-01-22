@@ -14,19 +14,22 @@ import { Client, Message } from 'discord.js';
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.getOrCreate(message, message.member!.voice.channel!);
 
+    // TODO: command with no arguments should cycle through loop modes
     let loopMode = serverQueue.loop;
     if (args[0]) {
-        loopMode = LOOP_MODES[args[0].toLowerCase() as keyof typeof LOOP_MODES];
-        if (!loopMode)
+        loopMode = LOOP_MODES[args[0].toUpperCase() as keyof typeof LOOP_MODES];
+
+        if (typeof loopMode === 'undefined')
             return message.channel.send({ embeds: [errorEmbed()
-                .setTitle(`Invalid loop mode \`${args[0].toLowerCase()}\``)
-                .setDescription(`Loop mode should be one of \`${Object.keys(LOOP_MODES).join(', ')}\``)] });
+                .setTitle(`Invalid loop mode: \`${args[0].toLowerCase()}\``)
+                // List loop modes (lowercase) after filtering out the number keys
+                .setDescription(`Loop mode should be one of \`${Object.keys(LOOP_MODES).map(e => e.toLowerCase()).filter(e => isNaN(+e)).join(', ')}\``)] });
     }
 
 
     serverQueue.setLoopMode(loopMode);
-    log(`Loop mode set to ${LOOP_MODES[loopMode]}`);
-    return message.channel.send({ embeds: [defaultEmbed().setDescription(`Loop mode now set to \`${loopMode}\``)] });
+    log(`Loop mode set to ${LOOP_MODES[loopMode].toLowerCase()}`);
+    return message.channel.send({ embeds: [defaultEmbed().setDescription(`Loop mode now set to \`${LOOP_MODES[loopMode].toLowerCase()}\``)] });
 };
 
 export const names = ['loop', 'l'];
