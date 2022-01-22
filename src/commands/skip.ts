@@ -20,25 +20,27 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let skipAmount: number = +args[0] ? +args[0] + 1 : 0;
     let skipTo = 0;
 
-    // If we're looping the queue, find the index of the song to jump to
-    if (serverQueue.loop === LOOP_MODES['QUEUE'])
-        skipTo = serverQueue.getIndex() + skipAmount % serverQueue.size();
-    else if (skipAmount > (serverQueue.size() - serverQueue.getIndex()))
+    if (skipAmount)
+        // If we're looping the queue, find the index of the song to jump to
+        if (serverQueue.loop === LOOP_MODES['QUEUE'])
+            skipTo = serverQueue.getIndex() + skipAmount % serverQueue.size();
+        else if (skipAmount > (serverQueue.size() - serverQueue.getIndex()))
         // Can't skip songs if it takes us out of the queue when not looping it
-        return await message.reply({ embeds: [errorEmbed().setDescription('Value out of bounds')] });
-    else
-        skipTo = serverQueue.getIndex() + skipAmount;
+            return await message.reply({ embeds: [errorEmbed().setDescription('Can\'t skip there, out of bounds.\nOnly possible when looping the queue')] });
+        else
+            skipTo = serverQueue.getIndex() + skipAmount;
 
     if (skipTo)
         serverQueue.jump(skipTo);
-    else
+    else if (serverQueue.getIndex() < serverQueue.size())
         serverQueue.skip();
+        // TODO: you should be able to skip the last song, other commands will break on invalid indexes however
 
     const currentSong = serverQueue.currentSong();
     if (currentSong)
         return message.channel.send({ embeds: [songEmbed(currentSong, 'Skipping', false)] });
 
-    return message.channel.send({ embeds: [queueNotPlaying()] });
+    return message.reply({ embeds: [queueNotPlaying()] });
 };
 
 export const names = ['skip', 's'];
