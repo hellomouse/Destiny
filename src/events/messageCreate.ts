@@ -42,10 +42,10 @@ export default async (client: Client, message: Message) => {
             if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_IS_PLAYING) {
                 const serverQueue = queueManager.get(message.guild!.id)!;
                 if (!serverQueue.isPlaying())
-                    return message.channel.send({ embeds: [queueNotPlaying()] });
+                    return message.reply({ embeds: [queueNotPlaying()] });
             }
             if (cmd.requirements & COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC && !message.member!.voice.channel)
-                return message.channel.send({ embeds: [notInVoiceChannelEmbed()] } );
+                return message.reply({ embeds: [notInVoiceChannelEmbed()] } );
         }
 
         if (message.channel instanceof NewsChannel || message.channel instanceof DMChannel ||
@@ -57,7 +57,7 @@ export default async (client: Client, message: Message) => {
         } catch (e) {
             // Show help text because arguments were invalid
             if (e instanceof FlagHelpError)
-                message.channel.send({ embeds: [helpEmbed(cmd)] });
+                message.reply({ embeds: [helpEmbed(cmd)] });
             // Real error occured
             else
                 console.log(e);
