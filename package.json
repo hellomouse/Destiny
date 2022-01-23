@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/hellomouse/Destiny#readme",
   "dependencies": {
+    "@discordjs/opus": "^0.7.0",
     "@discordjs/rest": "^0.2.0-canary.0",
     "@discordjs/voice": "^0.7.5",
     "@types/fluent-ffmpeg": "^2.1.20",
