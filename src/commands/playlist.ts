@@ -76,7 +76,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
                 if (!songs.length) return message.channel.send({ embeds: [errorEmbed().setDescription(`Not a valid song(s)`)] });
 
                 let occurences = [...new Set(songs)]
-                    .map(x => localData.hasSong(userId, playlistName, x.song.url) ? 1 : 0)
+                    .map<number>(x => localData.hasSong(userId, playlistName, x.song.url) ? 1 : 0)
                     .reduce((prev, current) => prev + current);
                 if (occurences === 0) return message.channel.send({ embeds: [defaultEmbed().setDescription('Song(s) not found in playlist')] });
 
