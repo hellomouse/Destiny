@@ -4,7 +4,7 @@ import { songEmbed, errorEmbed, playlistEmbed } from '../embeds.js';
 
 import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands.js';
 import { Song, YouTubeSong } from '../song.js';
-import { Client, Message } from 'discord.js';
+import { Client, Message, MessageEmbed } from 'discord.js';
 
 /**
  * @description Play a song with the provided link
@@ -35,7 +35,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         // message/info.ts could handle user callback/delegate it
         // bad idea, we give function conditions and messages
         // like sendResponse(messagestuff, [playlists.length === 0, ddd], callback or `Added ${songs.length} songs`...)
-        let enqueuedEmbed;
+        let enqueuedEmbed: MessageEmbed;
         if (playlists.length === 0) {
             enqueuedEmbed = songEmbed(songs[0].song, 'Added to Queue', false);
             if (songs.length > 0) enqueuedEmbed.setDescription(enqueuedEmbed.description + ` and ${songs.length - 1} others`);
