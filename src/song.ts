@@ -43,16 +43,12 @@ export default class Song {
     public formattedDuration: string;
     public duration: number;
     public artist?: string;
-    requestedBy: User;
-    public requestedChannel: Message['channel'];
 
     /**
      * Construct a new song
      * @param {string} url Url of the song
-     * @param {MessageAuthor} author Author of the request
-     * @param {TextChannel} channel Channel command was run
      */
-    constructor(url: string, author: User, channel: Message['channel']) {
+    constructor(url: string) {
         this.id = uuidv4();
         this.references = 0;
         this.metadataTTL = Infinity;
@@ -63,8 +59,6 @@ export default class Song {
         this.formattedDuration = 'XX:XX';
         this.duration = Infinity;
         this.artist = undefined;
-        this.requestedChannel = channel;
-        this.requestedBy = author;
     }
 
     /**
@@ -123,9 +117,6 @@ export default class Song {
                 try {
                     let songReference = await SongManager.getCreateSong(arg, message.author, message.channel);
                     songs.push(songReference);
-                    // get song type, new SongType, check if exists in global song manager queue,
-                    // get reference, if not, add, get reference
-                    // push reference to songs
                 } catch (e) {
                     // do nothing i guess?
                 }
@@ -153,8 +144,8 @@ class YouTubeSong extends Song {
     public youtubeId?: string;
     public viewCount?: number;
 
-    constructor(url: string, author: User, channel: Message['channel']) {
-        super(url, author, channel);
+    constructor(url: string) {
+        super(url);
     }
 
     static isSong(url: string) {
@@ -247,9 +238,7 @@ class YouTubeSong extends Song {
             let songReference: SongReference;
             if (!SongManager.hasId(id)) {
                 const ytSong = new YouTubeSong(
-                    `https://www.youtube.com/watch?v=${song.id}`,
-                    message.author,
-                    message.channel
+                    `https://www.youtube.com/watch?v=${song.id}`
                 );
                 songReference = await SongManager.addSong(
                     await ytSong.finalize(
@@ -279,8 +268,8 @@ class YouTubeSong extends Song {
 class FileSong extends Song {
     public album?: string;
 
-    constructor(url: string, author: User, channel: Message['channel']) {
-        super(url, author, channel);
+    constructor(url: string) {
+        super(url);
     }
 
     static isSong(url: string) {
@@ -357,7 +346,7 @@ export class SongManager {
             if (SongManager.songs.has(id)) return SongManager.getSongReference(id, requestedBy, requestedChannel);
 
             // eslint-disable-next-line new-cap
-            let song = await new songType(url, requestedBy, requestedChannel).finalize();
+            let song = await new songType(url).finalize();
             let songReference = await SongManager.addSong(song, requestedBy, requestedChannel);
 
             return songReference;
