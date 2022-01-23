@@ -1,6 +1,6 @@
 import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
-import { songEmbed, errorEmbed, playlistEmbed } from '../embeds.js';
+import { errorEmbed, playlistEmbed, songEmbed } from '../embeds.js';
 
 import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands.js';
 import { Song, YouTubeSong } from '../song.js';
@@ -37,7 +37,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         // like sendResponse(messagestuff, [playlists.length === 0, ddd], callback or `Added ${songs.length} songs`...)
         let enqueuedEmbed: MessageEmbed;
         if (playlists.length === 0) {
-            enqueuedEmbed = songEmbed(songs[0].song, 'Added to Queue', false);
+            enqueuedEmbed = songEmbed(songs[0], 'Added to Queue', false);
             if (songs.length > 0) enqueuedEmbed.setDescription(enqueuedEmbed.description + ` and ${songs.length - 1} others`);
         } else if (onlyPlaylistSongs)
             if (playlists.length === 1)

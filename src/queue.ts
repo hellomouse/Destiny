@@ -4,7 +4,7 @@ import { songEmbed } from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from '@discordjs/voice';
-import { Song, SongReference } from './song.js';
+import { SongReference } from './song.js';
 import MessageCollection, { SongQueueMessage, SingletonMessage, NormalMessage } from './messages.js';
 
 // const LOOP_MODES = ['none', 'off', 'song', 'queue'] as const;
@@ -108,15 +108,15 @@ export class ServerQueue {
     }
 
     currentSong() {
-        return this.songs[this.index].song;
+        return this.songs[this.index];
     }
 
     isPlaying() {
         return this.audioPlayer.state.status === AudioPlayerStatus.Playing;
     }
 
-    async sendNowPlayingEmbed(song: Song) {
-        await this.messages.get('nowPlaying')?.send(song.requestedChannel, { embeds: [songEmbed(song, 'Now Playing')] });
+    async sendNowPlayingEmbed(songReference: SongReference) {
+        await this.messages.get('nowPlaying')?.send(songReference.requestedChannel, { embeds: [songEmbed(songReference, 'Now Playing')] });
     }
 
     /**
@@ -143,7 +143,7 @@ export class ServerQueue {
             await this.play();
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
-            await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.songs[this.index - 1].song, 'Finished Playing')] });
+            await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.songs[this.index - 1], 'Finished Playing')] });
         }
     }
 
@@ -155,12 +155,13 @@ export class ServerQueue {
     async play(seekTime = 0, errorCounter = 0) {
         let player = this.audioPlayer;
 
-        const song = this.currentSong()!;
+        const currentSongReference = this.currentSong();
+        const song = currentSongReference.song;
 
-        this.textChannel = song.requestedChannel; // Update text channel
+        this.textChannel = currentSongReference.requestedChannel; // Update text channel
 
         if (errorCounter < 1)
-            await this.sendNowPlayingEmbed(song);
+            await this.sendNowPlayingEmbed(currentSongReference);
 
         log(`Started playing the music : ${song.title} ${this.index}`);
 

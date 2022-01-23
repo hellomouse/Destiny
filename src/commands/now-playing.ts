@@ -13,14 +13,14 @@ import { Client, Message } from 'discord.js';
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
-    const song = serverQueue.currentSong();
+    const songReference = serverQueue.currentSong();
 
-    if (!song) return message.channel.send({ embeds: [queueNotPlaying()] });
+    if (!songReference) return message.channel.send({ embeds: [queueNotPlaying()] });
 
     const time = formatDuration(serverQueue.audioResource!.playbackDuration / 1000);
-    const embed = song.getEmbed(
-        songEmbed(song, 'Now Playing', false)
-            .addField('Duration', `${time} / ${song.formattedDuration}`, true)
+    const embed = songReference.song.getEmbed(
+        songEmbed(songReference, 'Now Playing', false)
+            .addField('Duration', `${time} / ${songReference.song.formattedDuration}`, true)
             .addField('Action', serverQueue.isPaused() ? 'Paused' : 'Playing', true)
     );
 

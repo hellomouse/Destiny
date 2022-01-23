@@ -29,7 +29,7 @@ function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: numbe
         let indexStr = (i + 1)
             .toString()
             .padStart(Math.floor(Math.log10(endIndex)) + 1, ' ');
-        let songtxt = `${indexStr}. [${song.requestedBy.tag}] (${song.formattedDuration}) ${song.title}`;
+        let songtxt = `${indexStr}. [${songReference.requestedBy.tag}] (${song.formattedDuration}) ${song.title}`;
         songtxt = songtxt.length > MAX_LINE_LENGTH
             ? songtxt.substring(0, MAX_LINE_LENGTH - 2) + '..'
             : songtxt;

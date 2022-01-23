@@ -2,7 +2,7 @@ import { AudioPlayerError } from '@discordjs/voice';
 import { MessageEmbed } from 'discord.js';
 import ytpl from 'ytpl';
 import config from '../config.cjs';
-import Song from './song.js';
+import Song, { SongReference } from './song.js';
 import { Command } from './types';
 
 // Default embed
@@ -33,17 +33,18 @@ export const helpEmbed = (cmd: Command) => {
 
 /**
 * An embed for a song ("Queued" / "Now playing")
-* @param {object} song Song obj
+* @param {object} songReference SongReference obj
 * @param {string} title Title
 * @param {boolean} showDuration show duration
 * @return {MessageEmbed}
 */
-export const songEmbed = (song: Song, title: string, showDuration = true) => {
+export const songEmbed = (songReference: SongReference, title: string, showDuration = true) => {
+    const song = songReference.song;
     let embed = defaultEmbed()
         .setTitle(showDuration
             ? `${title} (${song.formattedDuration})`
             : title)
-        .setDescription(`[${song.title}](${song.url}) [${song.requestedBy.toString()}]`)
+        .setDescription(`[${song.title}](${song.url}) [${songReference.requestedBy.toString()}]`)
         .setURL(song.url);
 
     if (song.thumbnail)

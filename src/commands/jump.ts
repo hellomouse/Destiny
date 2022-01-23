@@ -23,9 +23,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     }
 
     log(`Skipping (jump): ${serverQueue!.songs[0].song.title}`);
-    const currentSong = serverQueue.currentSong();
-    if (currentSong)
-        return await message.reply({ embeds: [songEmbed(currentSong, 'Jumping to...', false)] });
+    const currentSongReference = serverQueue.currentSong();
+    if (currentSongReference)
+        return await message.reply({ embeds: [songEmbed(currentSongReference, 'Jumping to...', false)] });
 
     //    return message.channel.send({ embeds: [songEmbed(currentSong, 'Jumping to...', false)] });
 
