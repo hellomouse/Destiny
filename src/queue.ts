@@ -126,7 +126,7 @@ export class ServerQueue {
 
         if (this.songs.length === 0) return;
 
-        if (this.loop !== LOOP_MODES['NONE'] || this.skipped)
+        if (this.loop !== LOOP_MODES['SONG'] || this.skipped)
             this.index++;
 
         this.skipped = false;
