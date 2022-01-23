@@ -38,7 +38,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         let enqueuedEmbed: MessageEmbed;
         if (playlists.length === 0) {
             enqueuedEmbed = songEmbed(songs[0], 'Added to Queue', false);
-            if (songs.length > 0) enqueuedEmbed.setDescription(enqueuedEmbed.description + ` and ${songs.length - 1} others`);
+            if (songs.length > 1) enqueuedEmbed.setDescription(enqueuedEmbed.description + ` and ${songs.length - 1} others`);
         } else if (onlyPlaylistSongs)
             if (playlists.length === 1)
                 enqueuedEmbed = playlistEmbed(playlists[0], undefined, `Added ${playlists[0].items.length}/${playlists[0].estimatedItemCount} songs`);
