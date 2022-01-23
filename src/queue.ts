@@ -103,6 +103,10 @@ export class ServerQueue {
         this.loop = loop;
     }
 
+    getLoopMode() {
+        return this.loop;
+    }
+
     currentSong() {
         return this.songs[this.index].song;
     }
