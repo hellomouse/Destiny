@@ -22,7 +22,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     if (skipAmount)
         // If we're looping the queue, find the index of the song to jump to
-        if (serverQueue.loop === LOOP_MODES['QUEUE'])
+        if (serverQueue.getLoopMode() === LOOP_MODES['QUEUE'])
             skipTo = serverQueue.getIndex() + skipAmount % serverQueue.size();
         else if (skipAmount > (serverQueue.size() - serverQueue.getIndex()))
         // Can't skip songs if it takes us out of the queue when not looping it

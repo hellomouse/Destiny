@@ -20,7 +20,7 @@ function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: numbe
 
     let queuetxt = '```swift';
     queuetxt += `\nQueue Page: ${page + 1} / ${maxPages}`;
-    queuetxt += `    Loop Mode: ${LOOP_MODES[serverQueue.loop]}\n\n`;
+    queuetxt += `    Loop Mode: ${LOOP_MODES[serverQueue.getLoopMode()]}\n\n`;
 
     let endIndex = Math.min((page + 1) * PAGE_SIZE, serverQueue.songs.length);
     for (let i = page * PAGE_SIZE; i < endIndex; i++) {
