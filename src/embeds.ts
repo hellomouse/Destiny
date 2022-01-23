@@ -12,6 +12,7 @@ export const defaultEmbed = () => new MessageEmbed();
 
 // Error embeds
 export const errorEmbed = () => defaultEmbed().setColor(0xFF0000);
+export const warningEmbed = () => defaultEmbed().setColor(0xF57C00);
 
 export const notInVoiceChannelEmbed = () => errorEmbed().setTitle('You must be in a voice channel to do this');
 export const songQueueEmpty = () => defaultEmbed().setDescription('The queue is empty');

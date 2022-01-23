@@ -1,8 +1,8 @@
 import { log } from '../utils.js';
-import { defaultEmbed } from '../embeds.js';
+import { defaultEmbed, warningEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
-import { Client, Message } from 'discord.js';
+import { Client, Message, Permissions } from 'discord.js';
 
 /**
  * @description Make the bot join the current voice channel the user is in
@@ -15,9 +15,11 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     log(message);
     if (!message || !message.member) return;
 
-    const voiceChannel = message.member.voice.channel;
+    const voiceChannel = message.member.voice.channel!;
     log(`voiceChannel: ${voiceChannel}`);
-    if (!voiceChannel) return; // You need to be in a voice channel
+
+    if (voiceChannel.permissionsFor(message.guild!.me!).missing([Permissions.FLAGS.SPEAK, Permissions.FLAGS.CONNECT]))
+        return message.channel.send({ embeds: [warningEmbed().setDescription(`Cannot join ${voiceChannel.toString()}: Insufficient Permissions`)] });
 
     log(`Joining ${voiceChannel.name}`);
     const queue = queueManager.getOrCreate(message, voiceChannel);
