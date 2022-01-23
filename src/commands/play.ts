@@ -1,6 +1,6 @@
 import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
-import { defaultEmbed, errorEmbed, playlistEmbed } from '../embeds.js';
+import { errorEmbed, playlistEmbed } from '../embeds.js';
 
 import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands.js';
 import { Song, YouTubeSong } from '../song.js';
@@ -36,10 +36,11 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         // bad idea, we give function conditions and messages
         // like sendResponse(messagestuff, [playlists.length === 0, ddd], callback or `Added ${songs.length} songs`...)
         let enqueuedEmbed;
-        if (playlists.length === 0)
-            enqueuedEmbed = defaultEmbed()
-                .setTitle('Added to Queue')
-                .setDescription(`Added ${songs.length} songs`);
+        if (playlists.length === 0) {
+            enqueuedEmbed = songEmbed(songs[0].song, 'Added to Queue', false);
+            if (songs.length > 0) enqueuedEmbed.setDescription(enqueuedEmbed.description +
+                ` and ${songs.length - 1} others`);
+        }
         else if (onlyPlaylistSongs)
             if (playlists.length === 1)
                 enqueuedEmbed = playlistEmbed(playlists[0], undefined, `Added ${playlists[0].items.length}/${playlists[0].estimatedItemCount} songs`);
