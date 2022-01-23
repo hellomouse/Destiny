@@ -177,7 +177,7 @@ class YouTubeSong extends Song {
         this.youtubeId = id || songMetadata.videoDetails.videoId;
         this.id = YouTubeSong.generateId(this.youtubeId);
         this.metadataTTL = Date.now() +
-            (config.songManager.metadataRefreshInterval.YouTubeSong * 1000 || this.metadataTTL);
+            (config.songManager.metadataRefreshInterval.YouTubeSong! * 1000 || this.metadataTTL);
         this.thumbnail = `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
         this.title = title || songMetadata.videoDetails.title;
         this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
