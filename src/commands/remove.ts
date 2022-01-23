@@ -13,7 +13,7 @@ import { Client, Message } from 'discord.js';
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
 
-    let index = +args[0] + 1;
+    let index = +args[0] - 1;
 
     let songReference = serverQueue.removeSong(index);
 
