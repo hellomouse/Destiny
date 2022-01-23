@@ -54,7 +54,7 @@ Looping
 - A/B loops
 - local playlists with limit start/end values for songs
 
-Fix "Finished playing" embed from showing when the bot leaves a voice channel
+Fix "Finished playing" embed from showing when the bot leaves a voice channel | DONE
 
 remove "loading 1 songs"
 
@@ -68,37 +68,39 @@ Flags for servers to switch between "channel stickyness"
 - If command used in another channel, redirect all output there - already exists
 - Send command output when a command is used in another channel but don't switch current text channel
 
-reload
+reload | DONE
 
 automated tests (check for all params, help text, etc...)
 
 locla file support / other sources 
-- oundcloud, bandcamp, http urls
+- soundcloud, bandcamp, http urls
 
 !!help maybe
 
 database somewhere
 
-- /clear - clear the queue
+- /clear - clear the queue | DONE
     /clear all by user
-- /jump index 
+- /jump position | DONE
 - /lyrics - find lyrics for track?
-- /remove 
-/ remove range start end
+- /remove | DONE
+/ remove range start end - e.g. !!remove 1-3|6|9-10?
 - shuffle 
 - 24/7 mode (never leave)
 
 - fastforward (amount)
 - rewind (amount)
-- seek (amount) 
+- seek (amount) | DONE
 - search
+    - returns table of results from service
+    - flag for specifyingn service, --service youtube or -s youtube
+    - select items to add to queue. iirc there's a discord textbox. 1-3|6|9-10
 
-save personal queues
+save personal queues (Needs to be redone)
 - load, list, create, delete
 
-add user to allowed list 
+add user to allowed list (Permisisons needs to be redone)
 - more permissins per user?
-
 
 effects
 - change speed 
