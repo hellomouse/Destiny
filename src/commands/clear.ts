@@ -10,7 +10,7 @@ import { Client, Message } from 'discord.js';
  * @param {Array<string>} args Unused
  * @return {Promise<Message>} sent message
  */
- export const run = async (client: Client, message: Message, args: Array<string>) => {
+export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
 
     serverQueue.clear(false);
