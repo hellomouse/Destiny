@@ -139,7 +139,7 @@ export class ServerQueue {
             this.index %= this.size();
 
         if (this.songs[this.index]) {
-            log(`Finished playing the music : ${(this.songs[this.index].song).title}`);
+            log(`Finished playing the music : ${(this.songs[this.index - 1].song).title}`);
             await this.play();
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
