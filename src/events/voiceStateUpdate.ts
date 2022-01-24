@@ -6,14 +6,14 @@ export default async (oldVoiceState: VoiceState, newVoiceState: VoiceState) => {
     if (serverQueue === undefined) return;
 
     let voiceChannel = serverQueue.voiceChannel;
+    const clientId = newVoiceState.guild.me!.id;
+    const isInVC = voiceChannel.members.has(clientId);
 
-    if (voiceChannel.members.size === 1)
-        serverQueue.inactivityHelper.onAlone();
-    else
-        serverQueue.inactivityHelper.onPersonJoin();
-
-    // need to get client id here
-    if (oldVoiceState?.member?.id === oldVoiceState.guild!.me!.id)
-        if (!newVoiceState.channel?.members.has(oldVoiceState.guild!.me!.id!))
-            console.log('left voice channel');
+    if (isInVC)
+        if (voiceChannel.members.size === 1)
+            serverQueue.inactivityHelper.onAlone();
+        else
+            serverQueue.inactivityHelper.onPersonJoin();
+    else if (newVoiceState.member?.id === clientId)
+        serverQueue.leave();
 };
