@@ -18,7 +18,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const voiceChannel = message.member.voice.channel!;
     log(`voiceChannel: ${voiceChannel}`);
 
-    if (voiceChannel.permissionsFor(message.guild!.me!).missing([Permissions.FLAGS.SPEAK, Permissions.FLAGS.CONNECT]))
+    if (!voiceChannel.permissionsFor(message.guild!.me!).has([Permissions.FLAGS.SPEAK, Permissions.FLAGS.CONNECT]))
         return message.channel.send({ embeds: [warningEmbed().setDescription(`Cannot join ${voiceChannel.toString()} due to \`Insufficient Permissions\``)] });
 
     log(`Joining ${voiceChannel.name}`);
