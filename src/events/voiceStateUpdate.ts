@@ -1,5 +1,6 @@
 import { queueManager } from '../queue.js';
 import type { VoiceState } from 'discord.js';
+import { log } from '../utils.js';
 
 export default async (oldVoiceState: VoiceState, newVoiceState: VoiceState) => {
     let serverQueue = queueManager.get(newVoiceState.guild.id);
@@ -14,6 +15,8 @@ export default async (oldVoiceState: VoiceState, newVoiceState: VoiceState) => {
             serverQueue.inactivityHelper.onAlone();
         else
             serverQueue.inactivityHelper.onPersonJoin();
-    else if (newVoiceState.member?.id === clientId)
+    else if (newVoiceState.member?.id === clientId) {
         serverQueue.leave();
+        log(`Left the channel ${voiceChannel.name}`);
+    }
 };
