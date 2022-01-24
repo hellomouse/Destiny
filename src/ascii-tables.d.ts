@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 declare module 'ascii-table' {
     export default class AsciiTable {
-        addRow(arg0: string, arg1: string) {
-            throw new Error('Method not implemented.');
-        }
-        render() {
-            throw new Error('Method not implemented.');
-        }
+        addRow(arg0: string, arg1: string): void;
+        render(): string;
         constructor(title: string);
         VERSION: string;
         LEFT: number;
