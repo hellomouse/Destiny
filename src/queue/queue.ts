@@ -150,11 +150,11 @@ export class ServerQueue {
         const previousIndex = this.index - 1 < 0 ? 0 : this.index - 1;
         if (this.songs[this.index]) {
             log(`Finished playing the music : ${(this.songs[previousIndex].song).title}`);
-            this.inactivityHelper.onNotPlaying();
             await this.play();
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
             await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.songs[previousIndex], 'Finished Playing')] });
+            this.inactivityHelper.onNotPlaying();
         }
     }
 
