@@ -25,7 +25,7 @@ export const postLoad = async (client: Client) => {
     for (let [commandName, command] of client.commands) {
         if (command.alias) continue;
 
-        let description = `${commandName.slice(0, 10).padEnd(10, ' ')} "${command.help.desc}"`;
+        let description = `${prefix}${commandName.slice(0, 10).padEnd(10, ' ')} "${command.help.desc}"`;
         if (charactersRemaining < 0) {
             pages.push(page + '```');
             page = '```swift\n';
@@ -38,7 +38,7 @@ export const postLoad = async (client: Client) => {
 
     pages = pages.map((value, index) => value.replace('```swift\n',
         '```swift\nPage ' + (index + 1) + ' / ' + pages.length +
-        ` - Use \`${prefix}help [command]\` to get command specific help\n`));
+        ` - Use \`${prefix}help\` for interactive help or \`${prefix}help [command]\` to get command specific help\n`));
 };
 
 /**
@@ -71,7 +71,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         sentMessage.edit({ components: sentMessage.components }).catch(console.error);
     }, 120000);
 
-    sentMessage?.createMessageComponentCollector({ componentType: 'BUTTON' })
+    sentMessage?.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 })
         .on('collect', async interaction => {
             if (!interaction.isButton()) return;
             for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
