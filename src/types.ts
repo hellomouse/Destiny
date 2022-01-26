@@ -7,9 +7,9 @@ export interface Command {
     postLoad?: (client: Client) => void;
     alias?: boolean;
     help: {
-        desc: string;
-        syntax: string;
-        detailed: string;
+        desc: string,
+        syntax: string,
+        detailed: string
     };
     names: string | Array<string>;
 }
