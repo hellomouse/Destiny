@@ -250,7 +250,7 @@ export class ServerQueue {
 
     /** Pause currently playing song */
     pause() {
-        if (this.isPlaying()) return;
+        if (!this.isPlaying()) return;
         this.audioPlayer.pause();
     }
 
