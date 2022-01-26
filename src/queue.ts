@@ -78,9 +78,15 @@ export class ServerQueue {
         return !this.songs.length;
     }
 
+    /** Check if the audio player is paused */
     isPaused() {
         return this.audioPlayer.state.status === AudioPlayerStatus.Paused ||
             this.audioPlayer.state.status === AudioPlayerStatus.AutoPaused;
+    }
+
+    /** Check if the audio player is idle */
+    isIdle() {
+        return this.audioPlayer.state.status === AudioPlayerStatus.Idle;
     }
 
     /**
@@ -268,9 +274,16 @@ export class ServerQueue {
             this.audioResource?.volume?.setVolumeLogarithmic(volume / VOLUME_BASE_UNIT);
     }
 
-    /** Resume currently playing song */
+    /** Resume currently playing song, or resume the queue */
     resume() {
-        if (!this.isPaused()) return;
+        if (this.isIdle()) {
+            // If the queue is not empty, and we are not playing, play the queue from the beginning
+            if (this.songs.length) {
+                this.index = 0;
+                this.play();
+            }
+            return;
+        }
 
         this.audioPlayer.unpause();
     }

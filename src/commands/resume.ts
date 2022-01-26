@@ -13,9 +13,15 @@ import { Client, Message } from 'discord.js';
  */
 export const run = async (client: Client, message: Message, args: Array<string>) => {
     const serverQueue = queueManager.get(message.guild!.id)!;
-    serverQueue.resume();
 
+    // loop mode off, we finish queue, we change loop mode to song/queue, resume should play
+
+    // No more songs to play if we aren't looping queue and the audio player is idle
+    if (serverQueue.isIdle() && serverQueue.getIndex() === serverQueue.size() && serverQueue.getLoopMode() === 0)
+        return message.channel.send({ embeds: [defaultEmbed().setDescription('No more songs to play. Add some!')] });
+    // check if we're at end of queue and no more songs to play
     log(`Resumed music playback`);
+    serverQueue.resume();
     return message.channel.send({ embeds: [defaultEmbed().setDescription(`:play_pause: Playback resumed`)] });
 };
 
