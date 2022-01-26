@@ -31,7 +31,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let playlists = await Promise.all(
         YouTubeSong.getYouTubePlaylistURLs(args)
             .map(x => YouTubeSong.getPlaylistData(x)))
-        .then(list => list.filter(async x => x.items.length > 0));
+        .then(list => list.filter(x => x.items.length > 0));
 
     let actualVideoNum = playlists.reduce((prev, current) => prev += current.items.length, 0);
     let expectedVideoNum = playlists.reduce((prev, current) => prev += current.estimatedItemCount, 0);
