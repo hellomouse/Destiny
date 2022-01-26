@@ -9,6 +9,7 @@ export interface Command {
     help: {
         desc: string;
         syntax: string;
+        detailed: string;
     };
     names: string | Array<string>;
 }

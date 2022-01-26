@@ -1,13 +1,15 @@
 import { Message, MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { warningEmbed } from '../embeds.js';
 import { Client } from '../types.js';
+import { configHandler } from '../configHandler.js';
 
 const detailedCommandHelp = new Map();
+const prefix = (await configHandler()).prefix;
 
 export const postLoad = async (client: Client) => {
     for (let [commandName, command] of client.commands) {
         if (command.alias) continue;
-        detailedCommandHelp.set(commandName, 'TODO: create nice help information here');
+        detailedCommandHelp.set(commandName, command.help.detailed || 'No help for this command exists just yet...');
     }
 };
 
@@ -44,7 +46,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             .on('collect', async interaction => {
                 await sentMessage.edit({
                     content: '```swift\nInteractive help\n\n' +
-                        interaction.values[0] + detailedCommandHelp.get(interaction.values[0]) + '```'
+                    prefix + interaction.values[0] + ' - ' + detailedCommandHelp.get(interaction.values[0]) + '```'
                 }).catch(console.error);
                 interaction.deferUpdate();
             });
@@ -56,13 +58,28 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         }, 120000);
     } else if (!detailedCommandHelp.has(args[0]))
         return message.channel.send({ embeds: [warningEmbed().setDescription('Command does not exist')] });
-    else {
-        // show help for command
-    }
+    else
+        await message.channel.send({
+            content: '```swift\n' +
+                prefix + args[0] + ' - ' + detailedCommandHelp.get(args[0]) + '```'
+        });
 };
 
 export const names = ['help'];
 export const help = {
     desc: 'Provides help for commands',
-    syntax: ''
+    syntax: '[command]',
+    detailed: `Provides usage information for a command.
+
+        With no arguments, an interactive emebd will be shown allowing you to switch between commands.
+        
+        Syntax uses characters which show you how a command can be used.
+        For example ${prefix}help [command]
+        The argument \`command\` is optional so usage is: \`${prefix}help help\` or  \`${prefix}help\`
+        
+        Syntax listing:
+        [argument] "Optional argumennt"
+        <argument> "Required argument"
+        --switch [argument]|<argument> "Paramaeter switch with optional or required arguments"
+        -s [argument]|<argument> "Shorthand for the switch"`
 };
