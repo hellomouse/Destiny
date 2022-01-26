@@ -49,7 +49,8 @@ async function load(client: Client) {
                     case 'commands': {
                         let props: Command = { ...await import(`${path}?ts=${Date.now()}`) };
                         if (Array.isArray(props.names))
-                            props.names.forEach(propName => {
+                            props.names.forEach((propName, index) => {
+                                if (index > 0) props.alias = true;
                                 client.commands.set(propName, props);
                             });
                         loaded.commands.push(name);
