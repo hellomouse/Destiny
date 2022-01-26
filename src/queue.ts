@@ -138,13 +138,13 @@ export class ServerQueue {
         if (this.loop === LOOP_MODES['QUEUE'])
             this.index %= this.size();
 
+        const previousIndex = this.index - 1 < 0 ? 0 : this.index - 1;
         if (this.songs[this.index]) {
-            const previousIndex = this.index - 1 < 0 ? 0 : this.index - 1;
             log(`Finished playing the music : ${(this.songs[previousIndex].song).title}`);
             await this.play();
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
-            await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.songs[this.index - 1], 'Finished Playing')] });
+            await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.songs[previousIndex], 'Finished Playing')] });
         }
     }
 
