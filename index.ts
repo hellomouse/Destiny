@@ -77,6 +77,11 @@ async function load(client: Client) {
         }
     });
     loaded.commands.push('reload');
+
+    // Call post setup hooks for commands
+    for (let command of client.commands.values())
+        if (typeof command.postLoad === 'function')
+            command.postLoad(client);
 }
 
 import { Client as DiscordClient, Intents, Message } from 'discord.js';

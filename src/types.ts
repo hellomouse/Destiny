@@ -4,9 +4,10 @@ import Enmap from 'enmap';
 export interface Command {
     requirements?: number;
     run: (client: Client, message: Message, args: Array<string>) => Promise<Message | void>;
+    postLoad?: (client: Client) => void;
     help: {
-        desc: string,
-        syntax: string
+        desc: string;
+        syntax: string;
     };
     names: string | Array<string>;
 }
