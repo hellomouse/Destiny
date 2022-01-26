@@ -17,6 +17,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     const serverQueue = queueManager.get(message.guild!.id)!;
 
+    if (serverQueue.isIdle()) return message.channel.send({ embeds: [errorEmbed().setDescription('Nothing is playing right now')] });
+
     let seekTime = +args[0];
     if (Number.isNaN(+args[0])) {
         // Try to match format: XXhXXm or AA:BB:CC
