@@ -70,8 +70,8 @@ export const inactivity = new Inactivity();
 export function log(content: any) {
     let dateObj = new Date();
 
-    let date = (dateObj.getDate() + 1).toString();
-    let month = dateObj.getMonth().toString();
+    let date = dateObj.getDate().toString();
+    let month = (dateObj.getMonth() + 1).toString();
     let year = dateObj.getFullYear().toString();
 
     if (date.length === 1) date = '0' + date;
