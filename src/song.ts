@@ -212,9 +212,9 @@ class YouTubeSong extends Song {
      */
     static getYoutubePlaylistID(url: string) {
         if (!url) return;
-        const YT_REGEX = /^.*(youtu.be\/|list=)([^#&?]*).*/;
+        const YT_REGEX = /^.*(youtu\.be|youtube.com)\/(.*list=)([^#&?].*)/;
         const m = url.match(YT_REGEX);
-        return m ? m[2] : undefined;
+        return m && m[3] !== 'WL' ? m[3] : undefined;
     }
 
     static getYouTubePlaylistURLs(args: Array<string>) {
