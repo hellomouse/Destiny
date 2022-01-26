@@ -12,7 +12,7 @@ process.on('unhandledRejection', error => {
 
 async function load(client: Client) {
     let utils = await import(`./src/utils.js?ts=${Date.now()}`);
-    let config = await configHandler();
+    let config = client.config = await configHandler();
 
     if (config.token !== client.lastToken) {
         client.lastToken = config.token;

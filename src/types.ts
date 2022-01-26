@@ -1,5 +1,6 @@
 import { Client as DiscordClient, Message } from 'discord.js';
 import Enmap from 'enmap';
+import { configHandler } from './configHandler';
 
 export interface Command {
     requirements?: number;
@@ -15,6 +16,7 @@ export interface Command {
 }
 
 export interface Client extends DiscordClient {
+    config: Awaited<ReturnType<typeof configHandler>>;
     lastToken: string | null;
     _events: unknown;
     commands: Enmap<string, Command>;
