@@ -3,7 +3,7 @@ import { log, VOLUME_BASE_UNIT } from './utils.js';
 import { songEmbed } from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
-import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from '@discordjs/voice';
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from '@discordjs/voice';
 import { SongReference } from './song.js';
 import MessageCollection, { SongQueueMessage, SingletonMessage, NormalMessage } from './messages.js';
 
@@ -292,7 +292,7 @@ export class ServerQueue {
         this.connection = joinVoiceChannel({
             channelId: this.voiceChannel.id,
             guildId: this.voiceChannel.guild.id,
-            adapterCreator: this.voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
+            adapterCreator: this.voiceChannel.guild.voiceAdapterCreator,
             selfDeaf: true
         });
         log(`Joined the channel : ${this.voiceChannel.name}`);
