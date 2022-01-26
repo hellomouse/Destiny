@@ -15,7 +15,7 @@ export interface Command {
 }
 
 export interface Client extends DiscordClient {
-    lastToken: null;
+    lastToken: string | null;
     _events: unknown;
     commands: Enmap<string, Command>;
 }
