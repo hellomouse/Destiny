@@ -5,6 +5,7 @@ import config from '../../config.cjs';
 import { queueManager } from '../queue.js';
 import { run as playRun } from './play.js'; // This is a hack for now
 import { Client, Message } from 'discord.js';
+import { CommandHelpProvider } from '../commands.js';
 
 /**
  * @description Manage playlists
@@ -105,7 +106,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['playlist', 'playlists', 'pl'];
-export const help = {
-    desc: 'Manage user playlists',
-    syntax: ''
-};
+// export const help = {
+//     desc: 'Manage user playlists',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('playlist')
+    .setDescription('Manage and play user playlists');

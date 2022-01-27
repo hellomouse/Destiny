@@ -2,7 +2,7 @@ import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
 import { errorEmbed, playlistEmbed, songEmbed, warningEmbed } from '../embeds.js';
 
-import COMMAMD_REQUIREMENTS, { hasEnoughArgs } from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider, hasEnoughArgs } from '../commands.js';
 import { Song, SongReference, YouTubeSong } from '../song.js';
 import { Client, Message, MessageEmbed } from 'discord.js';
 
@@ -68,8 +68,13 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
 // perhaps we can improve how commands work?
 export const names = ['play', 'p'];
-export const help = {
-    desc: 'Add a song to the queue',
-    syntax: '<youtube url | playlist | file | search query>'
-};
+// export const help = {
+//     desc: 'Add a song to the queue',
+//     syntax: '<youtube url | playlist | file | search query>'
+// };
+export let help = new CommandHelpProvider('play')
+    .setDescription('Adds song to the queue to be played')
+    .setSyntax([
+        new CommandArgument('search query', CommandArgumentNecessity.Optional) // Need or list search query or link or file link
+    ]); // <youtube url | playlist | file | search query>
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

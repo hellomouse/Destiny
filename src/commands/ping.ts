@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
-import { Client } from '../types';
+import { CommandHelpProvider } from '../commands.js';
+import type { Client } from '../types';
 
 /**
  * @description Pause current song
@@ -13,7 +14,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['ping'];
-export const help = {
-    desc: 'PONG!',
-    syntax: ''
-};
+// export const help = {
+//     desc: 'PONG!',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('ping')
+    .setDescription('Ping the bot');

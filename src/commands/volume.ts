@@ -1,7 +1,7 @@
 import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import { FlagHelpError, MAX_VOLUME } from '../utils.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandArgument, CommandHelpProvider } from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -35,8 +35,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['volume', 'v', 'vol'];
-export const help = {
-    desc: 'Set the volume of the music',
-    syntax: '<volume 0-200>'
-};
+// export const help = {
+//     desc: 'Set the volume of the music',
+//     syntax: '<volume 0-200>'
+// };
+export let help = new CommandHelpProvider('volume')
+    .setDescription('Sets the volume').setSyntax([new CommandArgument('volume', 0)]);
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

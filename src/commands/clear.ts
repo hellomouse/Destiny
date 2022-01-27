@@ -1,6 +1,6 @@
 import { defaultEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -19,8 +19,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['clear'];
-export const help = {
-    desc: 'Clears the queue',
-    syntax: ''
-};
+// export const help = {
+//     desc: 'Clears the queue',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('clear')
+    .setDescription('Clears the queue');
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY | COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

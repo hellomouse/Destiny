@@ -1,7 +1,7 @@
 import { log } from '../utils.js';
 import { defaultEmbed, warningEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
 import { Client, Message, Permissions } from 'discord.js';
 
 /**
@@ -30,9 +30,11 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['summon', 'join', 'j'];
-export const help = {
-    desc: 'Summon the bot to the voice channel the user is in',
-    syntax: ''
-};
+// export const help = {
+//     desc: 'Summon the bot to the voice channel the user is in',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('summon')
+    .setDescription('Summon the bot to the voice channel you\'re in');
 
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;
