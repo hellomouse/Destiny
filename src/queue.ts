@@ -160,6 +160,11 @@ export class ServerQueue {
      * @return {*} The dispatcher
      */
     async play(seekTime = 0, errorCounter = 0) {
+        // When we seek we want to end the currently playing song,
+        // but not increment the index
+        this.ignoreNextSongEnd = true;
+        this.audioPlayer.stop(true);
+
         let player = this.audioPlayer;
 
         const currentSongReference = this.currentSong();
