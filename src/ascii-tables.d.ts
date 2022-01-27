@@ -23,7 +23,7 @@ declare module 'ascii-table' {
         getTitle(): string;
         setTitleAlign(dir: number): AsciiTable;
         sort(): AsciiTable;
-        sortColumn(idx: number, method: Function): AsciiTable;
+        sortColumn(idx: number, method: (...args: Array<any>) => any): AsciiTable;
         setHeading(...args: Array<string>): AsciiTable;
         getHeading(): Array<string>;
         setHeadingAlign(dir: number): AsciiTable;
