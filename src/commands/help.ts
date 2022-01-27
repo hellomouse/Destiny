@@ -21,6 +21,7 @@ export const postLoad = async (client: Client) => {
  * @return {Promise<Message>} sent message
  */
 export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message | void> => {
+    const { prefix } = client.config;
     if (!args[0]) {
         let content = '```swift\nInteractive help\n\nUse the dropdown to view help for a command```';
 
