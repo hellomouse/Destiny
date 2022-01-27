@@ -59,6 +59,13 @@ export class ServerQueue {
             }
         });
 
+        this.audioPlayer.on(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
+        this.audioPlayer.on('error', async error => {
+            console.log('dispatcher errored: ' + error);
+            this.ignoreNextSongEnd = true;
+            await this.play();
+        });
+
         this.songs = [];
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this.loop = LOOP_MODES['NONE']; // in LOOP_MODES
@@ -182,13 +189,6 @@ export class ServerQueue {
         this.connection!.subscribe(player);
         player.play(audio);
 
-        player.removeAllListeners();
-        player.once(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
-        player.once('error', async error => {
-            console.log('dispatcher errored: ' + error);
-            this.ignoreNextSongEnd = true;
-            await this.play(0, errorCounter + 1);
-        });
         audio.volume!.setVolumeLogarithmic(this.volume / VOLUME_BASE_UNIT);
         return player;
     }
