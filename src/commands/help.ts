@@ -1,15 +1,15 @@
 import { Message, MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { warningEmbed } from '../embeds.js';
 import { Client } from '../types.js';
-import { configHandler } from '../configHandler.js';
 
 const detailedCommandHelp = new Map();
-const prefix = (await configHandler()).prefix;
-
 export const postLoad = async (client: Client) => {
+    const { prefix } = client.config;
+
     for (let [commandName, command] of client.commands) {
         if (command.alias) continue;
-        detailedCommandHelp.set(commandName, command.help.detailed || 'No help for this command exists just yet...');
+        detailedCommandHelp.set(commandName,
+            command.help.detailed.replaceAll('{prefix}', prefix) || 'No help for this command exists just yet...');
     }
 };
 
@@ -74,8 +74,8 @@ export const help = {
         With no arguments, an interactive emebd will be shown allowing you to switch between commands.
         
         Syntax uses characters which show you how a command can be used.
-        For example ${prefix}help [command]
-        The argument \`command\` is optional so usage is: \`${prefix}help help\` or  \`${prefix}help\`
+        For example {prefix}help [command]
+        The argument \`command\` is optional so usage is: \`{prefix}help help\` or  \`{prefix}help\`
         
         Syntax listing:
         [argument] "Optional argumennt"
