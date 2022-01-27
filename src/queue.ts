@@ -248,15 +248,11 @@ export class ServerQueue {
     }
 
     /**
-     * Initially, ServerQueue is not paused
-     * This function will start playing the queue if that is the case
-     * but will not resume if user has paused the player
+     * Only play songs if user hasn't explictly paused
      */
-    async playIfNewInstance() {
-        if (!this.isPlaying()) {
+    async playIfIdle() {
+        if (this.isIdle())
             await this.play();
-            this.resume();
-        }
     }
 
     /** Pause currently playing song */
