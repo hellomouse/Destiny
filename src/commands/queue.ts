@@ -7,12 +7,13 @@ const PAGE_SIZE = 10;
 const MAX_LINE_LENGTH = 80;
 
 // first, prev, next, last
-const ROW_BTN_EMOJI = ['929913795726418001', '929913795491561615', '929913795726442567', '929913795747405924'];
+const ROW_BTN_EMOJI = ['emojii:929913795726418001', 'emojii:929913795491561615', 'Current', 'emojii:929913795726442567', 'emojii:929913795747405924'];
 const ROW_BTN_FUNC = [
-    (page: number, maxPages: number) => 0,
-    (page: number, maxPages: number) => page - 1,
-    (page: number, maxPages: number) => page + 1,
-    (page: number, maxPages: number) => maxPages - 1
+    (page: number, maxPages: number, currentPage: number) => 0,
+    (page: number, maxPages: number, currentPage: number) => page - 1,
+    (page: number, maxPages: number, currentPage: number) => currentPage,
+    (page: number, maxPages: number, currentPage: number) => page + 1,
+    (page: number, maxPages: number, currentPage: number) => maxPages - 1
 ];
 
 function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: number) {
@@ -56,22 +57,31 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     if (!serverQueue || serverQueue.size() === 0)
         return message.reply({ embeds: [songQueueEmpty()] });
 
-    let page = 0;
     let maxPages = Math.ceil(serverQueue.songs.length / PAGE_SIZE);
+    let currentPage = Math.floor(serverQueue.getIndex() / PAGE_SIZE);
+    let page = currentPage;
+
     if (args.length) {
         page = +args[0] - 1;
         if (Number.isNaN(page))
             throw new FlagHelpError();
     }
+    page = Math.floor(page);
     page = Math.max(0, Math.min(page, maxPages - 1));
 
     let queuetxt = getQueueContent(page, serverQueue, maxPages);
 
     const row = new MessageActionRow();
-    row.addComponents(...ROW_BTN_EMOJI.map(emoji => new MessageButton()
-        .setEmoji(emoji)
-        .setCustomId(emoji)
-        .setStyle('PRIMARY')));
+    row.addComponents(...ROW_BTN_EMOJI.map((label, i) => {
+        let btn = new MessageButton()
+            .setCustomId(label + i)
+            .setStyle('PRIMARY');
+        if (label.startsWith('emojii:'))
+            btn = btn.setEmoji(label.split(':')[1]);
+        else
+            btn = btn.setLabel(label);
+        return btn;
+    }));
 
     log('Showed music queue');
     let sentMessage = await serverQueue.messages.get('queue')?.send(message.channel, {
@@ -83,8 +93,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         .on('collect', async interaction => {
             if (!interaction.isButton()) return;
             for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
-                if (interaction.customId === ROW_BTN_EMOJI[i]) {
-                    page = ROW_BTN_FUNC[i](page, maxPages);
+                if (interaction.customId === ROW_BTN_EMOJI[i] + i) {
+                    page = ROW_BTN_FUNC[i](page, maxPages, currentPage);
                     let content = getQueueContent(page, serverQueue, maxPages);
                     await interaction.update({ content })
                         .catch(console.error);
