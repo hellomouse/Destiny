@@ -80,6 +80,19 @@ async function load(client: Client) {
     });
     loaded.commands.push('reload');
 
+    client.once('ready', cl =>{
+        cl.user.setPresence({
+            status: 'online',
+            activities: [
+                {
+                    name: client.config.prefix + 'help',
+                    type: 'PLAYING'
+                }
+            ]
+        });
+    });
+
+
     // Call post setup hooks for commands
     for (let command of client.commands.values())
         if (typeof command.postLoad === 'function')
