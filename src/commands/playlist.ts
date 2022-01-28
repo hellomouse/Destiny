@@ -1,5 +1,5 @@
 import { defaultEmbed, errorEmbed } from '../embeds.js';
-import Song from '../song.js';
+import { Song } from '../song.js';
 import localData from '../local-data.js';
 import config from '../../config.cjs';
 import { queueManager } from '../queue.js';
