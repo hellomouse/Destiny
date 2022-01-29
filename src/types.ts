@@ -1,5 +1,6 @@
 import { Client as DiscordClient, Message } from 'discord.js';
 import Enmap from 'enmap';
+import { CommandHelpProvider } from './commands';
 import { configHandler } from './configHandler';
 
 export interface Command {
@@ -7,11 +8,7 @@ export interface Command {
     run: (client: Client, message: Message, args: Array<string>) => Promise<Message | void>;
     postLoad?: (client: Client) => void;
     alias?: boolean;
-    help: {
-        desc: string,
-        syntax: string,
-        detailed: string
-    };
+    help: CommandHelpProvider;
     names: string | Array<string>;
 }
 

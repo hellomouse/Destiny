@@ -1,7 +1,7 @@
 import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { log } from '../utils.js';
 import { queueManager, LOOP_MODES } from '../queue.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -32,8 +32,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['loop', 'l'];
-export const help = {
-    desc: 'Change looping settings',
-    syntax: '[loop | none/off | queue]'
-};
+// export const help = {
+//     desc: 'Change looping settings',
+//     syntax: '[loop | none/off | queue]'
+// };
+export let help = new CommandHelpProvider('loop')
+    .setDescription('Change looping settings');
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

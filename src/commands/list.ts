@@ -1,4 +1,5 @@
 import { Message, MessageActionRow, MessageButton } from 'discord.js';
+import { CommandHelpProvider } from '../commands.js';
 import { configHandler } from '../configHandler.js';
 import { Client } from '../types.js';
 
@@ -25,7 +26,7 @@ export const postLoad = async (client: Client) => {
     for (let [commandName, command] of client.commands) {
         if (command.alias) continue;
 
-        let description = `${prefix}${commandName.slice(0, 10).padEnd(10, ' ')} "${command.help.desc}"`;
+        let description = `${prefix}${commandName.slice(0, 10).padEnd(10, ' ')} "${command.help.getDescription()}"`;
         if (charactersRemaining < 0) {
             pages.push(page + '```');
             page = '```swift\n';
@@ -87,7 +88,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['list'];
-export const help = {
-    desc: 'List commands',
-    syntax: ''
-};
+// export const help = {
+//     desc: 'List commands',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('list')
+    .setDescription('List commands');

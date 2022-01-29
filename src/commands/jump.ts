@@ -1,8 +1,9 @@
 import { FlagHelpError, log } from '../utils.js';
 import { songEmbed, queueNotPlaying, errorEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
-import { Client, Message } from 'discord.js';
+import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
+import { Message } from 'discord.js';
+import { Client } from '../types';
 
 /**
  * @description Jump to a specific position in the queue
@@ -34,8 +35,13 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['jump'];
-export const help = {
-    desc: 'Jump to a specific position in the queue',
-    syntax: '[position]'
-};
+// export const help = {
+//     desc: 'Jump to a specific position in the queue',
+//     syntax: '[position]'
+// };
+
+export let help = new CommandHelpProvider('jump')
+    .setDescription('Jumps to a specific position in the queue')
+    .setSyntax([new CommandArgument('position', CommandArgumentNecessity.Optional)]);
+
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY | COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

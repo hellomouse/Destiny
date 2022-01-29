@@ -20,7 +20,7 @@ export const queueNotPlaying = () => defaultEmbed().setDescription('Nothing is p
 
 export const helpEmbed = (cmd: Command) => {
     let embed = defaultEmbed()
-        .setDescription((cmd.help && cmd.help.desc) ? cmd.help.desc : 'No description provided')
+        .setDescription((cmd.help && cmd.help.text) ? cmd.help.getDescription() : 'No description provided')
         .setFooter(`Type ${config.prefix}list to list commands, or ${config.prefix}help <command> for more info on a given command`)
         .setTitle(config.prefix + cmd.names[0]);
 

@@ -1,6 +1,6 @@
 import { defaultEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -23,8 +23,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['shuffle'];
-export const help = {
-    desc: 'Shuffle playlist',
-    syntax: ''
-};
+// export const help = {
+//     desc: 'Shuffle playlist',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('shuffle')
+    .setDescription('Shuffle the songs in the queue');
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;

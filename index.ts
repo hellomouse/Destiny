@@ -1,6 +1,7 @@
 import { readdir } from 'fs/promises';
 import { configHandler } from './src/configHandler.js';
 import { Client, Command } from './src/types.js';
+import { CommandHelpProvider } from './src/commands.js';
 import { resolve as pathResolve } from 'path';
 import Enmap from 'enmap';
 import './src/local-data.js';
@@ -29,6 +30,8 @@ async function load(client: Client) {
 
     let loaded: { events: Array<string>, commands: Array<string> } = { events: [], commands: [] };
 
+    CommandHelpProvider.setPrefix(client.config.prefix);
+
     try {
         let files = [
             ...(await readdir('./src/events/')).map(x => ({ name: x, type: 'events' })),
@@ -51,6 +54,7 @@ async function load(client: Client) {
                         if (Array.isArray(props.names))
                             props.names.forEach((propName, index) => {
                                 if (index > 0) props.alias = true;
+                                props.help.build();
                                 client.commands.set(propName, props);
                             });
                         loaded.commands.push(name);
@@ -72,12 +76,22 @@ async function load(client: Client) {
             return message.channel.send('Reloaded.');
         },
         names: 'reload',
-        help: {
-            desc: 'Reload the modules',
-            syntax: ''
-        }
+        help: new CommandHelpProvider('reload').setDescription('Reload the modules').build()
     });
     loaded.commands.push('reload');
+
+    client.once('ready', cl =>{
+        cl.user.setPresence({
+            status: 'online',
+            activities: [
+                {
+                    name: client.config.prefix + 'help',
+                    type: 'PLAYING'
+                }
+            ]
+        });
+    });
+
 
     // Call post setup hooks for commands
     for (let command of client.commands.values())

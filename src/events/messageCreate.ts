@@ -4,7 +4,7 @@ import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } fr
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { queueManager } from '../queue.js';
 
-import { DMChannel, Message, NewsChannel, ThreadChannel } from 'discord.js';
+import { Message, NewsChannel, ThreadChannel, DMChannel } from 'discord.js';
 import { Client } from '../types';
 
 const MAX_LEN = 1000; // TODO: remove
@@ -48,8 +48,7 @@ export default async (client: Client, message: Message) => {
 
         if (message.channel instanceof NewsChannel || message.channel instanceof DMChannel ||
             message.channel instanceof ThreadChannel)
-            return; // commands cannot be run in those channels for now
-
+            return; // commands cannot be run in the other channel types for now
         try {
             await cmd.run(client, message, args);
         } catch (e) {

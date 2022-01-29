@@ -2,6 +2,7 @@ import { log } from '../utils.js';
 import { defaultEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import { Client, Message } from 'discord.js';
+import { CommandHelpProvider } from '../commands.js';
 
 /**
  * @description Stops the music and make the bot leave the channel
@@ -22,8 +23,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     return message.channel.send({ embeds: [defaultEmbed().setDescription(':wave:')] });
 };
 
-export const names = ['dc', 'disconnect', 'leave', 'die', 'fuckoff'];
-export const help = {
-    desc: 'Disconnect the bot',
-    syntax: ''
-};
+export const names = ['disconnect', 'dc', 'leave', 'die', 'fuckoff'];
+// export const help = {
+//     desc: 'Disconnect the bot',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('disconnect')
+    .setDescription('Disconnect from the voice channel');

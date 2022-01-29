@@ -1,7 +1,7 @@
 import { formatDuration } from '../utils.js';
 import { queueManager } from '../queue.js';
 import { queueNotPlaying, songEmbed } from '../embeds.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -28,8 +28,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['nowplaying', 'now_playing', 'np', 'playing', 'song', 'current'];
-export const help = {
-    desc: 'Get the currently playing song',
-    syntax: ''
-};
+// export const help = {
+//     desc: 'Get the currently playing song',
+//     syntax: ''
+// };
+export let help = new CommandHelpProvider('nowplaying')
+    .setDescription('Display the currently playing song');
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY | COMMAMD_REQUIREMENTS.REQUIRE_IS_PLAYING;

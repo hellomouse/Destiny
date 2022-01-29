@@ -1,6 +1,6 @@
 import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
-import COMMAMD_REQUIREMENTS from '../commands.js';
+import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
 import { Client, Message } from 'discord.js';
 
 /**
@@ -23,8 +23,11 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 };
 
 export const names = ['remove'];
-export const help = {
-    desc: 'Remove a song from the queue',
-    syntax: '<song position>'
-};
+// export const help = {
+//     desc: 'Remove a song from the queue',
+//     syntax: '<song position>'
+// };
+export let help = new CommandHelpProvider('remove')
+    .setDescription('Remove a song from the queue')
+    .setSyntax([new CommandArgument('song position', CommandArgumentNecessity.Necessary)]);
 export const requirements = COMMAMD_REQUIREMENTS.REQUIRE_QUEUE_NON_EMPTY | COMMAMD_REQUIREMENTS.REQUIRE_USER_IN_VC;
