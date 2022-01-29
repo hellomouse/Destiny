@@ -17,6 +17,9 @@ export default async (client: Client, message: Message) => {
 
         // Verify sender and server are allowed
 
+        // Message must start with command prefix
+        if (!message.content.startsWith(client.config.prefix)) return;
+
         const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
         const command = args.shift()!.toLowerCase();
         const cmd = client.commands.get(command);
