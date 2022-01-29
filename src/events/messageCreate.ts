@@ -1,25 +1,23 @@
 import strings from '../strings.json';
 import { FlagHelpError, log } from '../utils.js';
 import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } from '../embeds.js';
-import config from '../../config.cjs';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { queueManager } from '../queue.js';
 
-const prefix = config.prefix;
 import { DMChannel, Message, NewsChannel, ThreadChannel } from 'discord.js';
 import { Client } from '../types';
 
 const MAX_LEN = 1000; // TODO: remove
 
 export default async (client: Client, message: Message) => {
-    if (message.content.indexOf(prefix) === 0) {
+    if (message.content.indexOf(client.config.prefix) === 0) {
         // Ignore self messages
         if (message.author.id === client.user!.id)
             return;
 
         // Verify sender and server are allowed
 
-        const args = message.content.slice(prefix.length).trim().split(/ +/g);
+        const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
         const command = args.shift()!.toLowerCase();
         const cmd = client.commands.get(command);
 
@@ -27,7 +25,7 @@ export default async (client: Client, message: Message) => {
 
         log(`[${message.author.tag} / ${message.author.id}] ${message.content.slice(0, MAX_LEN)}`);
 
-        if (!config.allowed.includes(message.author.id) && config.allowed.length > 0) {
+        if (!client.config.allowed.includes(message.author.id) && client.config.allowed.length > 0) {
             message.channel.send(strings.permissionDenied);
             log(`${message.author.tag} tried to run the command '${message.content.slice(0, MAX_LEN)}' but permission was not accepted`);
             return;
