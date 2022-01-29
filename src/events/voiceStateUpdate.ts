@@ -1,6 +1,6 @@
 import { inactivity } from '../utils.js';
 import { queueManager } from '../queue.js';
-import { VoiceState } from 'discord.js';
+import type { VoiceState } from 'discord.js';
 
 export default async (oldVoiceState: VoiceState, newVoiceState: VoiceState) => {
     let serverQueue = queueManager.get(newVoiceState.guild.id);

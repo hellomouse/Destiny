@@ -1,7 +1,7 @@
 import { Message, MessageActionRow, MessageButton } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import { configHandler } from '../configHandler.js';
-import { Client } from '../types.js';
+import type { Client } from '../types';
 
 // description character limit
 const DESCRIPTION_CHARACTER_LIMIT = 1000;

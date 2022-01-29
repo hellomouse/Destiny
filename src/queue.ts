@@ -3,7 +3,8 @@ import { log, VOLUME_BASE_UNIT } from './utils.js';
 import { songEmbed } from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
-import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection } from '@discordjs/voice';
+import type { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice';
+import { AudioPlayerStatus, createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior } from '@discordjs/voice';
 import { SongReference } from './song.js';
 import MessageCollection, { SongQueueMessage, SingletonMessage, NormalMessage } from './messages.js';
 

@@ -1,7 +1,7 @@
 import { log } from '../utils.js';
 import { defaultEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
-import { Client, Message } from 'discord.js';
+import type { Client, Message } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 
 /**

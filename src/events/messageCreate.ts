@@ -4,8 +4,9 @@ import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } fr
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { queueManager } from '../queue.js';
 
-import { Message, NewsChannel, ThreadChannel, DMChannel } from 'discord.js';
-import { Client } from '../types';
+import { NewsChannel, ThreadChannel, DMChannel } from 'discord.js';
+import type { Message } from 'discord.js';
+import type { Client } from '../types';
 
 const MAX_LEN = 1000; // TODO: remove
 

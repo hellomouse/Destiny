@@ -1,7 +1,7 @@
 import { defaultEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
-import { Client, Message } from 'discord.js';
+import type { Client, Message } from 'discord.js';
 
 /**
  * @description Clears the queue

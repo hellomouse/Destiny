@@ -1,7 +1,7 @@
 import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
-import { Client, Message } from 'discord.js';
+import type { Client, Message } from 'discord.js';
 
 /**
  * @description Remove a song from the queue at the specified index, or the current song if no index is specified
