@@ -153,7 +153,7 @@ class YouTubeSong extends Song {
     }
 
     async finalize(id?: string, title?: string, duration?: number,
-        artist?: string, viewCount?: number): Promise<YouTubeSong> {
+        artist?: string, viewCount?: number): Promise<this> {
         const defaultSongMetadata = {
             videoDetails: {
                 videoId: id || '0',
