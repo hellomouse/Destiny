@@ -10,15 +10,12 @@ import { Client } from '../types';
 const MAX_LEN = 1000; // TODO: remove
 
 export default async (client: Client, message: Message) => {
-    if (message.content.indexOf(client.config.prefix) === 0) {
+    if (message.content.startsWith(client.config.prefix)) {
         // Ignore self messages
         if (message.author.id === client.user!.id)
             return;
 
         // Verify sender and server are allowed
-
-        // Message must start with command prefix
-        if (!message.content.startsWith(client.config.prefix)) return;
 
         const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
         const command = args.shift()!.toLowerCase();
