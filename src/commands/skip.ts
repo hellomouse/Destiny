@@ -2,7 +2,7 @@ import { log } from '../utils.js';
 import { songEmbed, errorEmbed, queueNotPlaying } from '../embeds.js';
 import { LOOP_MODES, queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
-import { Client, Message } from 'discord.js';
+import type { Client, Message } from 'discord.js';
 
 /**
  * @description Skip the current song

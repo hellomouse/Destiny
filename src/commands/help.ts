@@ -1,7 +1,8 @@
-import { Message, MessageActionRow, MessageSelectMenu } from 'discord.js';
+import { MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import { defaultEmbed, warningEmbed } from '../embeds.js';
-import { Client } from '../types.js';
+import type { Client } from '../types';
+import type { Message } from 'discord.js';
 
 const detailedCommandHelp = new Map<string, CommandHelpProvider>();
 export const postLoad = async (client: Client) => {

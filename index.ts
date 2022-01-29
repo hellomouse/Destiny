@@ -1,6 +1,6 @@
 import { readdir } from 'fs/promises';
 import { configHandler } from './src/configHandler.js';
-import { Client, Command } from './src/types.js';
+import type { Client, Command } from './src/types.js';
 import { CommandHelpProvider } from './src/commands.js';
 import { resolve as pathResolve } from 'path';
 import Enmap from 'enmap';

@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import type { Message } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import type { Client } from '../types';
 

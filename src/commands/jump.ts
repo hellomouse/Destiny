@@ -2,8 +2,8 @@ import { FlagHelpError, log } from '../utils.js';
 import { songEmbed, queueNotPlaying, errorEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
-import { Message } from 'discord.js';
-import { Client } from '../types';
+import type { Message } from 'discord.js';
+import type { Client } from '../types';
 
 /**
  * @description Jump to a specific position in the queue

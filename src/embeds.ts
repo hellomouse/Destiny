@@ -1,9 +1,9 @@
-import { AudioPlayerError } from '@discordjs/voice';
+import type { AudioPlayerError } from '@discordjs/voice';
 import { MessageEmbed } from 'discord.js';
-import ytpl from 'ytpl';
+import type ytpl from 'ytpl';
 import config from '../config.cjs';
-import Song, { SongReference } from './song.js';
-import { Command } from './types';
+import type { Song, SongReference } from './song.js';
+import type { Command } from './types';
 
 // Default embed
 export const defaultEmbed = () => new MessageEmbed();

@@ -2,7 +2,8 @@ import { log } from '../utils.js';
 import { defaultEmbed, warningEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
-import { Client, Message, Permissions } from 'discord.js';
+import type { Client, Message } from 'discord.js';
+import { Permissions } from 'discord.js';
 
 /**
  * @description Make the bot join the current voice channel the user is in

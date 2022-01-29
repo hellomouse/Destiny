@@ -2,7 +2,7 @@ import { formatDuration } from '../utils.js';
 import { queueManager } from '../queue.js';
 import { queueNotPlaying, songEmbed } from '../embeds.js';
 import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
-import { Client, Message } from 'discord.js';
+import type { Client, Message } from 'discord.js';
 
 /**
  * @description Get current playing song

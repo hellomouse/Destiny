@@ -4,7 +4,7 @@ import { errorEmbed, playlistEmbed, songEmbed, warningEmbed } from '../embeds.js
 
 import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider, hasEnoughArgs } from '../commands.js';
 import { Song, SongReference, YouTubeSong } from '../song.js';
-import { Client, Message, MessageEmbed } from 'discord.js';
+import type { Client, Message, MessageEmbed } from 'discord.js';
 
 /**
  * @description Play a song with the provided link
