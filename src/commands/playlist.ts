@@ -1,5 +1,5 @@
 import { defaultEmbed, errorEmbed } from '../embeds.js';
-import { Song } from '../song.js';
+import { getSongReferences } from '../song.js';
 import localData from '../local-data.js';
 import config from '../../config.cjs';
 import { queueManager } from '../queue.js';
@@ -27,7 +27,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let playlistsLength = Object.keys(playlists).length;
     let hasPlaylist = localData.hasPlaylist(userId, playlistName);
     let playlist = playlists[playlistName] || [];
-    let [songs] = await Song.getSongReferences(args.slice(2), message);
+    let [songs] = await getSongReferences(args.slice(2), message);
 
     switch (args[0] === 'list' ? args[0] : args[1]) {
             case 'create': {
