@@ -17,7 +17,8 @@
     "lib": [
       "esnext"
     ],
-    "outDir": "build"
+    "outDir": "build",
+    "composite": true
   },
   "exclude": [
     "node_modules",
@@ -26,6 +27,7 @@
   "include": [
     "**/*.ts",
     ".eslintrc.cjs",
-    "config.cjs"
+    "config.cjs",
+    "src/strings.json"
   ],
 }
