@@ -143,7 +143,8 @@ export class ServerQueue {
 
         if (this.songs.length === 0) return;
 
-        if (this.loop !== LOOP_MODES['SONG'] || this.skipped)
+        // Increment index if we're not looping the current song
+        if (this.loop !== LOOP_MODES['SONG'])
             this.index++;
 
         this.skipped = false;
