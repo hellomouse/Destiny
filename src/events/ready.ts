@@ -1,4 +1,4 @@
-import type { Client } from 'discord.js';
+import type { Client } from '../types';
 import { log } from '../utils.js';
 
 export default (client: Client) => {

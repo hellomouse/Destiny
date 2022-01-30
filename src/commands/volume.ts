@@ -2,7 +2,8 @@ import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { queueManager } from '../queue.js';
 import { FlagHelpError, MAX_VOLUME } from '../utils.js';
 import COMMAMD_REQUIREMENTS, { CommandArgument, CommandHelpProvider } from '../commands.js';
-import type { Client, Message } from 'discord.js';
+import type { Client } from '../types';
+import type { Message } from 'discord.js';
 
 /**
  * @description Adjust the playback volume
