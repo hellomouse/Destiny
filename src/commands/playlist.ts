@@ -4,7 +4,8 @@ import localData from '../local-data.js';
 import config from '../../config.cjs';
 import { queueManager } from '../queue.js';
 import { run as playRun } from './play.js'; // This is a hack for now
-import type { Client, Message } from 'discord.js';
+import type { Client } from '../types';
+import type { Message } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 
 /**

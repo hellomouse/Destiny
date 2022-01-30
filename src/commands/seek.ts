@@ -2,7 +2,8 @@ import { defaultEmbed, errorEmbed } from '../embeds.js';
 import { FlagHelpError, formatDuration, log } from '../utils.js';
 import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
-import type { Client, Message } from 'discord.js';
+import type { Client } from '../types';
+import type { Message } from 'discord.js';
 
 /**
  * @description Seek to a given timestamp

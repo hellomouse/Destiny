@@ -1,7 +1,8 @@
 import { defaultEmbed } from '../embeds.js';
 import { log } from '../utils.js';
 import { queueManager } from '../queue.js';
-import type { Client, Message } from 'discord.js';
+import type { Client } from '../types';
+import type { Message } from 'discord.js';
 import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
 
 /**

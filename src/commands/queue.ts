@@ -1,7 +1,8 @@
 import { FlagHelpError, log } from '../utils.js';
 import { songQueueEmpty } from '../embeds.js';
 import { LOOP_MODES, queueManager, ServerQueue } from '../queue.js';
-import type { Client, Message } from 'discord.js';
+import type { Client } from '../types';
+import type { Message } from 'discord.js';
 import { MessageActionRow, MessageButton } from 'discord.js';
 import { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
 
