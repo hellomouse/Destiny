@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "labels": ["maintenance"],
+  "extends": ["config:base", ":disableDependencyDashboard", "group:linters"],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "rangeStrategy": "replace",
+  "semanticCommitType": "build",
+  "packageRules": [
+    {
+      "matchPackagePrefixes": ["@discordjs/"],
+      "matchPackageNames": ["discord.js", "discord-api-types"],
+      "groupName": "discordjs"
+    },
+    {
+      "matchPackageNames": ["ytdl-core", "ytpl", "ytsr"],
+      "groupName": "ytdl-core"
+    },
+    {
+      "matchPackageNames": ["ffmpeg-static", "fluent-ffmpeg", "@types/fluent-ffmpeg"],
+      "groupName": "ffmpeg"
+    }
+  ]
+}
