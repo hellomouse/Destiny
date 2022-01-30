@@ -1,7 +1,8 @@
 import { User, Message } from 'discord.js';
 import config from '../../config.cjs';
 import { SongReference } from './reference.js';
-import { getSongTypeFromURL, Song, SongAlreadyExistsError, SongNotFoundError, SongQueueFullError } from './song.js';
+import { Song, SongAlreadyExistsError, SongNotFoundError, SongQueueFullError } from './song.js';
+import { getSongTypeFromURL } from './utils.js';
 import { FileSong } from './file.js';
 import { YouTubeSong } from './youtube.js';
 
