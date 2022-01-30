@@ -24,7 +24,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         [songs, onlyPlaylistSongs] = await Song.getSongReferences(args.join(' ').split(' | '), message, true);
     } catch (e: any) {
         if (e.message === 'Mixes not supported')
-            message.reply({ embeds: [errorEmbed().setDescription('Cannot play YouTube Mixes at this time.')] });
+            return message.reply({ embeds: [errorEmbed().setDescription('Cannot play YouTube Mixes at this time.')] });
         throw e;
     }
 
