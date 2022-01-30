@@ -16,6 +16,9 @@
   },
   "author": "Hellomouse",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.6.0"
+  },
   "bugs": {
     "url": "https://github.com/hellomouse/Destiny/issues"
   },
