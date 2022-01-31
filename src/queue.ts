@@ -1,5 +1,5 @@
 import config from '../config.cjs';
-import { log, VOLUME_BASE_UNIT } from './utils.js';
+import { inactivity, log, VOLUME_BASE_UNIT } from './utils.js';
 import { songEmbed } from './embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
@@ -316,6 +316,7 @@ export class ServerQueue {
     }
 
     leave() {
+        inactivity.onLeave();
         this.connection?.destroy();
         this.clear(true);
     }
@@ -384,7 +385,8 @@ export class QueueManager {
     remove(serverID: string) {
         if (this._queues[serverID]) {
             let serverQueue = this._queues[serverID];
-            if (serverQueue) serverQueue.clear();
+            if (serverQueue)
+                serverQueue.leave();
         }
         this._queues[serverID] = undefined;
     }

@@ -2,8 +2,9 @@ import AsciiTable from 'ascii-table';
 
 import { defaultEmbed } from './embeds.js';
 import config from '../config.cjs';
-import type { ServerQueue } from './queue.js';
+import { queueManager, ServerQueue } from './queue.js';
 import ytsr from 'ytsr';
+import { VoiceConnectionStatus } from '@discordjs/voice';
 
 export class FlagHelpError extends Error {
     constructor(message?: string) {
@@ -38,8 +39,10 @@ class Inactivity {
         clearTimeout(this.aloneTimer);
         if (this.config.waitRejoinSeconds < 0) return;
         setTimeout(() => {
-            serverQueue.leave();
-            serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
+            if (serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
+                queueManager.remove(serverQueue.serverID);
+                serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
+            }
         }, this.config.waitRejoinSeconds);
     }
 
@@ -47,12 +50,22 @@ class Inactivity {
         clearTimeout(this.aloneTimer);
     }
 
+    /**
+     * When the bot leaves the voice channel clear all timers
+     */
+    onLeave() {
+        clearTimeout(this.aloneTimer);
+        clearTimeout(this.inactivityTimer);
+    }
+
     onNotPlaying(serverQueue: ServerQueue) {
         clearTimeout(this.inactivityTimer);
         if (this.config.botIdleSeconds < 0) return;
         setTimeout(() => {
-            serverQueue.leave();
-            serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
+            if (serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
+                serverQueue.leave();
+                serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
+            }
         }, this.config.botIdleSeconds);
     }
 
