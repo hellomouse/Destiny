@@ -315,7 +315,7 @@ export class ServerQueue {
     }
 
     leave() {
-        inactivity.onLeave();
+        this.inactivityHelper.onLeave();
         this.connection?.destroy();
         this.clear(true);
     }
