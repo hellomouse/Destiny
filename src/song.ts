@@ -71,10 +71,10 @@ export default class Song {
     }
 
     /**
-     * Return a stream that starts at seekTime
+     * Return a {@link Stream.PassThrough} that starts at seekTime
      * @param {string} url stream url
      * @param {number} seekTime Seconds to seek to
-     * @return {*} Stream object
+     * @return {Stream.PassThrough} Stream object
      */
     async seek(url: string, seekTime = 0) {
         let outputStream = new Stream.PassThrough();
@@ -163,7 +163,7 @@ class YouTubeSong extends Song {
                 viewCount: 0
             }
         };
-        let songMetadata = !id ? await ytdl.getInfo(this.url) : defaultSongMetadata;
+        let songMetadata = !id ? await ytdl.getBasicInfo(this.url) : defaultSongMetadata;
 
         this.youtubeId = id || songMetadata.videoDetails.videoId;
         this.id = YouTubeSong.generateId(this.youtubeId);
@@ -179,15 +179,25 @@ class YouTubeSong extends Song {
         return this;
     }
 
+    /**
+     * Returns a stream url to be used with ffmpeg for seeking
+     */
     async getStreamURL() {
+        // This call takes about a second which is noticable, can it be improved?
         let formats = (await ytdl.getInfo(this.url)).formats;
         return formats.filter(format => format.mimeType?.includes('audio/mp4'))[0].url;
     }
 
+    /**
+     * Generate a unique id for the song to be used with SongManager
+     */
     static generateId(id: string) {
         return `youtube_${id}`;
     }
 
+    /**
+     * Generate a unique id from a youtube url
+     */
     static generateIdFromUrl(url: string) {
         return YouTubeSong.generateId(ytdl.getURLVideoID(url));
     }
@@ -196,6 +206,10 @@ class YouTubeSong extends Song {
         return embed.addField('YT Channel', this.artist || 'No artist', true);
     }
 
+    /**
+     * @param {number} seek Seek time
+     * Returns a stream to be used with {@link ServerQueue#play}
+     */
     async getStream(seek = 0) {
         if (!seek) return ytdl(this.url, {
             filter: 'audioonly',
@@ -203,12 +217,12 @@ class YouTubeSong extends Song {
             highWaterMark: 1 << 25
         });
 
-        return this.seek(await this.getStreamURL(), seek);
+        return await this.seek(await this.getStreamURL(), seek);
     }
 
     /**
-     * @param {string} url Url to check
-     * @return {*} undefined if no playlist id, otherwise string playlits id
+     * @param {string} url Potential playlist url
+     * @return {string|undefined} Returns undefined if url provided isn't a valid playlist url or is a watch later one
      */
     static getYoutubePlaylistID(url: string) {
         if (!url) return;
@@ -225,6 +239,11 @@ class YouTubeSong extends Song {
         return await playlist(url);
     }
 
+    /**
+     * Processes videos in a youtube playlist
+     * If the video has been cached, a {@link SongReference} will be added to the array to be returned
+     * else a new {@link YouTubeSong} is created with the metadata given from the playlist metdata call
+     */
     static async unpackPlaylist(url: string, message: Message) {
         let songs: Array<SongReference> = [];
 
@@ -316,7 +335,7 @@ class FileSong extends Song {
     async getStream(seek = 0) {
         if (seek === 0) return this.url;
 
-        return this.seek(this.url, seek);
+        return await this.seek(this.url, seek);
     }
 }
 

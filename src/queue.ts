@@ -293,8 +293,8 @@ export class ServerQueue {
     }
 
     /**
-     * Adds SongReferences' to the queue
-     * @param {Song} song Song to add
+     * Adds {@link SongReferences}' to the queue
+     * @param {Array<SongReference>} song Song to add
      */
     add(songReferences: Array<SongReference>) {
         for (let songReference of songReferences) {
