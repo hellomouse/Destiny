@@ -19,6 +19,10 @@ export class YouTubeSong extends Song {
         super(url);
     }
 
+    /**
+     * Checks if a url is a valid youtube url
+     * @param url URL to check
+     */
     static isSong(url: string) {
         return ytdl.validateURL(url);
     }
@@ -79,7 +83,7 @@ export class YouTubeSong extends Song {
 
     /**
      * @param {number} seek Seek time
-     * Returns a stream to be used with {@link ServerQueue#play}
+     * Returns a stream to be used with {@link ServerQueue.play}
      */
     async getStream(seek = 0) {
         if (!seek) return ytdl(this.url, {
@@ -102,10 +106,17 @@ export class YouTubeSong extends Song {
         return m && m[3] !== 'WL' ? m[3] : undefined;
     }
 
+    /**
+     * Get song URLs from a given YouTube playlist ID
+     */
     static getYouTubePlaylistURLs(args: Array<string>) {
         return args.filter(x => this.getYoutubePlaylistID(x));
     }
 
+    /**
+     * Gets the metadata of a given YouTube playlist
+     * @param url YouTube playlist url
+     */
     static async getPlaylistData(url: string) {
         return await playlist(url);
     }

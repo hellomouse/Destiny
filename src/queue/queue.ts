@@ -115,10 +115,16 @@ export class ServerQueue {
         return this.loop;
     }
 
+    /**
+     * Get the {@link SongReference} at the current index
+     */
     currentSong() {
         return this.songs[this.index];
     }
 
+    /**
+     * Check if the audio player is playing
+     */
     isPlaying() {
         return this.audioPlayer.state.status === AudioPlayerStatus.Playing;
     }
@@ -240,6 +246,10 @@ export class ServerQueue {
         }
     }
 
+    /**
+     * Remove a song from the queue at the specified index
+     * @param index The index of the song to remove
+     */
     removeSong(index: number) {
         let songReference = this.songs.splice(index, 1)[0];
         songReference!.song.references--;
@@ -269,6 +279,10 @@ export class ServerQueue {
 
     }
 
+    /**
+     * Set the volume of the player to the specified value
+     * @param volume The volume to set
+     */
     setVolume(volume: number) {
         this.volume = volume;
         if (this.isPlaying())
@@ -291,7 +305,7 @@ export class ServerQueue {
     }
 
     /**
-     * Adds {@link SongReferences}' to the queue
+     * Adds {@link SongReference}' to the queue
      * @param {Array<SongReference>} song Song to add
      */
     add(songReferences: Array<SongReference>) {
@@ -314,6 +328,9 @@ export class ServerQueue {
         log(`Joined the channel : ${this.voiceChannel.name}`);
     }
 
+    /**
+     * Disconnects from the queue's linked voice channel and clears the queue
+     */
     leave() {
         this.inactivityHelper.onLeave();
         this.connection?.destroy();

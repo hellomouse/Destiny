@@ -52,6 +52,12 @@ export class SongManager {
         return SongManager.songs.has(id);
     }
 
+    /**
+     * Adds a song to the songs hashmap and returns a song reference
+     * @param {Song} song Song to add
+     * @param {User} requestedBy User that requested the song
+     * @param {Message['channel']} requestedChannel Channel in which the song was requested
+     */
     static async addSong(song: YouTubeSong | FileSong, requestedBy: User, requestedChannel: Message['channel']) {
         if (SongManager.songs.size >= config.songManager.hardNumLimit) throw new SongQueueFullError('Song cache full');
         if (SongManager.hasId(song.id)) throw new SongAlreadyExistsError('Song already exists'); // !!!!
@@ -63,6 +69,7 @@ export class SongManager {
         return this.getSongReference(song.id, requestedBy, requestedChannel);
     }
 
+    /** Get the song with the specified id */
     static getSong(id: string): YouTubeSong | FileSong {
         let song = SongManager.songs.get(id);
         if (typeof song === 'undefined') throw new SongNotFoundError();
@@ -70,6 +77,12 @@ export class SongManager {
         return song;
     }
 
+    /**
+     * Gets a song from the songs hashmap and returns a {@link SongReference} containing it
+     * @param {Song} song Song to add
+     * @param {User} requestedBy User that requested the song
+     * @param {Message['channel']} requestedChannel Channel in which the song was requested
+     */
     static getSongReference(id: string, requestedBy: User, requestedChannel: Message['channel']) {
         let song = SongManager.getSong(id);
         if (typeof song === 'undefined') throw new SongNotFoundError(); // need to change to throw error
@@ -77,6 +90,9 @@ export class SongManager {
         return new SongReference(song.id, requestedBy, requestedChannel);
     }
 
+    /**
+     * Cleans the songs hashmap of songs that are not in use
+     */
     static clean() {
         SongManager.songs.forEach((song: Song, key: string, songs: Map<string, Song>) => {
             if (song.references === 0) songs.delete(key);
@@ -84,6 +100,9 @@ export class SongManager {
         SongManager.cacheCleanTimeoutDestroyed = true;
     }
 
+    /**
+     * Checks if the cache cleanup timeout is running, if not then start it if it should be running
+     */
     static checkCleanup() {
         if (this.songs.size > config.songManager.softNumLimit)
             if (SongManager.cacheCleanTimeoutDestroyed) {
@@ -92,6 +111,9 @@ export class SongManager {
             }
     }
 
+    /**
+     * Refreshes the song metadata
+     */
     static refreshMetadata() {
         let date = Date.now();
         SongManager.songs.forEach(async song => {

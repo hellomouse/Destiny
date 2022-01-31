@@ -44,7 +44,7 @@ export class Song {
 
     /**
      * Run any async operations after construction,
-     * returns itself so you can call await song.finalize()
+     * returns itself so you can call {@link finalize}
      * @return {Song}
      */
     async finalize(): Promise<Song> {
