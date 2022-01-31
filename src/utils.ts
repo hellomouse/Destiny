@@ -63,7 +63,7 @@ class Inactivity {
         if (this.config.botIdleSeconds < 0) return;
         setTimeout(() => {
             if (serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
-                serverQueue.leave();
+                queueManager.remove(serverQueue.serverID);
                 serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
             }
         }, this.config.botIdleSeconds);

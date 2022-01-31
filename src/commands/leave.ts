@@ -18,8 +18,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         return;
 
     log('Stopped playing music');
-    serverQueue.leave();
-    queueManager.remove(message.guild!.id);
+    queueManager.remove(serverQueue.serverID);
 
     return message.channel.send({ embeds: [defaultEmbed().setDescription(':wave:')] });
 };
