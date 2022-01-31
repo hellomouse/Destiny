@@ -112,6 +112,10 @@ Syntax:
     setExampleUsage() {
 
     }
+
+    getSyntax() {
+        return this.syntax;
+    }
 }
 
 export default COMMAMD_REQUIREMENTS;

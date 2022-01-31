@@ -24,8 +24,8 @@ export const helpEmbed = (cmd: Command) => {
         .setFooter({ text: `Type ${config.prefix}list to list commands, or ${config.prefix}help <command> for more info on a given command` })
         .setTitle(config.prefix + cmd.names[0]);
 
-    if (cmd.help && cmd.help.syntax)
-        embed = embed.addField('Syntax', `\`${config.prefix}${cmd.names[0]} ${cmd.help.syntax}\``, true);
+    if (cmd.help)
+        embed = embed.addField('Syntax', `\`${config.prefix}${cmd.names[0]} ${cmd.help.getSyntax()}\``, true);
     if (Array.isArray(cmd.names))
         embed = embed.addField('Aliases', cmd.names.join(', '), true);
 
