@@ -7,6 +7,7 @@ import { AudioPlayerStatus, createAudioPlayer, createAudioResource, joinVoiceCha
 import type { SongReference } from '../song.js';
 import MessageCollection, { SongQueueMessage, SingletonMessage, NormalMessage } from '../messages.js';
 import { LOOP_MODES } from './loop.js';
+import type { TextLikeChannels } from '../types';
 
 /**
  * A queue for a specified server
@@ -17,7 +18,7 @@ export class ServerQueue {
 
     public serverID: string;
     public voiceChannel: VoiceBasedChannel;
-    public textChannel: Message['channel'];
+    public textChannel: TextLikeChannels;
     public connection?: VoiceConnection;
     private audioPlayer: AudioPlayer;
     public songs: Array<SongReference>;

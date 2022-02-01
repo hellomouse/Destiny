@@ -18,3 +18,5 @@ export interface Client extends DiscordClient {
     _events: unknown;
     commands: Enmap<string, Command>;
 }
+
+export type TextLikeChannels = Message['channel'];

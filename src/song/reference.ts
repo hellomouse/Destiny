@@ -1,4 +1,5 @@
 import type { User, Message } from 'discord.js';
+import type { TextLikeChannels } from '../types.js';
 import { isURL, getYouTubeURL } from '../utils.js';
 import { SongManager } from './manager.js';
 import { YouTubeSong } from './youtube.js';
@@ -41,14 +42,14 @@ export async function getSongReferences(args: Array<string>, message: Message,
 export class SongReference {
     public readonly id: string;
     public readonly requestedBy: User;
-    public requestedChannel: Message['channel'];
+    public requestedChannel: TextLikeChannels;
 
 
     // when we ask for a song reference, increment the link song.references variable by one
     // songreference is like a proxy
     // have delete method here, when we remove it from a SongQueue we call delete. song.references--
     // this will allow cleanup of unused songs from the global songs map
-    constructor(id: string, requestedBy: User, requestedChannel: Message['channel']) {
+    constructor(id: string, requestedBy: User, requestedChannel: TextLikeChannels) {
         this.id = id;
         this.requestedBy = requestedBy;
         this.requestedChannel = requestedChannel;

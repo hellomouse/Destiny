@@ -1,4 +1,5 @@
 import { Collection, Message, MessageOptions, MessagePayload } from 'discord.js';
+import type { TextLikeChannels } from './types';
 
 class CustomMessage {
     protected message: Message<boolean> | undefined;
@@ -6,12 +7,12 @@ class CustomMessage {
         this.message = undefined;
     }
 
-    async _send(channel: Message['channel'], options: string | MessagePayload | MessageOptions) {
+    async _send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
         this.message = await channel.send(options);
         return this.message;
     }
 
-    async send(channel: Message['channel'], options: string | MessagePayload | MessageOptions) {
+    async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
         await this._send(channel, options);
         return this.message;
     }
@@ -31,7 +32,7 @@ export class SingletonMessage extends CustomMessage {
         super();
     }
 
-    async send(channel: Message['channel'], options: string | MessagePayload | MessageOptions) {
+    async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
         if (this.message) this.message.delete().catch(err => console.log(err));
         return await this._send(channel, options);
     }
@@ -54,7 +55,7 @@ export class SongQueueMessage extends CustomMessage {
         this.previousMessage.edit({ components: this.previousMessage.components }).catch(console.error);
     }
 
-    async send(channel: Message['channel'], options: string | MessagePayload | MessageOptions) {
+    async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
         // TODO: Figure out why DiscordAPIError is thrown.
         // We send a new message, and disable the buttons on the previous message
         this.previousMessage = this.message;

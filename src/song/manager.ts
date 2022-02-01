@@ -1,13 +1,13 @@
-import { User, Message } from 'discord.js';
+import type { User } from 'discord.js';
 import config from '../../config.cjs';
 import { SongReference } from './reference.js';
-import { Song, SongAlreadyExistsError, SongNotFoundError, SongQueueFullError } from './song.js';
+import { SongAlreadyExistsError, SongNotFoundError, SongQueueFullError } from './song.js';
 import { getSongTypeFromURL } from './utils.js';
-import { FileSong } from './file.js';
-import { YouTubeSong } from './youtube.js';
+import type { TextLikeChannels } from '../types';
+import { SongTypes } from './types.js';
 
 export class SongManager {
-    private static songs: Map<string, YouTubeSong | FileSong>;
+    private static songs: Map<string, SongTypes>;
     private static cacheCleanTimeout: NodeJS.Timeout;
     private static cacheCleanTimeoutDestroyed: boolean;
     private static cacheCleanTimeoutDuration: number;
@@ -21,8 +21,9 @@ export class SongManager {
 
     /**
      * Creates a new song in the songs hashmap, if it already exists then return it
+     * @throws {SongAlreadyExistsError} If the song already exists
      */
-    static async getCreateSong(url: string, requestedBy: User, requestedChannel: Message['channel']): Promise<SongReference> {
+    static async getCreateSong(url: string, requestedBy: User, requestedChannel: TextLikeChannels) {
         // Stupid eslint... We throw an error if the song is not a known song type
         // eslint-disable-next-line no-useless-catch
         try {
@@ -56,9 +57,9 @@ export class SongManager {
      * Adds a song to the songs hashmap and returns a song reference
      * @param {Song} song Song to add
      * @param {User} requestedBy User that requested the song
-     * @param {Message['channel']} requestedChannel Channel in which the song was requested
+     * @param {TextLikeChannels} requestedChannel Channel in which the song was requested
      */
-    static async addSong(song: YouTubeSong | FileSong, requestedBy: User, requestedChannel: Message['channel']) {
+    static async addSong(song: SongTypes, requestedBy: User, requestedChannel: TextLikeChannels) {
         if (SongManager.songs.size >= config.songManager.hardNumLimit) throw new SongQueueFullError('Song cache full');
         if (SongManager.hasId(song.id)) throw new SongAlreadyExistsError('Song already exists'); // !!!!
 
@@ -70,7 +71,7 @@ export class SongManager {
     }
 
     /** Get the song with the specified id */
-    static getSong(id: string): YouTubeSong | FileSong {
+    static getSong(id: string): SongTypes {
         let song = SongManager.songs.get(id);
         if (typeof song === 'undefined') throw new SongNotFoundError();
 
@@ -81,9 +82,9 @@ export class SongManager {
      * Gets a song from the songs hashmap and returns a {@link SongReference} containing it
      * @param {Song} song Song to add
      * @param {User} requestedBy User that requested the song
-     * @param {Message['channel']} requestedChannel Channel in which the song was requested
+     * @param {TextLikeChannels} requestedChannel Channel in which the song was requested
      */
-    static getSongReference(id: string, requestedBy: User, requestedChannel: Message['channel']) {
+    static getSongReference(id: string, requestedBy: User, requestedChannel: TextLikeChannels) {
         let song = SongManager.getSong(id);
         if (typeof song === 'undefined') throw new SongNotFoundError(); // need to change to throw error
 
@@ -94,7 +95,7 @@ export class SongManager {
      * Cleans the songs hashmap of songs that are not in use
      */
     static clean() {
-        SongManager.songs.forEach((song: Song, key: string, songs: Map<string, Song>) => {
+        SongManager.songs.forEach((song, key, songs) => {
             if (song.references === 0) songs.delete(key);
         });
         SongManager.cacheCleanTimeoutDestroyed = true;
