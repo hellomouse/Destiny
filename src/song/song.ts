@@ -11,8 +11,9 @@ export class SongNotFoundError extends Error {}
 /**
  * Base Song class, do not use directly!
  * @author BWBellairs
+ * @abstract
  */
-export class Song {
+export abstract class Song {
     public id: string;
     public references: number;
     public url: string;
