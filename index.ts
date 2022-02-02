@@ -5,11 +5,18 @@ import { CommandHelpProvider } from './src/commands.js';
 import { resolve as pathResolve } from 'path';
 import Enmap from 'enmap';
 import './src/local-data.js';
+import semver from 'semver';
+import { engines } from './package.json';
 
 // Remove this
 process.on('unhandledRejection', error => {
     console.error('Unhandled promise rejection:', error);
 });
+
+if (!semver.satisfies(process.version, engines.node)) {
+    console.error('Node version must be at least 16.6.0');
+    process.exit(1);
+}
 
 async function load(client: Client) {
     let utils = await import(`./src/utils.js?ts=${Date.now()}`);

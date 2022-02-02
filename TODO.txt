@@ -35,7 +35,7 @@ youtube 403 detection
 errors if no search result on youtube
 use opus stream 
 
-warn about node version when starting up >= 14
+warn about node version when starting up >= 14 | DONE
 
 warn if no perms to view voice channel | DONE
 
