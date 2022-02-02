@@ -21,7 +21,7 @@ export class SongManager {
 
     /**
      * Creates a new song in the songs hashmap, if it already exists then return it
-     * @throws {SongAlreadyExistsError} If the song already exists
+     * @throws {@link SongQueueFullError} If the song cache is full
      */
     static async getCreateSong(url: string, requestedBy: User, requestedChannel: TextLikeChannels) {
         // Stupid eslint... We throw an error if the song is not a known song type
@@ -42,7 +42,8 @@ export class SongManager {
         }
     }
 
-    static async hasSong(url: string) {
+    /** Check if the specified URL is found in the song manager */
+    static hasSong(url: string) {
         let songType = getSongTypeFromURL(url);
         let id = songType.generateIdFromUrl(url);
 
@@ -58,6 +59,8 @@ export class SongManager {
      * @param {Song} song Song to add
      * @param {User} requestedBy User that requested the song
      * @param {TextLikeChannels} requestedChannel Channel in which the song was requested
+     * @throws {@link SongAlreadyExistsError} If the song already exists
+     * @throws {@link SongQueueFullError} If the song cache is full
      */
     static async addSong(song: SongTypes, requestedBy: User, requestedChannel: TextLikeChannels) {
         if (SongManager.songs.size >= config.songManager.hardNumLimit) throw new SongQueueFullError('Song cache full');
@@ -70,7 +73,10 @@ export class SongManager {
         return this.getSongReference(song.id, requestedBy, requestedChannel);
     }
 
-    /** Get the song with the specified id */
+    /**
+     * Get the song with the specified id
+     * @throws {@link SongNotFoundError} If the song is not found
+     */
     static getSong(id: string): SongTypes {
         let song = SongManager.songs.get(id);
         if (typeof song === 'undefined') throw new SongNotFoundError();
@@ -83,6 +89,7 @@ export class SongManager {
      * @param {Song} song Song to add
      * @param {User} requestedBy User that requested the song
      * @param {TextLikeChannels} requestedChannel Channel in which the song was requested
+     * @throws {@link SongNotFoundError} If the song is not found
      */
     static getSongReference(id: string, requestedBy: User, requestedChannel: TextLikeChannels) {
         let song = SongManager.getSong(id);
