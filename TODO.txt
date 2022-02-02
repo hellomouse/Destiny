@@ -37,11 +37,12 @@ use opus stream
 
 warn about node version when starting up >= 14
 
-warn if no perms to view voice channel
+warn if no perms to view voice channel | DONE
 
 colored terminal log
 
-Each ServerQueue should have it's own instance, also not all timers are cleared. Only dereferenced
+Each ServerQueue should have it's own instance | DONE, use QueueManager
+Not all timers are cleared, only dereferenced | DONE
 
 load playlists
 - from text file
