@@ -4,7 +4,6 @@ import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } fr
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { queueManager } from '../queue.js';
 
-import { NewsChannel, ThreadChannel, DMChannel } from 'discord.js';
 import type { Message } from 'discord.js';
 import type { Client } from '../types';
 
@@ -47,8 +46,7 @@ export default async (client: Client, message: Message) => {
                 return message.reply({ embeds: [notInVoiceChannelEmbed()] } );
         }
 
-        if (message.channel instanceof NewsChannel || message.channel instanceof DMChannel ||
-            message.channel instanceof ThreadChannel)
+        if (message.channel.type !== 'GUILD_TEXT')
             return; // commands cannot be run in the other channel types for now
         try {
             await cmd.run(client, message, args);
