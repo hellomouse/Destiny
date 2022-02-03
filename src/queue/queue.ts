@@ -184,7 +184,7 @@ export class ServerQueue {
 
         this.textChannel = currentSongReference.requestedChannel; // Update text channel
 
-        if (errorCounter < 1)
+        if (errorCounter < 1 && !(seekTime > 0))
             await this.sendNowPlayingEmbed(currentSongReference);
 
         log(`Started playing the music : ${song.title} ${this.index}`);
