@@ -89,7 +89,7 @@ database somewhere
 - shuffle
 - 24/7 mode (never leave)
 
-- fastforward (amount)
+- fastforward (amount) | DONE
 - rewind (amount)
 - seek (amount) | DONE
 - search
