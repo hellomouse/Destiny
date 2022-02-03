@@ -2,7 +2,7 @@ example format again
 
 whitelist servers
 
-403 retry count 
+403 retry count
 
 better youtube url validation
 
@@ -14,8 +14,8 @@ remind command
 
 turn off music bot / turn on music bot
 
-collect stats on songs nad shit :D
-- total times played 
+collect stats on songs and shit :D
+- total times played
 - total songs
 - per user too
 
@@ -24,7 +24,7 @@ add dB option for db volumes? (dispatcher.setVolumeDecibels)
 require percentage for percent, otherwise like 0.5?
 compute displayVolume like in aegiscommand-discord
 
-limit length of files 
+limit length of files
 
 
 
@@ -33,7 +33,7 @@ permissions aint workin
 check if url is valid
 youtube 403 detection
 errors if no search result on youtube
-use opus stream 
+use opus stream
 
 warn about node version when starting up >= 14 | DONE
 
@@ -73,7 +73,7 @@ reload | DONE
 
 automated tests (check for all params, help text, etc...)
 
-locla file support / other sources 
+locla file support / other sources
 - soundcloud, bandcamp, http urls
 
 !!help maybe
@@ -86,7 +86,7 @@ database somewhere
 - /lyrics - find lyrics for track?
 - /remove | DONE
 / remove range start end - e.g. !!remove 1-3|6|9-10?
-- shuffle 
+- shuffle
 - 24/7 mode (never leave)
 
 - fastforward (amount)
@@ -104,7 +104,7 @@ add user to allowed list (Permisisons needs to be redone)
 - more permissins per user?
 
 effects
-- change speed 
+- change speed
 - bassboost
 -  change pitch?
-- reseteffects 
+- reseteffects
