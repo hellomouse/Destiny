@@ -43,7 +43,7 @@ export class InactivityHelper {
     onAlone() {
         clearTimeout(this.aloneTimer);
         if (InactivityHelper.config.waitRejoinSeconds < 0) return;
-        setTimeout(() => {
+        this.aloneTimer = setTimeout(() => {
             if (this.serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
                 queueManager.remove(this.serverQueue.serverID);
                 this.serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving as no one is in VC')] });
@@ -66,7 +66,7 @@ export class InactivityHelper {
     onNotPlaying() {
         clearTimeout(this.inactivityTimer);
         if (InactivityHelper.config.botIdleSeconds < 0) return;
-        setTimeout(() => {
+        this.inactivityTimer = setTimeout(() => {
             if (this.serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed) {
                 queueManager.remove(this.serverQueue.serverID);
                 this.serverQueue.textChannel.send({ embeds: [defaultEmbed().setDescription(':wave: Leaving due to inactivity')] });
