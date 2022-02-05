@@ -72,7 +72,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         sentMessage.edit({ components: sentMessage.components }).catch(console.error);
     }, 120000);
 
-    sentMessage?.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 })
+    sentMessage.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 })
         .on('collect', async interaction => {
             if (!interaction.isButton()) return;
             for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
