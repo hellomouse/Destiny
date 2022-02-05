@@ -3,7 +3,7 @@ import { songEmbed } from '../embeds.js';
 
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import type { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice';
-import { AudioPlayerStatus, createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior } from '@discordjs/voice';
+import { AudioPlayerStatus, createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus } from '@discordjs/voice';
 import type { SongReference } from '../song.js';
 import MessageCollection, { SongQueueMessage, SingletonMessage, NormalMessage } from '../messages.js';
 import { LOOP_MODES } from './loop.js';
@@ -46,6 +46,8 @@ export class ServerQueue {
         this.textChannel = message.channel;
         this.voiceChannel = voiceChannel;
 
+        this.inactivityHelper = new InactivityHelper(this);
+
         this.connection = undefined;
         this.audioPlayer = createAudioPlayer({
             behaviors: {
@@ -54,13 +56,14 @@ export class ServerQueue {
         });
 
         this.audioPlayer.on(AudioPlayerStatus.Idle, this.onSongFinish.bind(this));
+        this.audioPlayer.on(AudioPlayerStatus.Playing, () => this.inactivityHelper.onPlaying());
+        this.audioPlayer.on(AudioPlayerStatus.Buffering, () => this.inactivityHelper.onPlaying());
+        this.audioPlayer.on(AudioPlayerStatus.Paused, () => this.inactivityHelper.onNotPlaying());
         this.audioPlayer.on('error', async error => {
             console.log('dispatcher errored: ' + error);
             this.ignoreNextSongEnd = true;
             await this.play();
         });
-
-        this.inactivityHelper = new InactivityHelper(this);
 
         this.songs = [];
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
@@ -204,7 +207,6 @@ export class ServerQueue {
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
             await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.currentSong(), 'Finished Playing')] });
-            this.inactivityHelper.onNotPlaying();
         }
     }
 
@@ -237,7 +239,6 @@ export class ServerQueue {
 
         this.connection!.subscribe(player);
         player.play(audio);
-        this.inactivityHelper.onPlaying();
 
         audio.volume!.setVolumeLogarithmic(this.volume / VOLUME_BASE_UNIT);
         return player;
@@ -313,7 +314,6 @@ export class ServerQueue {
     pause() {
         if (!this.isPlaying()) return;
         this.audioPlayer.pause();
-        this.inactivityHelper.onNotPlaying();
     }
 
     shuffleOn() {
@@ -346,7 +346,6 @@ export class ServerQueue {
         }
 
         this.audioPlayer.unpause();
-        this.inactivityHelper.onPlaying();
     }
 
     /**
@@ -370,6 +369,7 @@ export class ServerQueue {
             adapterCreator: this.voiceChannel.guild.voiceAdapterCreator,
             selfDeaf: true
         });
+        this.connection.on(VoiceConnectionStatus.Destroyed, () => this.inactivityHelper.onLeave());
         log(`Joined the channel : ${this.voiceChannel.name}`);
     }
 
@@ -377,7 +377,6 @@ export class ServerQueue {
      * Disconnects from the queue's linked voice channel and clears the queue
      */
     leave() {
-        this.inactivityHelper.onLeave();
         this.connection?.destroy();
         this.clear(true);
     }
