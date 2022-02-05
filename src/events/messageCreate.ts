@@ -10,6 +10,16 @@ import type { Client } from '../types';
 const MAX_LEN = 1000; // TODO: remove
 
 export default async (client: Client, message: Message) => {
+    if (message.author.id === client.user!.id) {
+        // gateway ping time tracking
+        let pingMatch = message.content.match(/^\(ping (\w+)\)$/);
+        if (pingMatch) {
+            let id = pingMatch[1];
+            let callback = client.pingInfo.get(id);
+            if (callback) callback(Date.now());
+        }
+    }
+
     if (message.content.startsWith(client.config.prefix)) {
         // Ignore self messages
         if (message.author.id === client.user!.id)

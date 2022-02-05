@@ -35,6 +35,8 @@ async function load(client: Client) {
 
     /* ----------------------------------------------- */
 
+    client.pingInfo = new Map<string, (apiReturnTime: number) => void>();
+
     let loaded: { events: Array<string>, commands: Array<string> } = { events: [], commands: [] };
 
     CommandHelpProvider.setPrefix(client.config.prefix);

@@ -13,6 +13,7 @@ export interface Command {
 }
 
 export interface Client extends DiscordClient {
+    pingInfo: Map<string, (apiReturnTime: number) => void>;
     config: Awaited<ReturnType<typeof configHandler>>;
     lastToken: string | null;
     _events: unknown;
