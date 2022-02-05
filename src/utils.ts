@@ -173,8 +173,21 @@ export function parseDuration(sec: string) {
     return seekTime;
 }
 
-export function getRandomInt(max:number): number {
-    return Math.floor(Math.random() * max);
+/**
+ * Generates a random number between the given min and max.
+ * @param min The minimum number.
+ * @param max The maximum number.
+ */
+export function getRandomInt(min: number, max: number): number;
+export function getRandomInt(max: number): number;
+export function getRandomInt(min: number, max?: number) {
+    if (!max) {
+        max = min;
+        min = 0;
+    }
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // what is = 100% volume, note volume command assumes this is 100 (it uses a % sign)
