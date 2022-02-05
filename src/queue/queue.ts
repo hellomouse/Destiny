@@ -77,6 +77,7 @@ export class ServerQueue {
         this.ignoreNextSongEnd = false; // Don't run anything after dispatcher ends for next end, for seeking
     }
 
+    /** Check if the song queue is empty */
     isEmpty() {
         return !this.songs.length;
     }
@@ -100,18 +101,31 @@ export class ServerQueue {
         return this.songs.length;
     }
 
+    /** Get current index */
     getIndex() {
         return this.index;
     }
 
+    /**
+     * Get the song at the specified index
+     * @param {number} index Index of the song to get
+     */
     getSongAtIndex(index: number) {
         return this.songs[index];
     }
 
+    /**
+     * Sets the loop mode
+     * @param loop Loop mode to set
+     */
     setLoopMode(loop: LOOP_MODES) {
         this.loop = loop;
     }
 
+    /**
+     * Returns the current loop mode
+     * @returns
+     */
     getLoopMode() {
         return this.loop;
     }
