@@ -18,6 +18,7 @@ export abstract class Song {
 
     public title: string;
     public formattedDuration: string;
+    /** Song duration, in seconds */
     public duration: number;
     public artist?: string;
 

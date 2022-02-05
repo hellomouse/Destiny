@@ -55,6 +55,7 @@ export class SongReference {
         this.requestedChannel = requestedChannel;
     }
 
+    /** Get the song that this reference belongs to */
     get song() {
         return SongManager.getSong(this.id);
     }
