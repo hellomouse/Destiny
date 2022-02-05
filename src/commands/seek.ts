@@ -26,8 +26,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             seekTime = parseDuration(args[0]);
         } catch (e) {
             return message.reply({
-                embeds: [errorEmbed()
-                    .setTitle(`Invalid seek parameter \`${args[0]}\``)]
+                embeds: [errorEmbed().setTitle(`Invalid seek parameter \`${args[0]}\``)]
             });
         }
 
