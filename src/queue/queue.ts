@@ -149,32 +149,61 @@ export class ServerQueue {
     }
 
     /**
+     * Finds the next song in the queue that can be played | TODO: skip invalid songs
+     * Respects loop mode
+     */
+    findNextValidSong() {
+        // Should we return the amount of songs that can't be played?
+        let nextIndex; // Next valid index
+
+        // A good thing to note is even if the song queue may be populated
+        // and the loop mode is queue, all songs could be invalid
+        // A message should be provided as such and playback stopped
+
+        // This should return the index if the next invalid song
+        // which is an attribute that isn't implemented yet so
+        // TODO: update
+        let nextSongIndex = this.index + 1;
+        let nextSongExists = typeof this.getSongAtIndex(nextSongIndex) !== 'undefined';
+        if (this.loop === LOOP_MODES.QUEUE) {
+            if (!nextSongExists)
+                nextIndex = this.getSongAtIndex(0) ? 0 : undefined;
+        } else if (this.loop === LOOP_MODES.SONG && typeof this.currentSong() !== 'undefined')
+            nextIndex = this.index;
+        else if (this.loop === LOOP_MODES.OFF)
+            nextIndex = nextSongExists ? nextSongIndex : undefined;
+        // this.index %= this.size();
+
+        // On looping song, check if the song still exists
+        // what about bugs...
+        // remove song?
+        // insert song?
+        // shuffling songs?
+        // Index will change and we'll lose track of this one, need to update this.index accordingly
+
+
+        return nextIndex;
+    }
+
+    /**
      * Executes on song finish
      */
     async onSongFinish() {
-        if (this.ignoreNextSongEnd) {
+        // this.isIdle is used here because you could skip a song during playback or after it's ended
+        if (this.ignoreNextSongEnd && !this.isIdle()) {
             this.ignoreNextSongEnd = false;
             return;
         }
 
-        if (this.songs.length === 0) return;
+        let nextIndex = this.findNextValidSong();
 
-        // Increment index if we're not looping the current song
-        if (this.loop !== LOOP_MODES['SONG'])
-            this.index++;
-
-        this.skipped = false;
-
-        if (this.loop === LOOP_MODES['QUEUE'])
-            this.index %= this.size();
-
-        const previousIndex = this.index - 1 < 0 ? 0 : this.index - 1;
-        if (this.songs[this.index]) {
-            log(`Finished playing the music : ${(this.songs[previousIndex].song).title}`);
+        if (typeof nextIndex !== 'undefined') {
+            log(`Finished playing the music : ${(this.currentSong().song).title}`);
+            this.index = nextIndex;
             await this.play();
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
-            await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.songs[previousIndex], 'Finished Playing')] });
+            await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.currentSong(), 'Finished Playing')] });
             this.inactivityHelper.onNotPlaying();
         }
     }
