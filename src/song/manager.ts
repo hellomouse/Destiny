@@ -1,8 +1,7 @@
 import type { User } from 'discord.js';
 import config from '../../config.cjs';
 import { SongReference } from './reference.js';
-import { SongAlreadyExistsError, SongNotFoundError, SongQueueFullError } from './song.js';
-import { getSongTypeFromURL } from './utils.js';
+import { getSongTypeFromURL, SongAlreadyExistsError, SongNotFoundError, SongQueueFullError } from './utils.js';
 import type { TextLikeChannels } from '../types';
 import { SongTypes } from './types.js';
 

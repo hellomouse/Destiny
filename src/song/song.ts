@@ -3,11 +3,6 @@ import Stream from 'stream';
 import { v4 as uuidv4 } from 'uuid';
 import type { MessageEmbed } from 'discord.js';
 
-export class SongAlreadyExistsError extends Error {}
-export class SongQueueFullError extends Error {}
-export class SongNotFoundError extends Error {}
-
-
 /**
  * Base Song class, do not use directly!
  * @author BWBellairs
