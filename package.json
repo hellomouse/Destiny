@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "cd build && node --experimental-json-modules index.js",
+    "start": "cd build && node index.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
@@ -17,7 +17,7 @@
   "author": "Hellomouse",
   "license": "MIT",
   "engines": {
-    "node": ">=16.6.0"
+    "node": ">=16.9.0"
   },
   "bugs": {
     "url": "https://github.com/hellomouse/Destiny/issues"
