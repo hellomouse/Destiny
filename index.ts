@@ -6,13 +6,14 @@ import { resolve as pathResolve } from 'path';
 import Enmap from 'enmap';
 import './src/local-data.js';
 import semver from 'semver';
-import pkg from './package.json';
+import { readFileSync } from 'fs';
 
 // Remove this
 process.on('unhandledRejection', error => {
     console.error('Unhandled promise rejection:', error);
 });
 
+const pkg = JSON.parse(readFileSync('./package.json', 'utf8').toString());
 if (!semver.satisfies(process.version, pkg.engines.node)) {
     console.error('Node version must be at least 16.6.0');
     process.exit(1);

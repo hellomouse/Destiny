@@ -1,14 +1,15 @@
-import strings from '../strings.json';
 import { FlagHelpError, log } from '../utils.js';
 import { helpEmbed, notInVoiceChannelEmbed, queueNotPlaying, songQueueEmpty } from '../embeds.js';
 import COMMAMD_REQUIREMENTS from '../commands.js';
 import { queueManager } from '../queue.js';
+import { readFileSync } from 'fs';
 
 import type { Message } from 'discord.js';
 import type { Client } from '../types';
 
 const MAX_LEN = 1000; // TODO: remove
 
+const strings = JSON.parse(readFileSync('./src/strings.json', 'utf8').toString());
 export default async (client: Client, message: Message) => {
     if (message.author.id === client.user!.id) {
         // gateway ping time tracking
