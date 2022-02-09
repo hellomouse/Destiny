@@ -18,7 +18,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     // loop mode off, we finish queue, we change loop mode to song/queue, resume should play
 
     // No more songs to play if we aren't looping queue and the audio player is idle
-    if (serverQueue.isIdle() && serverQueue.getIndex() === serverQueue.size() && serverQueue.getLoopMode() === 0)
+    if ((serverQueue.isIdle() &&
+            serverQueue.getIndex() === serverQueue.size() &&
+            serverQueue.getLoopMode() === 0) ||
+            serverQueue.isEmpty())
         return message.channel.send({ embeds: [defaultEmbed().setDescription('No more songs to play. Add some!')] });
     // check if we're at end of queue and no more songs to play
     log(`Resumed music playback`);
