@@ -35,6 +35,7 @@ export class ServerQueue {
     audioResource?: AudioResource;
     messages: MessageCollection;
     inactivityHelper: InactivityHelper;
+    private isSeeking: any;
 
     /**
      * Construct a server queue
@@ -78,6 +79,7 @@ export class ServerQueue {
         this.messages.set('queue', new SongQueueMessage());
 
         this.ignoreNextSongEnd = false; // Don't run anything after dispatcher ends for next end, for seeking
+        this.isSeeking = false;
     }
 
     /** Check if the song queue is empty */
@@ -166,7 +168,7 @@ export class ServerQueue {
         // This should return the index if the next invalid song
         // which is an attribute that isn't implemented yet so
         // TODO: update
-        let nextSongIndex = this.index + 1;
+        let nextSongIndex = this.isSeeking ? this.index : this.index + 1;
         let nextSongExists = typeof this.getSongAtIndex(nextSongIndex) !== 'undefined';
         if (this.loop === LOOP_MODES.QUEUE) {
             if (!nextSongExists)
@@ -219,7 +221,7 @@ export class ServerQueue {
         // When we seek we want to end the currently playing song,
         // but not increment the index
         if (!this.isIdle() && seekTime > 0) {
-            this.ignoreNextSongEnd = true;
+            this.isSeeking = true;
             this.audioPlayer.stop(true);
         }
 
