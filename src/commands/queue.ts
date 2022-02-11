@@ -38,7 +38,7 @@ function getQueueContent(page: number, serverQueue: ServerQueue, maxPages: numbe
             ? songtxt.substring(0, MAX_LINE_LENGTH - 2) + '..'
             : songtxt;
 
-        if (serverQueue.getIndex() === i)
+        if (serverQueue.getIndex() === i && !serverQueue.isIdle())
             songtxt = `     ⌈ Now playing ⌉\n${songtxt}\n     ⌊ Now playing ⌋`;
         queuetxt += songtxt + '\n';
     }
