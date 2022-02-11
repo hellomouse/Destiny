@@ -264,7 +264,7 @@ export class ServerQueue {
      */
     jump(position: number) {
         if (position > this.songs.length)
-            throw new Error('Position is out of bounds');
+            throw new RangeError('Position is out of bounds');
 
         this.index = position - 1; // Convert to 0-based index
         this.skipped = true;
