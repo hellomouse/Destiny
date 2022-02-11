@@ -168,7 +168,7 @@ export class ServerQueue {
         // This should return the index if the next invalid song
         // which is an attribute that isn't implemented yet so
         // TODO: update
-        let nextSongIndex = this.isSeeking ? this.index : this.index + 1;
+        let nextSongIndex = this.index + 1;
         let nextSongExists = typeof this.getSongAtIndex(nextSongIndex) !== 'undefined';
         if (this.loop === LOOP_MODES.QUEUE) {
             if (!nextSongExists)
@@ -194,8 +194,8 @@ export class ServerQueue {
      * Executes on song finish
      */
     async onSongFinish() {
-        // this.isIdle is used here because you could skip a song during playback or after it's ended
-        if (this.ignoreNextSongEnd && !this.isIdle()) {
+        // this.isIdle() is used here because you could skip a song during playback or after it's ended
+        if (this.ignoreNextSongEnd && !this.isIdle() || this.isSeeking) {
             this.ignoreNextSongEnd = false;
             return;
         }
