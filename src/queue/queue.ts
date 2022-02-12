@@ -170,10 +170,12 @@ export class ServerQueue {
         // TODO: update
         let nextSongIndex = this.index + 1;
         let nextSongExists = typeof this.getSongAtIndex(nextSongIndex) !== 'undefined';
-        if (this.loop === LOOP_MODES.QUEUE) {
+        if (this.loop === LOOP_MODES.QUEUE)
             if (!nextSongExists)
                 nextIndex = this.getSongAtIndex(0) ? 0 : undefined;
-        } else if (this.loop === LOOP_MODES.SONG && typeof this.currentSong() !== 'undefined')
+            else
+                nextIndex = nextSongIndex;
+        else if (this.loop === LOOP_MODES.SONG && typeof this.currentSong() !== 'undefined')
             nextIndex = this.index;
         else if (this.loop === LOOP_MODES.OFF)
             nextIndex = nextSongExists ? nextSongIndex : undefined;
