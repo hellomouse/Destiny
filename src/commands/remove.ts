@@ -20,7 +20,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     if (!songReference)
         return message.reply({ embeds: [errorEmbed().setDescription('No song at position')] });
-    return message.reply({ embeds: [defaultEmbed().setTitle('Song removed').setDescription(`${songReference.song.title} has been removed from position ${index - 1}`)] });
+    return message.reply({ embeds: [defaultEmbed().setTitle('Song removed').setDescription(`${songReference.song.title} has been removed from position ${index + 1}`)] });
 };
 
 export const names = ['remove'];
