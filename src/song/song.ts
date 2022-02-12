@@ -1,7 +1,8 @@
-import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from 'ffmpeg-static';
 import Stream from 'stream';
 import { v4 as uuidv4 } from 'uuid';
 import type { MessageEmbed } from 'discord.js';
+import { spawn } from 'child_process';
 
 /**
  * Base Song class, do not use directly!
@@ -56,16 +57,10 @@ export abstract class Song {
      */
     async seek(url: string, seekTime = 0) {
         let outputStream = new Stream.PassThrough();
-        ffmpeg(url)
-            .seekInput(seekTime)
-            .format('mp3')
-            .inputOptions('-fflags', 'nobuffer', '-probesize', '32', '-analyzeduration', '0') // '-ss', seekTime,
-            .output(outputStream, { end: true })
-            .noVideo()
-            .on('error', e => console.error(e))
-            .addOutputOption('-strict', '-2')
-            .run();
+        const { stdout } = spawn(ffmpegPath,
+            [' -i', url, '-ss', seekTime.toString(), '-f', 'mp3', '-fflags', 'nobuffer', '-probesize', '32', '-analyzeduration', '0', '-vn', '-strict', '2', 'pipe:1']);
 
+        stdout.pipe(outputStream);
         return outputStream;
     }
 
