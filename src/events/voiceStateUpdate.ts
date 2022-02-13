@@ -16,7 +16,7 @@ export default async (oldVoiceState: VoiceState, newVoiceState: VoiceState) => {
         else
             serverQueue.inactivityHelper.onPersonJoin();
     else if (newVoiceState.member?.id === clientId) {
-        serverQueue.leave();
+        queueManager.remove(serverQueue.serverID);
         log(`Left the channel ${voiceChannel.name}`);
     }
 };
