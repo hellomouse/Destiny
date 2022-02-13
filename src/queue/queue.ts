@@ -198,9 +198,10 @@ export class ServerQueue {
     async onSongFinish() {
         // this.isIdle() is used here because you could skip a song during playback or after it's ended
         // this.isSeeking is used here because the player is in the idle state
-        if (this.ignoreNextSongEnd && !this.isIdle() || this.isSeeking) {
+        if (this.ignoreNextSongEnd && !this.isIdle() || this.isSeeking || this.skipped) {
             this.ignoreNextSongEnd = false;
             this.isSeeking = false;
+            this.skipped = false;
             return;
         }
 
