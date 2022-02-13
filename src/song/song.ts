@@ -37,7 +37,6 @@ export abstract class Song {
         this.id = uuidv4();
         this.references = 0;
         this.url = url;
-        this.thumbnail = undefined;
 
         this.title = 'No title';
         this.duration = Infinity;
