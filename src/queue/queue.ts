@@ -369,14 +369,16 @@ export class ServerQueue {
      * Connects to the queue's linked voice channel
      */
     join() {
-        this.connection = joinVoiceChannel({
-            channelId: this.voiceChannel.id,
-            guildId: this.voiceChannel.guild.id,
-            adapterCreator: this.voiceChannel.guild.voiceAdapterCreator,
-            selfDeaf: true
-        });
-        this.connection.on(VoiceConnectionStatus.Destroyed, () => this.inactivityHelper.onLeave());
-        log(`Joined the channel : ${this.voiceChannel.name}`);
+        if (typeof this.connection === 'undefined') {
+            this.connection = joinVoiceChannel({
+                channelId: this.voiceChannel.id,
+                guildId: this.voiceChannel.guild.id,
+                adapterCreator: this.voiceChannel.guild.voiceAdapterCreator,
+                selfDeaf: true
+            });
+            this.connection.on(VoiceConnectionStatus.Destroyed, () => this.inactivityHelper.onLeave());
+            log(`Joined the channel : ${this.voiceChannel.name}`);
+        }
     }
 
     /**
