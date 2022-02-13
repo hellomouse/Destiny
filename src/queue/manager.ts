@@ -1,3 +1,4 @@
+import { VoiceConnectionStatus } from '@discordjs/voice';
 import type { Message, VoiceBasedChannel } from 'discord.js';
 import config from '../../config.cjs';
 import { ServerQueue } from './queue.js';
@@ -65,7 +66,7 @@ export class QueueManager {
     remove(serverID: string) {
         if (this._queues[serverID]) {
             let serverQueue = this._queues[serverID];
-            if (serverQueue)
+            if (serverQueue && serverQueue.connection?.state.status !== VoiceConnectionStatus.Destroyed)
                 serverQueue.leave();
         }
         this._queues[serverID] = undefined;
