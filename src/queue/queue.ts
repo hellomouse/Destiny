@@ -370,7 +370,8 @@ export class ServerQueue {
      * Connects to the queue's linked voice channel
      */
     join() {
-        if (typeof this.connection === 'undefined') {
+        if (typeof this.connection === 'undefined' ||
+            typeof this.connection !== 'undefined' && this.connection.state.status === VoiceConnectionStatus.Destroyed) {
             this.connection = joinVoiceChannel({
                 channelId: this.voiceChannel.id,
                 guildId: this.voiceChannel.guild.id,
