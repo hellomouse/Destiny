@@ -118,7 +118,7 @@ export class YouTubeSong extends Song {
      * @param url YouTube playlist url
      */
     static async getPlaylistData(url: string) {
-        return await playlist(url);
+        return await playlist(url, { limit: Infinity, pages: Infinity });
     }
 
     /**
