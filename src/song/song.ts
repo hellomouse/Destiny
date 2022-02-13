@@ -2,6 +2,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import Stream from 'stream';
 import { v4 as uuidv4 } from 'uuid';
 import type { MessageEmbed } from 'discord.js';
+import { formatDuration } from '../utils.js';
 
 /**
  * Base Song class, do not use directly!
@@ -12,12 +13,18 @@ export abstract class Song {
     public id: string;
     public references: number;
     public url: string;
-    public thumbnail?: string;
-
-    public metadataTTL: number;
+    private _thumbnail?: string;
+    public get thumbnail(): string | undefined {
+        return this._thumbnail;
+    }
+    public set thumbnail(value: string | undefined) {
+        this._thumbnail = value;
+    }
+    public get formattedDuration() {
+        return formatDuration(this.duration);
+    }
 
     public title: string;
-    public formattedDuration: string;
     /** Song duration, in seconds */
     public duration: number;
     public artist?: string;
@@ -29,12 +36,10 @@ export abstract class Song {
     constructor(url: string) {
         this.id = uuidv4();
         this.references = 0;
-        this.metadataTTL = Infinity;
         this.url = url;
         this.thumbnail = undefined;
 
         this.title = 'No title';
-        this.formattedDuration = 'XX:XX';
         this.duration = Infinity;
         this.artist = undefined;
     }

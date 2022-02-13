@@ -1,6 +1,5 @@
 import ffmpeg from 'fluent-ffmpeg';
 import type { MessageEmbed } from 'discord.js';
-import { formatDuration } from '../utils.js';
 import { Song } from './song.js';
 
 /**
@@ -40,7 +39,6 @@ export class FileSong extends Song {
 
         this.duration = format.duration || this.duration;
         this.duration = Math.round(this.duration);
-        this.formattedDuration = formatDuration(this.duration);
 
         return this;
     }

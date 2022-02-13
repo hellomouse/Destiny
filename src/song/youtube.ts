@@ -1,8 +1,6 @@
 import { MessageEmbed, Message } from 'discord.js';
 import ytdl from 'ytdl-core';
 import playlist from 'ytpl';
-import config from '../../config.cjs';
-import { formatDuration } from '../utils.js';
 import { Song } from './song.js';
 import { SongManager } from './manager.js';
 import type { SongReference } from './reference.js';
@@ -42,16 +40,16 @@ export class YouTubeSong extends Song {
 
         this.youtubeId = id || songMetadata.videoDetails.videoId;
         this.id = YouTubeSong.generateId(this.youtubeId);
-        this.metadataTTL = Date.now() +
-            (config.songManager.metadataRefreshInterval.YouTubeSong! * 1000 || this.metadataTTL);
-        this.thumbnail = `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
         this.title = title || songMetadata.videoDetails.title;
         this.duration = duration || +songMetadata.videoDetails.lengthSeconds || this.duration;
-        this.formattedDuration = formatDuration(this.duration);
         this.artist = artist || songMetadata.videoDetails.author.name;
         this.viewCount = viewCount || +songMetadata.videoDetails.viewCount;
 
         return this;
+    }
+
+    public get thumbnail() {
+        return `https://img.youtube.com/vi/${this.youtubeId}/maxresdefault.jpg`;
     }
 
     /**

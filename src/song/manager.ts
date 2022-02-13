@@ -118,18 +118,6 @@ export class SongManager {
             }
     }
 
-    /**
-     * Refreshes the song metadata
-     */
-    static refreshMetadata() {
-        let date = Date.now();
-        SongManager.songs.forEach(async song => {
-            // If the song metadata is old then update it
-            if (date > song.metadataTTL)
-                await song.finalize();
-        });
-    }
 }
 
 export const songManager = new SongManager(); // need to export this so queue.ts can use it
-setInterval(SongManager.refreshMetadata, 600000); // Check for song available metadata refreshes every 10 minutes
