@@ -14,7 +14,7 @@ export class SongManager {
     constructor() {
         SongManager.songs = new Map();
         SongManager.cacheCleanTimeout = setTimeout(() => { }, 0);
-        SongManager.cacheCleanTimeoutDuration = config.songManager.cacheCleanTimeoutDuration *= 1000;
+        SongManager.cacheCleanTimeoutDuration = config.songManager.cacheCleanTimeoutDuration * 1000;
         SongManager.cacheCleanTimeoutDestroyed = true;
     }
 
