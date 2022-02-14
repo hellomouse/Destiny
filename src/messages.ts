@@ -16,6 +16,12 @@ class CustomMessage {
         await this._send(channel, options);
         return this.message;
     }
+
+    async delete() {
+        let deletedMessage = await this.message?.delete().catch(err => console.log(err));
+        this.message = undefined;
+        return deletedMessage;
+    }
 }
 
 export class NormalMessage extends CustomMessage {
@@ -33,7 +39,7 @@ export class SingletonMessage extends CustomMessage {
     }
 
     async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
-        if (this.message) this.message.delete().catch(err => console.log(err));
+        await this.delete();
         return await this._send(channel, options);
     }
 }
