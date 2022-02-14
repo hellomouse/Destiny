@@ -46,19 +46,22 @@ export class SingletonMessage extends CustomMessage {
 
 export class SongQueueMessage extends CustomMessage {
     private previousMessage: Message<boolean> | undefined;
+    private active: boolean; // Buttons active?
     constructor() {
         super();
+        this.active = false;
     }
 
     // Disable buttons for the previous song queue message
     async disableButtons() {
-        if (!this.previousMessage) return;
+        if (!this.previousMessage || !this.active) return;
 
         this.previousMessage.components[0].components.forEach(
             button => button.setDisabled(true)
         );
 
         this.previousMessage.edit({ components: this.previousMessage.components }).catch(console.error);
+        this.active = false;
     }
 
     async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
@@ -66,6 +69,7 @@ export class SongQueueMessage extends CustomMessage {
         // We send a new message, and disable the buttons on the previous message
         this.previousMessage = this.message;
         let message = await this._send(channel, options);
+        if (message) this.active = true;
         await this.disableButtons();
         return message;
     }
