@@ -6,7 +6,7 @@ import COMMAMD_REQUIREMENTS, { CommandArgument, CommandArgumentNecessity, Comman
 import type { SongReference } from '../song.js';
 import { YouTubeSong, getSongReferences } from '../song.js';
 import type { Client } from '../types';
-import type { Message, MessageEmbed } from 'discord.js';
+import type { Message, Embed } from 'discord.js';
 
 /**
  * @description Play a song with the provided link
@@ -40,7 +40,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     if (!songs.length) return message.reply({ embeds: [warningEmbed().setDescription('Could not find any songs')] });
 
-    let enqueuedEmbed: MessageEmbed;
+    let enqueuedEmbed: Embed;
     if (playlists.length === 0) {
         enqueuedEmbed = songEmbed(songs[0], 'Added to Queue', false);
         if (songs.length > 1) enqueuedEmbed.setDescription(enqueuedEmbed.description + ` and ${songs.length - 1} others`);

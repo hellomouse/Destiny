@@ -1,4 +1,4 @@
-import { MessageActionRow, MessageSelectMenu } from 'discord.js';
+import { ActionRow, ComponentType, SelectMenuComponent, SelectMenuOption } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import { defaultEmbed, warningEmbed } from '../embeds.js';
 import type { Client } from '../types';
@@ -23,26 +23,26 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let content = defaultEmbed();
     if (!args[0]) {
         content.setDescription('Use the dropdown to view help for a command').setTitle('Interactive help');
-        let selectMenu = new MessageSelectMenu()
+        let selectMenu = new SelectMenuComponent()
             .setCustomId('select')
             .setPlaceholder('Select a command to view it\'s usage');
 
         for (let [commandName, help] of detailedCommandHelp)
-            selectMenu.addOptions([
+            selectMenu.addOptions(new SelectMenuOption(
                 {
                     label: commandName,
                     value: commandName,
                     description: help.getDescription()
                 }
-            ]);
+            ));
 
-        const row = new MessageActionRow().addComponents(selectMenu);
+        const row = new ActionRow().addComponents(selectMenu);
         let sentMessage = await message.channel.send({
             embeds: [content],
             components: [row]
         });
 
-        sentMessage.createMessageComponentCollector({ componentType: 'SELECT_MENU', time: 120000 })
+        sentMessage.createMessageComponentCollector({ componentType: ComponentType.ActionRow, time: 120000 })
             .on('collect', async interaction => {
                 await sentMessage.edit({
                     embeds: [content.setDescription(detailedCommandHelp.get(interaction.values[0])!.text)]

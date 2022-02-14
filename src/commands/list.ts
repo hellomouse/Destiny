@@ -1,4 +1,4 @@
-import { Message, MessageActionRow, MessageButton } from 'discord.js';
+import { Message, ActionRow, ButtonComponent, ButtonStyle, ComponentType } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import { configHandler } from '../configHandler.js';
 import type { Client } from '../types';
@@ -52,12 +52,12 @@ export const postLoad = async (client: Client) => {
 export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message | void> => {
     let index = Math.max(0, Math.min(+args[0] - 1 | 0, pages.length - 1));
 
-    const row = new MessageActionRow();
-    row.addComponents(...ROW_BTN_EMOJI.map(emoji => new MessageButton()
+    const row = new ActionRow();
+    row.addComponents(...ROW_BTN_EMOJI.map(emoji => new ButtonComponent()
         .setEmoji(emoji)
         .setCustomId(emoji)
         .setDisabled(pages.length === 1)
-        .setStyle('PRIMARY')));
+        .setStyle(ButtonStyle.Primary)));
 
     let sentMessage = await message.channel.send({
         content: pages[index],
@@ -72,7 +72,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         sentMessage.edit({ components: sentMessage.components }).catch(console.error);
     }, 120000);
 
-    sentMessage.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 })
+    sentMessage.createMessageComponentCollector({ componentType: ComponentType.Button, time: 120000 })
         .on('collect', async interaction => {
             if (!interaction.isButton()) return;
             for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
