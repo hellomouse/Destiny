@@ -42,7 +42,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             components: [row]
         });
 
-        sentMessage.createMessageComponentCollector({ componentType: ComponentType.ActionRow, time: 120000 })
+        sentMessage.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: 120000 })
             .on('collect', async interaction => {
                 await sentMessage.edit({
                     embeds: [content.setDescription(detailedCommandHelp.get(interaction.values[0])!.text)]

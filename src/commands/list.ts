@@ -54,7 +54,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     const row = new ActionRow();
     row.addComponents(...ROW_BTN_EMOJI.map(emoji => new ButtonComponent()
-        .setEmoji(emoji)
+        .setEmoji({ id: emoji })
         .setCustomId(emoji)
         .setDisabled(pages.length === 1)
         .setStyle(ButtonStyle.Primary)));

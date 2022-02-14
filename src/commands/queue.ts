@@ -80,7 +80,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             .setCustomId(label + i)
             .setStyle(ButtonStyle.Primary);
         if (label.startsWith('emojii:'))
-            btn = btn.setEmoji(label.split(':')[1]);
+            btn = btn.setEmoji({ id: label.split(':')[1] });
         else
             btn = btn.setLabel(label);
         return btn;
