@@ -4,6 +4,7 @@ import COMMAMD_REQUIREMENTS from '../commands.js';
 import { queueManager } from '../queue.js';
 import { readFileSync } from 'fs';
 
+import { ChannelType } from 'discord.js';
 import type { Message } from 'discord.js';
 import type { Client } from '../types';
 
@@ -57,7 +58,7 @@ export default async (client: Client, message: Message) => {
                 return message.reply({ embeds: [notInVoiceChannelEmbed()] } );
         }
 
-        if (!['GUILD_TEXT', 'GUILD_VOICE'].includes(message.channel.type))
+        if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(message.channel.type))
             return; // commands cannot be run in the other channel types for now
         try {
             await cmd.run(client, message, args);
