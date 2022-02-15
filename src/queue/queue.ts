@@ -389,6 +389,7 @@ export class ServerQueue {
      */
     leave() {
         this.connection?.destroy();
+        (this.messages.get('queue') as SongQueueMessage).disableButtons();
         this.clear(true);
     }
 }
