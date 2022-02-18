@@ -2,9 +2,9 @@ import { Collection, Message, MessageOptions, MessagePayload } from 'discord.js'
 import type { TextLikeChannels } from './types';
 
 class CustomMessage {
-    protected message: Message<boolean> | undefined;
+    protected message: Message<boolean> | null;
     constructor() {
-        this.message = undefined;
+        this.message = null;
     }
 
     async _send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
@@ -15,6 +15,12 @@ class CustomMessage {
     async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
         await this._send(channel, options);
         return this.message;
+    }
+
+    async delete() {
+        let deletedMessage = await this.message?.delete().catch(err => console.log(err));
+        this.message = null;
+        return deletedMessage;
     }
 }
 
@@ -33,34 +39,35 @@ export class SingletonMessage extends CustomMessage {
     }
 
     async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
-        if (this.message) this.message.delete().catch(err => console.log(err));
+        await this.delete();
         return await this._send(channel, options);
     }
 }
 
 export class SongQueueMessage extends CustomMessage {
-    private previousMessage: Message<boolean> | undefined;
+    private previousMessage: Message<boolean> | null;
     constructor() {
         super();
+        this.previousMessage = null;
     }
 
     // Disable buttons for the previous song queue message
-    async disableButtons() {
-        if (!this.previousMessage) return;
+    disableButtons(messageToDisable = this.message) {
+        if (!messageToDisable) return;
 
-        this.previousMessage.components[0].components.forEach(
-            button => button.setDisabled(true)
-        );
+        for (let button of messageToDisable.components[0].components)
+            button.setDisabled(true);
 
-        this.previousMessage.edit({ components: this.previousMessage.components }).catch(console.error);
+        messageToDisable.edit({ components: messageToDisable.components }).catch(console.error);
     }
 
     async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {
         // TODO: Figure out why DiscordAPIError is thrown.
         // We send a new message, and disable the buttons on the previous message
         this.previousMessage = this.message;
+
         let message = await this._send(channel, options);
-        await this.disableButtons();
+        this.disableButtons(this.previousMessage);
         return message;
     }
 }

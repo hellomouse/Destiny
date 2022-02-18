@@ -214,6 +214,7 @@ export class ServerQueue {
         } else {
             log(`Finished playing all musics, no more musics in the queue`);
             await this.messages.get('finishedPlaying')?.send(this.textChannel, { embeds: [songEmbed(this.currentSong(), 'Finished Playing')] });
+            await this.messages.get('nowPlaying')?.delete();
         }
     }
 
@@ -388,6 +389,7 @@ export class ServerQueue {
      */
     leave() {
         this.connection?.destroy();
+        (this.messages.get('queue') as SongQueueMessage).disableButtons();
         this.clear(true);
     }
 }
