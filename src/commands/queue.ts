@@ -2,8 +2,8 @@ import { FlagHelpError, log } from '../utils.js';
 import { songQueueEmpty } from '../embeds.js';
 import { LOOP_MODES, queueManager, ServerQueue } from '../queue.js';
 import type { Client } from '../types';
-import { ButtonStyle, ComponentType, Message } from 'discord.js';
-import { ActionRow, ButtonComponent } from 'discord.js';
+import type { Message } from 'discord.js';
+import { ActionRow, ButtonComponent, ButtonStyle, ComponentType } from 'discord.js';
 import { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
 
 const PAGE_SIZE = 10;
