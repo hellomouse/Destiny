@@ -38,7 +38,6 @@
     "erlpack": "github:discord/erlpack",
     "ffmpeg-static": "^4.4.1",
     "fluent-ffmpeg": "^2.1.2",
-    "node-ipc": "^10.1.0",
     "semver": "^7.3.5",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.8",
