@@ -123,7 +123,7 @@ export function isURL(url: string): boolean {
  * @param {object} loaded
  * @return {string} ASCII table
  */
-export function showTable(loaded: { commands: Array<string>, events: Array<string> }) {
+export function showTable(loaded: { commands: Array<string>; events: Array<string> }) {
     let table = new AsciiTable('Loading content...');
     table.setHeading('Commands', 'Events');
     for (let i = 0; i <= Math.max(loaded.commands.length, loaded.events.length) - 1; i++)
