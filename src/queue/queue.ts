@@ -24,7 +24,6 @@ export class ServerQueue {
     public songs: Array<SongReference>;
     public volume: number;
     public loop: number;
-    public skipped: boolean;
     public index: number;
     public lastNowPlayingMessage?: Message;
     public ignoreNextSongEnd: boolean;
@@ -69,7 +68,6 @@ export class ServerQueue {
         this.songs = [];
         this.volume = ServerQueue.consts.DEFAULT_VOLUME;
         this.loop = LOOP_MODES['NONE']; // in LOOP_MODES
-        this.skipped = false;
 
         this.index = 0;
 
@@ -198,10 +196,9 @@ export class ServerQueue {
     async onSongFinish() {
         // this.isIdle() is used here because you could skip a song during playback or after it's ended
         // this.isSeeking is used here because the player is in the idle state
-        if (this.ignoreNextSongEnd && !this.isIdle() || this.isSeeking || this.skipped) {
+        if (this.ignoreNextSongEnd && !this.isIdle() || this.isSeeking) {
             this.ignoreNextSongEnd = false;
             this.isSeeking = false;
-            this.skipped = false;
             return;
         }
 
@@ -257,7 +254,6 @@ export class ServerQueue {
      * and advance the queue
      */
     skip() {
-        this.skipped = true;
         this.audioPlayer.stop();
         this.audioResource = undefined; // Remove reference to audio resource, to prevent memory leak
     }
@@ -271,7 +267,6 @@ export class ServerQueue {
             throw new RangeError('Position is out of bounds');
 
         this.index = position - 1; // Convert to 0-based index
-        this.skipped = true;
         this.ignoreNextSongEnd = true;
         this.audioPlayer.stop();
         this.audioResource = undefined; // Remove reference to audio resource, to prevent memory leak
@@ -285,7 +280,6 @@ export class ServerQueue {
      */
     clear(restoreDefaults = false) {
         this.skip();
-        this.skipped = false;
 
         for (let songReference of this.songs)
             songReference.song.references--;
