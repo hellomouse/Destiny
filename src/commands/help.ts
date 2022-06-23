@@ -52,8 +52,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
         // disable select menu after 2 minutes
         setTimeout(() => {
-            sentMessage.components[0].components[0].setDisabled(true);
-            sentMessage.edit({ components: sentMessage.components }).catch(console.error);
+            const disabledRow = new ActionRowBuilder<SelectMenuBuilder>().addComponents(selectMenu.setDisabled(true));
+            sentMessage.edit({ components: [disabledRow] }).catch(console.error);
         }, 120000);
     } else if (!detailedCommandHelp.has(args[0]))
         return message.channel.send({ embeds: [warningEmbed().setDescription('Command does not exist')] });
