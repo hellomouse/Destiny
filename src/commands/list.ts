@@ -1,4 +1,4 @@
-import { Message, ActionRow, ButtonComponent, ButtonStyle, ComponentType } from 'discord.js';
+import { Message, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import { configHandler } from '../configHandler.js';
 import type { Client } from '../types';
@@ -52,8 +52,8 @@ export const postLoad = async (client: Client) => {
 export const run = async (client: Client, message: Message, args: Array<string>): Promise<Message | void> => {
     let index = Math.max(0, Math.min(+args[0] - 1 | 0, pages.length - 1));
 
-    const row = new ActionRow();
-    row.addComponents(...ROW_BTN_EMOJI.map(emoji => new ButtonComponent()
+    const row = new ActionRowBuilder<ButtonBuilder>();
+    row.addComponents(...ROW_BTN_EMOJI.map(emoji => new ButtonBuilder()
         .setEmoji({ id: emoji })
         .setCustomId(emoji)
         .setDisabled(pages.length === 1)

@@ -3,7 +3,7 @@ import { songQueueEmpty } from '../embeds.js';
 import { LOOP_MODES, queueManager, ServerQueue } from '../queue.js';
 import type { Client } from '../types';
 import type { Message } from 'discord.js';
-import { ActionRow, ButtonComponent, ButtonStyle, ComponentType } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
 import { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
 
 const PAGE_SIZE = 10;
@@ -74,9 +74,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     let queuetxt = getQueueContent(page, serverQueue, maxPages);
 
-    const row = new ActionRow();
+    const row = new ActionRowBuilder<ButtonBuilder>();
     row.addComponents(...ROW_BTN_EMOJI.map((label, i) => {
-        let btn = new ButtonComponent()
+        let btn = new ButtonBuilder()
             .setCustomId(label + i)
             .setStyle(ButtonStyle.Primary);
         if (label.startsWith('emojii:'))
