@@ -53,12 +53,11 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let index = Math.max(0, Math.min(+args[0] - 1 | 0, pages.length - 1));
 
     const row = new ActionRowBuilder<ButtonBuilder>();
-    const buttons = ROW_BTN_EMOJI.map(emoji => new ButtonBuilder()
+    row.addComponents(...ROW_BTN_EMOJI.map(emoji => new ButtonBuilder()
         .setEmoji({ id: emoji })
         .setCustomId(emoji)
         .setDisabled(pages.length === 1)
-        .setStyle(ButtonStyle.Primary));
-    row.addComponents(...buttons);
+        .setStyle(ButtonStyle.Primary)));
 
     let sentMessage = await message.channel.send({
         content: pages[index],
@@ -67,8 +66,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     // disable buttons after 2 minutes
     setTimeout(() => {
-        const disabledRow = new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(...buttons.map(btn => btn.setDisabled(true)));
+        const disabledRow = new ActionRowBuilder<ButtonBuilder>(sentMessage.components[0].toJSON());
+        for (let button of disabledRow.components)
+            button.setDisabled(true);
         sentMessage.edit({ components: [disabledRow] }).catch(console.error);
     }, 120000);
 

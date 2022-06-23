@@ -21,8 +21,8 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const time = formatDuration(serverQueue.audioResource!.playbackDuration / 1000);
     const embed = songReference.song.getEmbed(
         songEmbed(songReference, 'Now Playing', false)
-            .addField({ name: 'Duration', value: `${time} / ${songReference.song.formattedDuration}`, inline: true })
-            .addField({ name: 'Action', value: serverQueue.isPaused() ? 'Paused' : 'Playing', inline: true })
+            .addFields({ name: 'Duration', value: `${time} / ${songReference.song.formattedDuration}`, inline: true })
+            .addFields({ name: 'Action', value: serverQueue.isPaused() ? 'Paused' : 'Playing', inline: true })
     );
 
     return message.channel.send({ embeds: [embed] });

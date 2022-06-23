@@ -52,7 +52,9 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
         // disable select menu after 2 minutes
         setTimeout(() => {
-            const disabledRow = new ActionRowBuilder<SelectMenuBuilder>().addComponents(selectMenu.setDisabled(true));
+            const disabledRow = new ActionRowBuilder<SelectMenuBuilder>(sentMessage.components[0].toJSON());
+            for (let select of disabledRow.components)
+                select.setDisabled(true);
             sentMessage.edit({ components: [disabledRow] }).catch(console.error);
         }, 120000);
     } else if (!detailedCommandHelp.has(args[0]))

@@ -111,7 +111,12 @@ async function load(client: Client) {
 
 import { ActivityType, Client as DiscordClient, GatewayIntentBits, Message } from 'discord.js';
 const client = new DiscordClient({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates]
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates
+    ]
 }) as Client;
 
 client.lastToken = null;
