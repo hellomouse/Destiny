@@ -57,7 +57,7 @@ export default async (client: Client, message: Message) => {
                 return message.reply({ embeds: [notInVoiceChannelEmbed()] } );
         }
 
-        if (message.channel.type !== 'GUILD_TEXT')
+        if (!['GUILD_TEXT', 'GUILD_VOICE'].includes(message.channel.type))
             return; // commands cannot be run in the other channel types for now
         try {
             await cmd.run(client, message, args);
