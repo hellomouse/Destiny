@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ComponentType, SelectMenuBuilder, SelectMenuOptionBuilder } from 'discord.js';
+import { ActionRowBuilder, ComponentType, SelectMenuBuilder } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import { defaultEmbed, warningEmbed } from '../embeds.js';
 import type { Client } from '../types';
@@ -28,13 +28,14 @@ export const run = async (client: Client, message: Message, args: Array<string>)
             .setPlaceholder('Select a command to view it\'s usage');
 
         for (let [commandName, help] of detailedCommandHelp)
-            selectMenu.addOptions(new SelectMenuOptionBuilder(
+            // For some reason, SelectMenuOptionBuilder does not work here, so we instead pass in the data directly
+            selectMenu.addOptions(
                 {
                     label: commandName,
                     value: commandName,
                     description: help.getDescription()
                 }
-            ));
+            );
 
         const row = new ActionRowBuilder<SelectMenuBuilder>().addComponents(selectMenu);
         let sentMessage = await message.channel.send({
