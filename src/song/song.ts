@@ -1,7 +1,7 @@
 import ffmpeg from 'fluent-ffmpeg';
 import Stream from 'stream';
 import { v4 as uuidv4 } from 'uuid';
-import type { MessageEmbed } from 'discord.js';
+import type { EmbedBuilder } from 'discord.js';
 import { formatDuration } from '../utils.js';
 
 /**
@@ -75,10 +75,10 @@ export abstract class Song {
 
     /**
      * Add fields for now playing embed
-     * @param {MessageEmbed} embed Embed to modify
-     * @return {MessageEmbed}
+     * @param {EmbedBuilder} embed Embed to modify
+     * @return {EmbedBuilder}
      */
-    getEmbed(embed: MessageEmbed) {
+    getEmbed(embed: EmbedBuilder) {
         return embed;
     }
 }

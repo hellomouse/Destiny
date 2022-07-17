@@ -1,5 +1,5 @@
 import ffmpeg from 'fluent-ffmpeg';
-import type { MessageEmbed } from 'discord.js';
+import type { EmbedBuilder } from 'discord.js';
 import { Song } from './song.js';
 
 /**
@@ -47,9 +47,9 @@ export class FileSong extends Song {
         return url;
     }
 
-    getEmbed(embed: MessageEmbed) {
-        if (this.artist) embed.addField('Artist', this.artist, true);
-        if (this.album) embed.addField('Album', this.album, true);
+    getEmbed(embed: EmbedBuilder) {
+        if (this.artist) embed.addFields({ name: 'Artist', value: this.artist, inline: true });
+        if (this.album) embed.addFields({ name: 'Album', value: this.album, inline: true });
         return embed;
     }
 

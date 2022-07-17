@@ -4,7 +4,7 @@ import { queueManager } from '../queue.js';
 import COMMAMD_REQUIREMENTS, { CommandHelpProvider } from '../commands.js';
 import type { Client } from '../types';
 import type { Message } from 'discord.js';
-import { Permissions } from 'discord.js';
+import { PermissionFlagsBits } from 'discord.js';
 
 /**
  * @description Make the bot join the current voice channel the user is in
@@ -20,9 +20,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const voiceChannel = message.member.voice.channel!;
     log(`voiceChannel: ${voiceChannel}`);
 
-    if (voiceChannel.members.has(message.guild!.me!.id)) return message.reply({ embeds: [warningEmbed().setDescription('I am already in this voice channel.')] });
+    const me = await message.guild!.members.fetchMe();
+    if (voiceChannel.members.has(me.id)) return message.reply({ embeds: [warningEmbed().setDescription('I am already in this voice channel.')] });
 
-    if (!voiceChannel.permissionsFor(message.guild!.me!).has([Permissions.FLAGS.SPEAK, Permissions.FLAGS.CONNECT]))
+    if (!voiceChannel.permissionsFor(me).has([PermissionFlagsBits.Speak, PermissionFlagsBits.Connect]))
         return message.channel.send({ embeds: [warningEmbed().setDescription(`Cannot join ${voiceChannel.toString()} due to \`Insufficient Permissions\``)] });
 
     log(`Joining ${voiceChannel.name}`);

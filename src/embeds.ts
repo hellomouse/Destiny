@@ -1,12 +1,12 @@
 import type { AudioPlayerError } from '@discordjs/voice';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import type ytpl from 'ytpl';
 import config from '../config.cjs';
 import type { Song, SongReference } from './song.js';
 import type { Command } from './types';
 
 // Default embed
-export const defaultEmbed = () => new MessageEmbed();
+export const defaultEmbed = () => new EmbedBuilder();
 // .setColor();
 // .setTimestamp();
 
@@ -25,9 +25,9 @@ export const helpEmbed = (cmd: Command) => {
         .setTitle(config.prefix + cmd.names[0]);
 
     if (cmd.help)
-        embed = embed.addField('Syntax', `\`${config.prefix}${cmd.names[0]} ${cmd.help.getSyntax()}\``, true);
+        embed = embed.addFields({ name: 'Syntax', value: `\`${config.prefix}${cmd.names[0]} ${cmd.help.getSyntax()}\``, inline: true });
     if (Array.isArray(cmd.names))
-        embed = embed.addField('Aliases', cmd.names.join(', '), true);
+        embed = embed.addFields({ name: 'Aliases', value: cmd.names.join(', '), inline: true });
 
     return embed;
 };

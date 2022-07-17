@@ -1,4 +1,4 @@
-import { MessageEmbed, Message } from 'discord.js';
+import { EmbedBuilder, Message } from 'discord.js';
 import ytdl from 'ytdl-core';
 import playlist from 'ytpl';
 import { Song } from './song.js';
@@ -75,8 +75,8 @@ export class YouTubeSong extends Song {
         return YouTubeSong.generateId(ytdl.getURLVideoID(url));
     }
 
-    getEmbed(embed: MessageEmbed) {
-        return embed.addField('YT Channel', this.artist || 'No artist', true);
+    getEmbed(embed: EmbedBuilder) {
+        return embed.addFields({ name: 'YT Channel', value: this.artist || 'No artist', inline: true });
     }
 
     /**

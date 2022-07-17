@@ -1,4 +1,4 @@
-import { MessageActionRow, MessageSelectMenu } from 'discord.js';
+import { ActionRowBuilder, ComponentType, SelectMenuBuilder, SelectMenuOptionBuilder } from 'discord.js';
 import { CommandHelpProvider } from '../commands.js';
 import { defaultEmbed, warningEmbed } from '../embeds.js';
 import type { Client } from '../types';
@@ -23,26 +23,26 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     let content = defaultEmbed();
     if (!args[0]) {
         content.setDescription('Use the dropdown to view help for a command').setTitle('Interactive help');
-        let selectMenu = new MessageSelectMenu()
+        let selectMenu = new SelectMenuBuilder()
             .setCustomId('select')
             .setPlaceholder('Select a command to view it\'s usage');
 
         for (let [commandName, help] of detailedCommandHelp)
-            selectMenu.addOptions([
-                {
+            selectMenu.addOptions(
+                new SelectMenuOptionBuilder({
                     label: commandName,
                     value: commandName,
                     description: help.getDescription()
-                }
-            ]);
+                })
+            );
 
-        const row = new MessageActionRow().addComponents(selectMenu);
+        const row = new ActionRowBuilder<SelectMenuBuilder>().addComponents(selectMenu);
         let sentMessage = await message.channel.send({
             embeds: [content],
             components: [row]
         });
 
-        sentMessage.createMessageComponentCollector({ componentType: 'SELECT_MENU', time: 120000 })
+        sentMessage.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: 120000 })
             .on('collect', async interaction => {
                 await sentMessage.edit({
                     embeds: [content.setDescription(detailedCommandHelp.get(interaction.values[0])!.text)]
@@ -52,8 +52,10 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
         // disable select menu after 2 minutes
         setTimeout(() => {
-            sentMessage.components[0].components[0].setDisabled(true);
-            sentMessage.edit({ components: sentMessage.components }).catch(console.error);
+            const disabledRow = new ActionRowBuilder<SelectMenuBuilder>(sentMessage.components[0].toJSON());
+            for (let select of disabledRow.components)
+                select.setDisabled(true);
+            sentMessage.edit({ components: [disabledRow] }).catch(console.error);
         }, 120000);
     } else if (!detailedCommandHelp.has(args[0]))
         return message.channel.send({ embeds: [warningEmbed().setDescription('Command does not exist')] });

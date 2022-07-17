@@ -1,4 +1,5 @@
-import { Collection, Message, MessageOptions, MessagePayload } from 'discord.js';
+import { ActionRowBuilder, Collection } from 'discord.js';
+import { ButtonBuilder, Message, MessageOptions, MessagePayload } from 'discord.js';
 import type { TextLikeChannels } from './types';
 
 class CustomMessage {
@@ -55,10 +56,10 @@ export class SongQueueMessage extends CustomMessage {
     disableButtons(messageToDisable = this.message) {
         if (!messageToDisable) return;
 
-        for (let button of messageToDisable.components[0].components)
+        const row = new ActionRowBuilder<ButtonBuilder>(messageToDisable.components[0].toJSON());
+        for (let button of row.components)
             button.setDisabled(true);
-
-        messageToDisable.edit({ components: messageToDisable.components }).catch(console.error);
+        messageToDisable.edit({ components: [row] }).catch(console.error);
     }
 
     async send(channel: TextLikeChannels, options: string | MessagePayload | MessageOptions) {

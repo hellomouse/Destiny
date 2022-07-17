@@ -96,7 +96,7 @@ async function load(client: Client) {
             activities: [
                 {
                     name: client.config.prefix + 'help',
-                    type: 'PLAYING'
+                    type: ActivityType.Playing
                 }
             ]
         });
@@ -109,9 +109,14 @@ async function load(client: Client) {
             command.postLoad(client);
 }
 
-import { Client as DiscordClient, Intents, Message } from 'discord.js';
+import { ActivityType, Client as DiscordClient, GatewayIntentBits, Message } from 'discord.js';
 const client = new DiscordClient({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates
+    ]
 }) as Client;
 
 client.lastToken = null;

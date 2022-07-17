@@ -3,7 +3,7 @@ import { songQueueEmpty } from '../embeds.js';
 import { LOOP_MODES, queueManager, ServerQueue } from '../queue.js';
 import type { Client } from '../types';
 import type { Message } from 'discord.js';
-import { MessageActionRow, MessageButton } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
 import { CommandArgument, CommandArgumentNecessity, CommandHelpProvider } from '../commands.js';
 
 const PAGE_SIZE = 10;
@@ -74,13 +74,13 @@ export const run = async (client: Client, message: Message, args: Array<string>)
 
     let queuetxt = getQueueContent(page, serverQueue, maxPages);
 
-    const row = new MessageActionRow();
+    const row = new ActionRowBuilder<ButtonBuilder>();
     row.addComponents(...ROW_BTN_EMOJI.map((label, i) => {
-        let btn = new MessageButton()
+        let btn = new ButtonBuilder()
             .setCustomId(label + i)
-            .setStyle('PRIMARY');
+            .setStyle(ButtonStyle.Primary);
         if (label.startsWith('emojii:'))
-            btn = btn.setEmoji(label.split(':')[1]);
+            btn = btn.setEmoji({ id: label.split(':')[1] });
         else
             btn = btn.setLabel(label);
         return btn;
@@ -92,7 +92,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
         components: [row]
     });
 
-    sentMessage?.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 })
+    sentMessage?.createMessageComponentCollector({ componentType: ComponentType.Button, time: 120000 })
         .on('collect', async interaction => {
             if (!interaction.isButton()) return;
             for (let i = 0; i < ROW_BTN_EMOJI.length; i++)
