@@ -20,7 +20,7 @@ export const run = async (client: Client, message: Message, args: Array<string>)
     const voiceChannel = message.member.voice.channel!;
     log(`voiceChannel: ${voiceChannel}`);
 
-    const me = await message.guild!.members.fetchMe();
+    const me = message.guild!.members.me!;
     if (voiceChannel.members.has(me.id)) return message.reply({ embeds: [warningEmbed().setDescription('I am already in this voice channel.')] });
 
     if (!voiceChannel.permissionsFor(me).has([PermissionFlagsBits.Speak, PermissionFlagsBits.Connect]))

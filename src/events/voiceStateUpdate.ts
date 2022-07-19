@@ -21,7 +21,7 @@ export default async (oldVoiceState: VoiceState, newVoiceState: VoiceState) => {
         serverQueue.voiceChannel = newVoiceState.channel;
 
     let voiceChannel = serverQueue.voiceChannel;
-    const clientId = (await newVoiceState.guild.members.fetchMe()).id;
+    const clientId = newVoiceState.guild.members.me!.id;
     const isInVC = voiceChannel.members.has(clientId);
 
     if (isInVC)
