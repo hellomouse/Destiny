@@ -29,7 +29,7 @@
     "@discordjs/voice": "^0.13.0",
     "@types/fluent-ffmpeg": "^2.1.20",
     "@types/semver": "^7.3.9",
-    "@types/uuid": "^8.3.4",
+    "@types/uuid": "^9.0.0",
     "ascii-table": "^0.0.9",
     "bufferutil": "^4.0.6",
     "discord.js": "^14.0.2",
