@@ -39,7 +39,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "semver": "^7.3.5",
     "sodium": "^3.0.2",
-    "utf-8-validate": "^5.0.8",
+    "utf-8-validate": "^6.0.0",
     "uuid": "^9.0.0",
     "ytdl-core": "4.11.2",
     "ytpl": "^2.2.3",
